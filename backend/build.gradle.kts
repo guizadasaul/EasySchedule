@@ -23,6 +23,10 @@ dependencies {
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
 
+	// Dependencia para la BD
+	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+	runtimeOnly("org.postgresql:postgresql")
+
 	// implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	// runtimeOnly("com.mysql:mysql-connector-j")
 	// testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
