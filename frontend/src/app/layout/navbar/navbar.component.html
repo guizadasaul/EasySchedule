@@ -1,0 +1,23 @@
+<nav class="navbar">
+  <span class="navbar__brand">EasySchedule</span>
+  <ul class="navbar__links">
+    <li>
+      <a routerLink="/home" routerLinkActive="active">Home</a>
+    </li>
+    <li>
+      <a routerLink="/malla" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Malla</a>
+    </li>
+    <li>
+      <a routerLink="/toma-de-materias" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Toma de Materias</a>
+    </li>
+    <li>
+      <a routerLink="/perfil" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Perfil</a>
+    </li>
+    <li>
+      <a routerLink="/login" routerLinkActive="active">Inicio de Sesión</a>
+    </li>
+    <li>
+      <a routerLink="/registro" routerLinkActive="active">Registro</a>
+    </li>
+  </ul>
+</nav>
