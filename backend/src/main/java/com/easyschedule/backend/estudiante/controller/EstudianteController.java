@@ -1,12 +1,15 @@
 package com.easyschedule.backend.estudiante.controller;
 
+import com.easyschedule.backend.auth.dto.RegistroRequest;
 import com.easyschedule.backend.estudiante.dto.EstudianteResponse;
 import com.easyschedule.backend.estudiante.dto.EstudianteUpdateRequest;
 import com.easyschedule.backend.estudiante.service.EstudianteService;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -14,6 +17,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/estudiantes")
@@ -44,5 +49,11 @@ public class EstudianteController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void delete(@PathVariable Long id) {
         estudianteService.delete(id);
+    }
+
+    @PostMapping("/registro")
+    public ResponseEntity<EstudianteResponse> register(@Valid @RequestBody RegistroRequest request) {
+        EstudianteResponse response = estudianteService.register(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 }

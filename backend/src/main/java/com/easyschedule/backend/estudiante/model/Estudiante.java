@@ -29,6 +29,15 @@ public class Estudiante {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false, length = 20, unique = true)
+    private String username;
+
+    @Column(nullable = false, length = 50, unique = true)
+    private String correo;
+
+    @Column(name = "password_hash", nullable = false)
+    private String passwordHash;
+
     @Column(nullable = true, length = 100)
     private String nombre;
 
@@ -80,6 +89,30 @@ public class Estudiante {
 
     public String getNombre() {
         return nombre;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getCorreo() {
+        return correo;
+    }
+
+    public void setCorreo(String correo) {
+        this.correo = correo;
+    }
+
+    public String getPasswordHash() {
+        return passwordHash;
+    }
+
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
     }
 
     public void setNombre(String nombre) {

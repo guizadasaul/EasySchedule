@@ -3,24 +3,24 @@
 @host = http://{{hostname}}:{{port}}
 
 
-### 1. Registrar un nuevo usuario (ÉXITO - 201)
-POST {{host}}/api/registro
+### 1. Registrar un nuevo estudiante con datos por defecto (ÉXITO - 201)
+POST {{host}}/api/estudiantes/registro
 Content-Type: application/json
 
 {
-  "username": "test4user",
+  "username": "test8user",
   "password": "password",
-  "email": "test4user@example.com"
+  "email": "test8user@example.com"
 }
 
 ### 2. Intentar registrar el mismo usuario (Error)
-POST {{host}}/api/registro
+POST {{host}}/api/estudiantes/registro
 Content-Type: application/json
 
 {
-  "username": "test5user",
+  "username": "test6user",
   "password": "password",
-  "email": "testuser@example.com"
+  "email": "test6user@example.com"
 }
 
 
