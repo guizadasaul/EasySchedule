@@ -1,29 +1,144 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+/* CONTENEDOR PRINCIPAL */
+
+.registro-container {
+  display: flex;
+  width: 100%;
+  min-height: calc(100vh - 70px);
+}
+
+/* IMAGEN IZQUIERDA */
+
+.registro-image {
+  flex: 1;
+  min-height: calc(100vh - 70px);
+  background-image: url("/library.jpg");
+  background-size: cover;
+  background-position: center;
+}
+
+/* PANEL DERECHO */
+
+.registro-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 60px;
+  background: #e8e3d9;
+}
+
+/* LOGO */
+
+.logo {
+  width: 90px;
+  height: 90px;
+  background: #4f6885;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+/* TITULO */
+
+h1 {
+  font-size: 42px;
+  margin-bottom: 30px;
+}
+
+/* FORMULARIO */
+
 .registro-form {
-    max-width: 420px;
-    margin: auto;
-    display: flex;
+  max-width: 420px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* GRUPOS */
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+/* INPUTS */
+
+input {
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid #aaa;
+  width: 100%;
+  font-size: 14px;
+}
+
+/* BOTONES */
+
+button {
+  padding: 12px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.btn-primary {
+  background: #6b84a3;
+  color: white;
+  font-size: 16px;
+}
+
+.btn-secondary {
+  background: #8a9fb8;
+  color: white;
+  font-size: 14px;
+}
+
+/* ERRORES */
+
+small {
+  color: red;
+  font-size: 12px;
+}
+
+/* LOADING */
+
+.loading {
+  font-size: 13px;
+  color: #555;
+}
+
+/* RESPONSIVE */
+
+@media (max-width: 900px) {
+
+  .registro-container {
     flex-direction: column;
-    gap: 10px;
   }
-  
-  input {
-    padding: 8px;
-    width: 100%;
+
+  .registro-image {
+    height: 250px;
+    min-height: 250px;
   }
-  
-  button {
-    padding: 10px;
+
+  .registro-panel {
+    padding: 30px;
+    align-items: center;
   }
-  
-  small {
-    color: red;
-    font-size: 12px;
+
+  .registro-form {
+    width: 90%;
   }
-  
-  @media (max-width: 600px) {
-  
-    .registro-form {
-      width: 90%;
-    }
-  
-  }
+
+}
