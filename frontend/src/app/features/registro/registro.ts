@@ -15,8 +15,11 @@ import { HttpClient } from '@angular/common/http';
 })
 export class Registro {
 
-  form: FormGroup;
+  successMessage = '';
+  errorMessage = '';
   loading = false;
+
+  form: FormGroup;
 
   constructor(private fb: FormBuilder, private http: HttpClient) {
 
@@ -43,30 +46,53 @@ export class Registro {
 
     return null;
   }
+
   registrar() {
 
     if (this.form.invalid) return;
-  
+
     this.loading = true;
-  
+    this.successMessage = '';
+    this.errorMessage = '';
+
     const payload = {
-      username: this.form.value.nombre + this.form.value.apellido,
+      username: this.form.value.nombre,
       email: this.form.value.correo,
       password: this.form.value.password
     };
-  
+
     this.http.post('http://localhost:8080/api/estudiantes/registro', payload)
       .subscribe({
-        next: (response) => {
-          console.log('Registro exitoso', response);
+
+        next: () => {
+
           this.loading = false;
+          this.successMessage = 'Registro exitoso. Redirigiendo...';
+
+          setTimeout(() => {
+            window.location.href = '/login';
+          }, 2000);
+
         },
-        error: (error) => {
-          console.error('Error en registro', error);
+
+        error: (err) => {
+
           this.loading = false;
+
+          if (err.status === 409) {
+            this.errorMessage = 'El correo ya está registrado';
+          }
+          else if (err.status === 400) {
+            this.errorMessage = 'Datos inválidos';
+          }
+          else {
+            this.errorMessage = 'Error del servidor. Intenta nuevamente';
+          }
+
         }
+
       });
-  
+
   }
 
 }

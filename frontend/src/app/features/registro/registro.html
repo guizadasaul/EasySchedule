@@ -63,8 +63,19 @@
         Ir a Iniciar Sesión
       </button>
 
+      <!-- Estado de carga -->
       <p *ngIf="loading" class="loading">
         Registrando usuario...
+      </p>
+
+      <!-- Mensaje de éxito -->
+      <p *ngIf="successMessage" class="success-message">
+        {{ successMessage }}
+      </p>
+
+      <!-- Mensaje de error -->
+      <p *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
       </p>
 
     </form>
