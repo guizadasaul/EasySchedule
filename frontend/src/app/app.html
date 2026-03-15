@@ -1,4 +1,7 @@
-<app-navbar />
-<main class="main-content">
+@if (showNavbar()) {
+  <app-navbar />
+}
+
+<main class="main-content" [class.main-content--auth]="!showNavbar()">
   <router-outlet />
 </main>

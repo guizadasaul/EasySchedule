@@ -2,6 +2,7 @@ import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { Registro } from './registro';
 import { ReactiveFormsModule } from '@angular/forms';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { provideRouter } from '@angular/router';
 
 describe('Registro Component', () => {
 
@@ -16,7 +17,8 @@ describe('Registro Component', () => {
         Registro,
         ReactiveFormsModule,
         HttpClientTestingModule
-      ]
+      ],
+      providers: [provideRouter([])],
     }).compileComponents();
 
     fixture = TestBed.createComponent(Registro);
@@ -38,7 +40,6 @@ describe('Registro Component', () => {
   it('debería crear el formulario con campos requeridos', () => {
 
     expect(component.form.contains('nombre')).toBeTrue();
-    expect(component.form.contains('apellido')).toBeTrue();
     expect(component.form.contains('correo')).toBeTrue();
     expect(component.form.contains('password')).toBeTrue();
     expect(component.form.contains('confirmPassword')).toBeTrue();
@@ -53,7 +54,6 @@ describe('Registro Component', () => {
 
     component.form.setValue({
       nombre: 'Eduardo',
-      apellido: 'Marin',
       correo: 'test@test.com',
       password: '12345678',
       confirmPassword: '12345678'
@@ -61,7 +61,7 @@ describe('Registro Component', () => {
 
     component.registrar();
 
-    const req = httpMock.expectOne('http://localhost:8080/api/estudiantes/registro');
+    const req = httpMock.expectOne('/api/registro');
 
     expect(req.request.method).toBe('POST');
 
@@ -75,7 +75,6 @@ describe('Registro Component', () => {
 
     component.form.setValue({
       nombre: 'Eduardo',
-      apellido: 'Marin',
       correo: 'test@test.com',
       password: '12345678',
       confirmPassword: '12345678'
@@ -83,7 +82,7 @@ describe('Registro Component', () => {
 
     component.registrar();
 
-    const req = httpMock.expectOne('http://localhost:8080/api/estudiantes/registro');
+    const req = httpMock.expectOne('/api/registro');
 
     req.flush(
       { message: 'correo existente' },
