@@ -27,7 +27,7 @@ export class Registro {
   successMessage = '';
   errorMessage = '';
   loading = false;
-  private readonly primaryRegisterPath = '/api/registro';
+  private readonly primaryRegisterPath = '/api/estudiantes/registro';
   private readonly fallbackRegisterPath = '/api/estudiantes/registro';
 
   form: FormGroup;
