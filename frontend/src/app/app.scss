@@ -1,11 +1,7 @@
 .main-content {
-  padding: 2rem 1.5rem;
-  max-width: 960px;
-  margin: 0 auto;
+  min-height: calc(100vh - var(--navbar-height));
 }
 
-.feature-page {
-  h2 {
-    margin-bottom: 0.5rem;
-  }
+.main-content--auth {
+  min-height: 100vh;
 }

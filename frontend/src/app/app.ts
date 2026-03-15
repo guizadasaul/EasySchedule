@@ -1,5 +1,7 @@
-import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
+import { filter, startWith } from 'rxjs';
 import { NavbarComponent } from './layout/navbar/navbar.component';
 
 @Component({
@@ -8,4 +10,26 @@ import { NavbarComponent } from './layout/navbar/navbar.component';
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })
-export class App {}
+export class App {
+  protected readonly showNavbar = signal(true);
+
+  private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
+
+  constructor() {
+    this.router.events
+      .pipe(
+        filter((event): event is NavigationEnd => event instanceof NavigationEnd),
+        startWith(null),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe(() => {
+        this.showNavbar.set(!this.isAuthRoute(this.router.url));
+      });
+  }
+
+  private isAuthRoute(url: string): boolean {
+    const cleanUrl = url.split('?')[0].split('#')[0];
+    return cleanUrl.startsWith('/login') || cleanUrl.startsWith('/registro');
+  }
+}

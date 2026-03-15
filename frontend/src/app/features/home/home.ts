@@ -2,12 +2,6 @@ import { Component, OnInit, signal } from '@angular/core';
 
 import { ApiService } from '../../services/api.service';
 
-interface HealthResponse {
-  status: string;
-  database: string;
-  error?: string;
-}
-
 @Component({
   selector: 'app-home',
   imports: [],
@@ -15,19 +9,19 @@ interface HealthResponse {
   styleUrl: './home.scss',
 })
 export class Home implements OnInit {
-  protected readonly healthStatus = signal<string>('Checking backend...');
+  protected readonly healthStatus = signal<string>('Comprobando conexión...');
 
   constructor(private readonly apiService: ApiService) {}
 
   ngOnInit(): void {
-    this.apiService.get<HealthResponse>('/health').subscribe({
-      next: (response) => {
-        this.healthStatus.set(
-          `GET /health OK -> status: ${response.status}, database: ${response.database}`,
-        );
+    this.apiService.get<unknown[]>('/api/estudiantes').subscribe({
+      next: () => {
+        this.healthStatus.set('Conexión exitosa');
       },
       error: (error) => {
-        this.healthStatus.set(`GET /health ERROR -> ${error.message}`);
+        this.healthStatus.set(
+          `Error de conexión: ${error.message}`,
+        );
       },
     });
   }
