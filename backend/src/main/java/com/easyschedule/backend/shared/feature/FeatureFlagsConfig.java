@@ -4,10 +4,9 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class FeatureFlagsConfig {
-
-    // Backend-owned defaults without external property files.
+    //here we have to activate the feature toggles
     private final boolean malla = false;
-    private final boolean tomaMaterias = false;
+    private final boolean tomaMaterias = true;
 
     public boolean isMalla() {
         return malla;

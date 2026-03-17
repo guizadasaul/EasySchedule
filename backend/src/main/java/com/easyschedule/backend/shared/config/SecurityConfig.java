@@ -34,6 +34,8 @@ public class SecurityConfig {
                 .requestMatchers("/api/estudiantes/**").permitAll()
                 // Permitir acceso público a los endpoints de mallas (para pruebas)
                 .requestMatchers("/api/mallas/**").permitAll()
+                // Permitir acceso público al endpoint de feature flags
+                .requestMatchers(HttpMethod.GET, "/api/features").permitAll()
                 // Requerir autenticación para cualquier otra petición
                 .anyRequest().authenticated()
             );

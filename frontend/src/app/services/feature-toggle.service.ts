@@ -13,10 +13,9 @@ export interface FeatureFlags {
   providedIn: 'root',
 })
 export class FeatureToggleService {
-  //here we change the flags
   private flags: FeatureFlags = {
-    malla: true,
-    tomaMaterias: true,
+    malla: false,
+    tomaMaterias: false,
   };
 
   constructor(private readonly http: HttpClient) {}
