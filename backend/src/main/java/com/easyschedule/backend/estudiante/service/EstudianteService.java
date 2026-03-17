@@ -7,6 +7,7 @@ import com.easyschedule.backend.auth.repositories.UserRepository;
 import com.easyschedule.backend.auth.service.AuthService;
 import com.easyschedule.backend.estudiante.dto.EstudianteResponse;
 import com.easyschedule.backend.estudiante.dto.EstudianteUpdateRequest;
+import com.easyschedule.backend.estudiante.dto.PerfilUpdateRequest;
 import com.easyschedule.backend.estudiante.model.Estudiante;
 import com.easyschedule.backend.estudiante.repository.EstudianteRepository;
 import com.easyschedule.backend.malla.model.Malla;
@@ -73,6 +74,58 @@ public class EstudianteService {
         estudiante.setMalla(malla);
 
         return toResponse(estudianteRepository.save(estudiante));
+    }
+
+    @Transactional
+    public EstudianteResponse updateProfile(String username, PerfilUpdateRequest request) {
+        Estudiante estudiante = estudianteRepository.findByUsernameIgnoreCase(username)
+            .orElseThrow(() -> new ResourceNotFoundException("Estudiante no encontrado con username: " + username));
+
+        User user = estudiante.getUser();
+        if (user == null) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "El estudiante no tiene un usuario asociado");
+        }
+
+        String usernameNormalizado = request.username().trim();
+        String emailNormalizado = request.email().trim().toLowerCase();
+        String carnetNormalizado = request.carnetIdentidad().trim();
+        String carreraNormalizada = request.carrera().trim();
+        String universidadNormalizada = request.universidad().trim();
+
+        if (!user.getUsername().equalsIgnoreCase(usernameNormalizado) && userRepository.existsByUsername(usernameNormalizado)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Error: El nombre de usuario ya está en uso");
+        }
+
+        if (!user.getEmail().equalsIgnoreCase(emailNormalizado) && userRepository.existsByEmail(emailNormalizado)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Error: El correo electrónico ya está registrado");
+        }
+
+        String carnetActual = estudiante.getCarnetIdentidad() == null ? "" : estudiante.getCarnetIdentidad();
+        if (!carnetActual.equalsIgnoreCase(carnetNormalizado)
+            && estudianteRepository.existsByCarnetIdentidadIgnoreCase(carnetNormalizado)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Error: El carnet de identidad ya está en uso");
+        }
+
+        Malla malla = mallaRepository.findFirstByCarreraIgnoreCaseAndUniversidadIgnoreCase(carreraNormalizada, universidadNormalizada)
+            .orElseThrow(() -> new ResourceNotFoundException(
+                "No existe una malla para la carrera '" + carreraNormalizada + "' y universidad '" + universidadNormalizada + "'"
+            ));
+
+        user.setUsername(usernameNormalizado);
+        user.setEmail(emailNormalizado);
+
+        estudiante.setUsername(usernameNormalizado);
+        estudiante.setCorreo(emailNormalizado);
+        estudiante.setNombre(request.nombre().trim());
+        estudiante.setApellido(request.apellido().trim());
+        estudiante.setCarnetIdentidad(carnetNormalizado);
+        estudiante.setFechaNacimiento(request.fechaNacimiento());
+        estudiante.setCarrera(carreraNormalizada);
+        estudiante.setMalla(malla);
+
+        userRepository.save(user);
+        Estudiante estudianteActualizado = estudianteRepository.save(estudiante);
+        return toResponse(estudianteActualizado);
     }
 
     public void delete(Long id) {

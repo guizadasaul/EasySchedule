@@ -3,6 +3,7 @@ package com.easyschedule.backend.estudiante.controller;
 import com.easyschedule.backend.auth.dto.RegistroRequest;
 import com.easyschedule.backend.estudiante.dto.EstudianteResponse;
 import com.easyschedule.backend.estudiante.dto.EstudianteUpdateRequest;
+import com.easyschedule.backend.estudiante.dto.PerfilUpdateRequest;
 import com.easyschedule.backend.estudiante.service.EstudianteService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -45,8 +46,16 @@ public class EstudianteController {
         return estudianteService.findByUsername(username);
     }
 
+    @PutMapping("/perfil/{username}")
+    public EstudianteResponse updateProfile(
+        @PathVariable String username,
+        @Valid @RequestBody PerfilUpdateRequest request
+    ) {
+        return estudianteService.updateProfile(username, request);
+    }
+
     @PutMapping("/{id}")
-    public EstudianteResponse update(@PathVariable Long id, @RequestBody EstudianteUpdateRequest request) {
+    public EstudianteResponse update(@PathVariable Long id, @Valid @RequestBody EstudianteUpdateRequest request) {
         return estudianteService.update(id, request);
     }
 
