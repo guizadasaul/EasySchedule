@@ -4,46 +4,46 @@
 
     <section class="registro-panel">
       <div class="logo" aria-hidden="true">
-        EASY
-        <span>SCHEDULE</span>
+        {{ 'brand.main' | translate }}
+        <span>{{ 'brand.sub' | translate }}</span>
       </div>
 
-      <h1 i18n="@@registro.title">Registro</h1>
+      <h1>{{ 'registro.title' | translate }}</h1>
 
       <form [formGroup]="form" (ngSubmit)="registrar()" class="registro-form" novalidate>
         <div class="form-group">
-          <label for="nombre" i18n="@@registro.label.username">Usuario</label>
-          <input id="nombre" type="text" formControlName="nombre" i18n-placeholder="@@registro.placeholder.username" placeholder="Ingresar Nombre de Usuario" />
-          <small *ngIf="form.get('nombre')?.touched && form.get('nombre')?.invalid" i18n="@@registro.validation.usernameRequired">El usuario es obligatorio</small>
+          <label for="nombre">{{ 'registro.label.username' | translate }}</label>
+          <input id="nombre" type="text" formControlName="nombre" [placeholder]="'registro.placeholder.username' | translate" />
+          <small *ngIf="form.get('nombre')?.touched && form.get('nombre')?.invalid">{{ 'registro.validation.usernameRequired' | translate }}</small>
         </div>
 
         <div class="form-group">
-          <label for="correo" i18n="@@registro.label.email">Email</label>
-          <input id="correo" type="email" formControlName="correo" i18n-placeholder="@@registro.placeholder.email" placeholder="Ingresar Email" />
-          <small *ngIf="form.get('correo')?.touched && form.get('correo')?.errors?.['required']" i18n="@@registro.validation.emailRequired">El correo es obligatorio</small>
-          <small *ngIf="form.get('correo')?.touched && form.get('correo')?.errors?.['email']" i18n="@@registro.validation.emailInvalid">Formato de correo inválido</small>
+          <label for="correo">{{ 'registro.label.email' | translate }}</label>
+          <input id="correo" type="email" formControlName="correo" [placeholder]="'registro.placeholder.email' | translate" />
+          <small *ngIf="form.get('correo')?.touched && form.get('correo')?.errors?.['required']">{{ 'registro.validation.emailRequired' | translate }}</small>
+          <small *ngIf="form.get('correo')?.touched && form.get('correo')?.errors?.['email']">{{ 'registro.validation.emailInvalid' | translate }}</small>
         </div>
 
         <div class="form-group">
-          <label for="password" i18n="@@registro.label.password">Contraseña</label>
-          <input id="password" type="password" formControlName="password" placeholder="************" />
-          <small *ngIf="form.get('password')?.touched && form.get('password')?.errors?.['minlength']" i18n="@@registro.validation.passwordMin">La contraseña debe tener mínimo 8 caracteres</small>
+          <label for="password">{{ 'registro.label.password' | translate }}</label>
+          <input id="password" type="password" formControlName="password" [placeholder]="'registro.placeholder.password' | translate" />
+          <small *ngIf="form.get('password')?.touched && form.get('password')?.errors?.['minlength']">{{ 'registro.validation.passwordMin' | translate }}</small>
         </div>
 
         <div class="form-group">
-          <label for="confirmPassword" i18n="@@registro.label.confirmPassword">Repetir Contraseña</label>
-          <input id="confirmPassword" type="password" formControlName="confirmPassword" placeholder="************" />
-          <small *ngIf="form.get('confirmPassword')?.touched && form.get('confirmPassword')?.errors?.['required']" i18n="@@registro.validation.confirmRequired">Debes confirmar tu contraseña</small>
-          <small *ngIf="form.get('confirmPassword')?.touched && form.errors?.['mismatch']" i18n="@@registro.validation.passwordMismatch">Las contraseñas no coinciden</small>
+          <label for="confirmPassword">{{ 'registro.label.confirmPassword' | translate }}</label>
+          <input id="confirmPassword" type="password" formControlName="confirmPassword" [placeholder]="'registro.placeholder.password' | translate" />
+          <small *ngIf="form.get('confirmPassword')?.touched && form.get('confirmPassword')?.errors?.['required']">{{ 'registro.validation.confirmRequired' | translate }}</small>
+          <small *ngIf="form.get('confirmPassword')?.touched && form.errors?.['mismatch']">{{ 'registro.validation.passwordMismatch' | translate }}</small>
         </div>
 
-        <button type="submit" class="btn-primary" [disabled]="form.invalid || loading" i18n="@@registro.button.submit">Registrarse</button>
-        <a routerLink="/login" class="btn-secondary" i18n="@@registro.button.gotoLogin">Ir a Iniciar Sesión</a>
-        <a routerLink="/home" class="btn-back" i18n="@@registro.button.backHome">Volver al inicio</a>
+        <button type="submit" class="btn-primary" [disabled]="form.invalid || loading">{{ 'registro.button.submit' | translate }}</button>
+        <a routerLink="/login" class="btn-secondary">{{ 'registro.button.gotoLogin' | translate }}</a>
+        <a routerLink="/home" class="btn-back">{{ 'registro.button.backHome' | translate }}</a>
 
-        <p *ngIf="loading" class="loading" i18n="@@registro.loading">Registrando usuario...</p>
-        <p *ngIf="successMessage" class="success-message">{{ successMessage }}</p>
-        <p *ngIf="errorMessage" class="error-message">{{ errorMessage }}</p>
+        <p *ngIf="loading" class="loading">{{ 'registro.loading' | translate }}</p>
+        <p *ngIf="successMessageKey" class="success-message">{{ successMessageKey | translate }}</p>
+        <p *ngIf="errorMessageKey" class="error-message">{{ errorMessageKey | translate }}</p>
       </form>
     </section>
   </div>
