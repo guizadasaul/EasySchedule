@@ -1,6 +1,6 @@
 <section class="perfil-page">
 	<header class="perfil-page__header">
-		<p class="perfil-page__eyebrow">{{ 'perfil.title' | translate }}</p>
+		<p class="perfil-page__eyebrow">{{ (editMode ? 'perfil.edit' : 'perfil.title') | translate }}</p>
 		<h1 class="perfil-page__name" *ngIf="!loading && perfil">{{ getNombreCompleto() }}</h1>
 	</header>
 
