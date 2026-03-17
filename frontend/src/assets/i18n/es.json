@@ -1,0 +1,92 @@
+{
+  "common": {
+    "language": {
+      "es": "ES",
+      "en": "EN",
+      "pt": "PT"
+    }
+  },
+  "brand": {
+    "main": "EASY",
+    "sub": "SCHEDULE"
+  },
+  "navbar": {
+    "home": "Inicio",
+    "malla": "Malla",
+    "tomaMaterias": "Toma de Materias",
+    "login": "Iniciar sesion",
+    "signup": "Registrarse",
+    "aria": {
+      "goHome": "Ir al inicio",
+      "profile": "Ir al perfil"
+    }
+  },
+  "home": {
+    "title": "EasySchedule",
+    "backendStatusLabel": "Estado de comunicacion con backend:",
+    "status": {
+      "checkingConnection": "Comprobando conexion...",
+      "connectionSuccess": "Conexion exitosa",
+      "connectionError": "Error de conexion: {{message}}"
+    }
+  },
+  "login": {
+    "title": "Login",
+    "email": "Correo",
+    "password": "Contrasena",
+    "placeholder": "Login Works!"
+  },
+  "malla": {
+    "placeholder": "Malla Works!",
+    "update": "Actualizar Malla",
+    "updatePlaceholder": "Actualizar Malla works!"
+  },
+  "tomaMaterias": {
+    "placeholder": "Toma de Materias Works!",
+    "subject": "Materia"
+  },
+  "materia": {
+    "placeholder": "Materia Works!"
+  },
+  "perfil": {
+    "placeholder": "Perfil Works!",
+    "edit": "Editar Perfil",
+    "editPlaceholder": "Editar Perfil Works!"
+  },
+  "registro": {
+    "title": "Registro",
+    "label": {
+      "username": "Usuario",
+      "email": "Email",
+      "password": "Contrasena",
+      "confirmPassword": "Repetir Contrasena"
+    },
+    "placeholder": {
+      "username": "Ingresar Nombre de Usuario",
+      "email": "Ingresar Email",
+      "password": "************"
+    },
+    "validation": {
+      "usernameRequired": "El usuario es obligatorio",
+      "emailRequired": "El correo es obligatorio",
+      "emailInvalid": "Formato de correo invalido",
+      "passwordMin": "La contrasena debe tener minimo 8 caracteres",
+      "confirmRequired": "Debes confirmar tu contrasena",
+      "passwordMismatch": "Las contrasenas no coinciden"
+    },
+    "button": {
+      "submit": "Registrarse",
+      "gotoLogin": "Ir a Iniciar Sesion",
+      "backHome": "Volver al inicio"
+    },
+    "loading": "Registrando usuario...",
+    "success": "Registro exitoso. Redirigiendo...",
+    "error": {
+      "userExists": "El usuario ya esta registrado",
+      "emailExists": "El correo ya esta registrado",
+      "invalidData": "Datos invalidos",
+      "backendConnection": "No se pudo conectar con el backend",
+      "server": "Error del servidor. Intenta nuevamente"
+    }
+  }
+}

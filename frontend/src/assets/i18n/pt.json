@@ -1,0 +1,92 @@
+{
+  "common": {
+    "language": {
+      "es": "ES",
+      "en": "EN",
+      "pt": "PT"
+    }
+  },
+  "brand": {
+    "main": "EASY",
+    "sub": "SCHEDULE"
+  },
+  "navbar": {
+    "home": "Início",
+    "malla": "Currículo",
+    "tomaMaterias": "Seleção de Disciplinas",
+    "login": "Entrar",
+    "signup": "Cadastrar-se",
+    "aria": {
+      "goHome": "Ir para a página inicial",
+      "profile": "Ir para o perfil"
+    }
+  },
+  "home": {
+    "title": "EasySchedule",
+    "backendStatusLabel": "Status da comunicação com o backend:",
+    "status": {
+      "checkingConnection": "Verificando conexão...",
+      "connectionSuccess": "Conexão realizada com sucesso",
+      "connectionError": "Erro de conexão: {{message}}"
+    }
+  },
+  "login": {
+    "title": "Entrar",
+    "email": "Email",
+    "password": "Senha",
+    "placeholder": "Login funcionando!"
+  },
+  "malla": {
+    "placeholder": "Currículo funcionando!",
+    "update": "Atualizar currículo",
+    "updatePlaceholder": "Atualização do currículo funcionando!"
+  },
+  "tomaMaterias": {
+    "placeholder": "Seleção de disciplinas funcionando!",
+    "subject": "Disciplina"
+  },
+  "materia": {
+    "placeholder": "Disciplina funcionando!"
+  },
+  "perfil": {
+    "placeholder": "Perfil funcionando!",
+    "edit": "Editar perfil",
+    "editPlaceholder": "Edição de perfil funcionando!"
+  },
+  "registro": {
+    "title": "Cadastro",
+    "label": {
+      "username": "Nome de usuário",
+      "email": "Email",
+      "password": "Senha",
+      "confirmPassword": "Confirmar senha"
+    },
+    "placeholder": {
+      "username": "Digite o nome de usuário",
+      "email": "Digite o email",
+      "password": "************"
+    },
+    "validation": {
+      "usernameRequired": "O nome de usuário é obrigatório",
+      "emailRequired": "O email é obrigatório",
+      "emailInvalid": "Formato de email inválido",
+      "passwordMin": "A senha deve ter pelo menos 8 caracteres",
+      "confirmRequired": "Você deve confirmar sua senha",
+      "passwordMismatch": "As senhas não coincidem"
+    },
+    "button": {
+      "submit": "Cadastrar",
+      "gotoLogin": "Ir para login",
+      "backHome": "Voltar para o início"
+    },
+    "loading": "Registrando usuário...",
+    "success": "Cadastro realizado com sucesso. Redirecionando...",
+    "error": {
+      "userExists": "O usuário já está registrado",
+      "emailExists": "O email já está registrado",
+      "invalidData": "Dados inválidos",
+      "backendConnection": "Não foi possível conectar ao backend",
+      "server": "Erro no servidor. Tente novamente"
+    }
+  }
+}

@@ -13,19 +13,12 @@
       "root": "",
       "sourceRoot": "src",
       "prefix": "app",
-      "i18n": {
-        "sourceLocale": "es",
-        "locales": {
-          "en": "src/locale/messages.en.xlf"
-        }
-      },
       "architect": {
         "build": {
           "builder": "@angular/build:application",
           "options": {
             "browser": "src/main.ts",
             "polyfills": [
-              "@angular/localize/init",
               "zone.js"
             ],
             "tsConfig": "tsconfig.app.json",
@@ -35,6 +28,11 @@
                 "glob": "**/*",
                 "input": "public"
 
+              },
+              {
+                "glob": "**/*",
+                "input": "src/assets",
+                "output": "assets"
               }
             ],
             "styles": [
@@ -49,7 +47,6 @@
                   "with": "src/environments/environment.ts"
                 }
               ],
-              "localize": true,
               "budgets": [
                 {
                   "type": "initial",
@@ -74,16 +71,6 @@
               "optimization": false,
               "extractLicenses": false,
               "sourceMap": true
-            },
-            "es": {
-              "localize": [
-                "es"
-              ]
-            },
-            "en": {
-              "localize": [
-                "en"
-              ]
             }
           },
           "defaultConfiguration": "production"
@@ -104,14 +91,10 @@
           },
           "defaultConfiguration": "development"
         },
-        "extract-i18n": {
-          "builder": "@angular/build:extract-i18n"
-        },
         "test": {
           "builder": "@angular/build:karma",
           "options": {
             "polyfills": [
-              "@angular/localize/init",
               "zone.js",
               "zone.js/testing"
             ],

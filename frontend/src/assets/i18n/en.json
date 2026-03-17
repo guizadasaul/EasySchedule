@@ -1,0 +1,92 @@
+{
+  "common": {
+    "language": {
+      "es": "ES",
+      "en": "EN",
+      "pt": "PT"
+    }
+  },
+  "brand": {
+    "main": "EASY",
+    "sub": "SCHEDULE"
+  },
+  "navbar": {
+    "home": "Home",
+    "malla": "Curriculum",
+    "tomaMaterias": "Course Selection",
+    "login": "Sign In",
+    "signup": "Sign Up",
+    "aria": {
+      "goHome": "Go to home",
+      "profile": "Go to profile"
+    }
+  },
+  "home": {
+    "title": "EasySchedule",
+    "backendStatusLabel": "Backend communication status:",
+    "status": {
+      "checkingConnection": "Checking connection...",
+      "connectionSuccess": "Connection successful",
+      "connectionError": "Connection error: {{message}}"
+    }
+  },
+  "login": {
+    "title": "Login",
+    "email": "Email",
+    "password": "Password",
+    "placeholder": "Login Works!"
+  },
+  "malla": {
+    "placeholder": "Curriculum Works!",
+    "update": "Update Curriculum",
+    "updatePlaceholder": "Update Curriculum works!"
+  },
+  "tomaMaterias": {
+    "placeholder": "Course Selection Works!",
+    "subject": "Subject"
+  },
+  "materia": {
+    "placeholder": "Subject Works!"
+  },
+  "perfil": {
+    "placeholder": "Profile Works!",
+    "edit": "Edit Profile",
+    "editPlaceholder": "Edit Profile Works!"
+  },
+  "registro": {
+    "title": "Register",
+    "label": {
+      "username": "Username",
+      "email": "Email",
+      "password": "Password",
+      "confirmPassword": "Repeat Password"
+    },
+    "placeholder": {
+      "username": "Enter Username",
+      "email": "Enter Email",
+      "password": "************"
+    },
+    "validation": {
+      "usernameRequired": "Username is required",
+      "emailRequired": "Email is required",
+      "emailInvalid": "Invalid email format",
+      "passwordMin": "Password must be at least 8 characters",
+      "confirmRequired": "You must confirm your password",
+      "passwordMismatch": "Passwords do not match"
+    },
+    "button": {
+      "submit": "Sign Up",
+      "gotoLogin": "Go to Sign In",
+      "backHome": "Back to home"
+    },
+    "loading": "Registering user...",
+    "success": "Registration successful. Redirecting...",
+    "error": {
+      "userExists": "User is already registered",
+      "emailExists": "Email is already registered",
+      "invalidData": "Invalid data",
+      "backendConnection": "Could not connect to backend",
+      "server": "Server error. Please try again"
+    }
+  }
+}

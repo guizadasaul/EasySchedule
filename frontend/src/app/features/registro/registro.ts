@@ -9,6 +9,7 @@ import {
 } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
 import { ApiService } from '../../services/api.service';
 
 @Component({
@@ -18,14 +19,15 @@ import { ApiService } from '../../services/api.service';
     CommonModule,
     ReactiveFormsModule,
     RouterLink,
+    TranslatePipe,
   ],
   templateUrl: './registro.html',
   styleUrls: ['./registro.scss']
 })
 export class Registro {
 
-  successMessage = '';
-  errorMessage = '';
+  successMessageKey = '';
+  errorMessageKey = '';
   loading = false;
   private readonly primaryRegisterPath = '/api/estudiantes/registro';
   private readonly fallbackRegisterPath = '/api/estudiantes/registro';
@@ -64,8 +66,8 @@ export class Registro {
     if (this.form.invalid) return;
 
     this.loading = true;
-    this.successMessage = '';
-    this.errorMessage = '';
+    this.successMessageKey = '';
+    this.errorMessageKey = '';
 
     const payload = {
       username: this.form.value.nombre,
@@ -85,7 +87,7 @@ export class Registro {
     this.apiService.post<void, typeof payload>(endpoint, payload).subscribe({
       next: () => {
         this.loading = false;
-        this.successMessage = $localize`:@@registro.success:Registro exitoso. Redirigiendo...`;
+        this.successMessageKey = 'registro.success';
 
         setTimeout(() => {
           this.router.navigateByUrl('/login');
@@ -101,15 +103,15 @@ export class Registro {
         const backendMessage = this.extractBackendMessage(err);
 
         if (err.status === 409 && backendMessage.includes('usuario')) {
-          this.errorMessage = $localize`:@@registro.error.userExists:El usuario ya está registrado`;
+          this.errorMessageKey = 'registro.error.userExists';
         } else if (err.status === 409 && backendMessage.includes('correo')) {
-          this.errorMessage = $localize`:@@registro.error.emailExists:El correo ya está registrado`;
+          this.errorMessageKey = 'registro.error.emailExists';
         } else if (err.status === 400) {
-          this.errorMessage = $localize`:@@registro.error.invalidData:Datos inválidos`;
+          this.errorMessageKey = 'registro.error.invalidData';
         } else if (err.status === 0) {
-          this.errorMessage = $localize`:@@registro.error.backendConnection:No se pudo conectar con el backend`;
+          this.errorMessageKey = 'registro.error.backendConnection';
         } else {
-          this.errorMessage = $localize`:@@registro.error.server:Error del servidor. Intenta nuevamente`;
+          this.errorMessageKey = 'registro.error.server';
         }
       },
     });
