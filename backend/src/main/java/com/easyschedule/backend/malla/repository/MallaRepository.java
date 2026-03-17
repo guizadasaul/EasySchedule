@@ -11,4 +11,6 @@ public interface MallaRepository extends JpaRepository<Malla, Long> {
 		String universidad,
 		String version
 	);
+
+	Optional<Malla> findFirstByCarreraIgnoreCaseAndUniversidadIgnoreCase(String carrera, String universidad);
 }

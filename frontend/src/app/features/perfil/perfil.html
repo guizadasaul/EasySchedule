@@ -87,9 +87,10 @@
 					<input type="text" formControlName="nombre" />
 				</label>
 
-				<label class="perfil-field">
+				<label class="perfil-field perfil-field--readonly">
 					<span>{{ 'perfil.fields.universidad' | translate }}</span>
-					<input type="text" formControlName="universidad" />
+					<small class="perfil-readonly-badge">{{ 'perfil.readOnly' | translate }}</small>
+					<input type="text" formControlName="universidad" readonly aria-readonly="true" />
 				</label>
 
 				<label class="perfil-field">
@@ -97,9 +98,10 @@
 					<input type="text" formControlName="apellido" />
 				</label>
 
-				<label class="perfil-field">
+				<label class="perfil-field perfil-field--readonly">
 					<span>{{ 'perfil.fields.carrera' | translate }}</span>
-					<input type="text" formControlName="carrera" />
+					<small class="perfil-readonly-badge">{{ 'perfil.readOnly' | translate }}</small>
+					<input type="text" formControlName="carrera" readonly aria-readonly="true" />
 				</label>
 
 				<label class="perfil-field">

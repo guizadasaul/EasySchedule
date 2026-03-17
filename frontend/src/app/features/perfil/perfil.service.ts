@@ -19,7 +19,8 @@ export class PerfilService {
 		return this.apiService.get<MallaResponse[]>('/api/mallas');
 	}
 
-	updatePerfil(estudianteId: number, payload: PerfilUpdateRequest): Observable<PerfilResponse> {
-		return this.apiService.put<PerfilResponse, PerfilUpdateRequest>(`/api/estudiantes/${estudianteId}`, payload);
+	updatePerfil(currentUsername: string, payload: PerfilUpdateRequest): Observable<PerfilResponse> {
+		const encodedUsername = encodeURIComponent(currentUsername);
+		return this.apiService.put<PerfilResponse, PerfilUpdateRequest>(`/api/estudiantes/perfil/${encodedUsername}`, payload);
 	}
 }

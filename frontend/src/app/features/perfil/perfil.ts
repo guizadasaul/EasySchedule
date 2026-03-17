@@ -6,7 +6,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 
 import { AuthSessionService } from '../../core/services/auth-session.service';
 import { LanguageService } from '../../core/services/language.service';
-import { MallaResponse, PerfilResponse, PerfilUpdateRequest } from './perfil.model';
+import {MallaResponse, PerfilResponse, PerfilUpdateRequest } from './perfil.model';
 import { PerfilService } from './perfil.service';
 
 type PerfilEditForm = FormGroup<{
@@ -34,7 +34,6 @@ export class Perfil implements OnInit {
   protected errorKey = '';
   protected successKey = '';
   protected readonly editForm: PerfilEditForm;
-
   private mallasDisponibles: MallaResponse[] = [];
 
   constructor(
@@ -56,15 +55,6 @@ export class Perfil implements OnInit {
   }
 
   ngOnInit(): void {
-    this.perfilService.getMallas().subscribe({
-      next: (mallas) => {
-        this.mallasDisponibles = mallas;
-      },
-      error: () => {
-        this.mallasDisponibles = [];
-      },
-    });
-
     const username = this.authSessionService.getCurrentUsername();
 
     if (!username) {
@@ -119,34 +109,26 @@ export class Perfil implements OnInit {
 
     const carrera = this.editForm.controls.carrera.value.trim();
     const universidad = this.editForm.controls.universidad.value.trim();
-    const mallaSeleccionada = this.buscarMalla(carrera, universidad);
-
-    if (!mallaSeleccionada) {
-      this.errorKey = 'perfil.error.mallaNotFound';
-      return;
-    }
+    const username = this.editForm.controls.username.value.trim();
+    const email = this.editForm.controls.email.value.trim();
 
     const updatePayload: PerfilUpdateRequest = {
+      username,
       nombre: this.editForm.controls.nombre.value.trim(),
       apellido: this.editForm.controls.apellido.value.trim(),
+      email,
       carnetIdentidad: this.editForm.controls.carnetIdentidad.value.trim(),
       fechaNacimiento: this.formatDateForApi(this.editForm.controls.fechaNacimiento.value),
-      semestreActual: this.perfil.semestreActual ?? 1,
       carrera,
-      mallaId: mallaSeleccionada.id,
+      universidad,
     };
 
     this.saving = true;
-    this.perfilService.updatePerfil(this.perfil.id, updatePayload).subscribe({
+    this.perfilService.updatePerfil(this.perfil.username, updatePayload).subscribe({
       next: (updatedPerfil) => {
         this.saving = false;
         this.editMode = false;
-        this.perfil = {
-          ...updatedPerfil,
-          username: this.editForm.controls.username.value.trim(),
-          email: this.editForm.controls.email.value.trim(),
-          universidad,
-        };
+        this.perfil = updatedPerfil;
         this.successKey = 'perfil.success.updated';
         this.authSessionService.setCurrentUsername(this.perfil.username);
         this.cargarFormulario(this.perfil);
