@@ -53,6 +53,7 @@
     "edit": "Edit Profile",
     "editPlaceholder": "Edit Profile Works!",
     "title": "Profile",
+    "readOnly": "Updated according to the curriculum.",
     "loading": "Loading profile data...",
     "avatarAlt": "User avatar",
     "fields": {

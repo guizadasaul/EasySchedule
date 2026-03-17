@@ -109,6 +109,17 @@
 	color: #1f2937;
 }
 
+.perfil-readonly-badge {
+	width: fit-content;
+	padding: 0.15rem 0.5rem;
+	border-radius: 999px;
+	font-size: 0.72rem;
+	font-weight: 700;
+	color: #1e3a8a;
+	background: #dbeafe;
+	border: 1px solid #93c5fd;
+}
+
 .perfil-field input {
 	height: 2.7rem;
 	border-radius: 999px;
@@ -117,6 +128,13 @@
 	background: color-mix(in srgb, var(--perfil-bg) 88%, white);
 	color: var(--perfil-text);
 	font-size: 0.95rem;
+}
+
+.perfil-field--readonly input {
+	background: #e2e8f0;
+	border-color: #94a3b8;
+	color: #475569;
+	cursor: not-allowed;
 }
 
 .perfil-edit-btn {

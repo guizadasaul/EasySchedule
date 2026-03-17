@@ -21,11 +21,12 @@ export interface MallaResponse {
 }
 
 export interface PerfilUpdateRequest {
+	username: string;
 	nombre: string;
 	apellido: string;
+	email: string;
 	carnetIdentidad: string;
 	fechaNacimiento: string;
-	semestreActual: number;
 	carrera: string;
-	mallaId: number;
+	universidad: string;
 }

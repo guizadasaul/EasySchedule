@@ -53,6 +53,7 @@
     "edit": "Editar perfil",
     "editPlaceholder": "Edicao de perfil funcionando!",
     "title": "Perfil",
+    "readOnly": "Atualiza-se conforme a grade curricular.",
     "loading": "Carregando dados do perfil...",
     "avatarAlt": "Avatar do usuario",
     "fields": {

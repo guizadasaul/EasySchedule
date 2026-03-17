@@ -53,6 +53,7 @@
     "edit": "Editar Perfil",
     "editPlaceholder": "Editar Perfil Works!",
     "title": "Perfil",
+    "readOnly": "Se actualiza según la malla.",
     "loading": "Cargando datos del perfil...",
     "avatarAlt": "Avatar del usuario",
     "fields": {
