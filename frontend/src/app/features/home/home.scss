@@ -4,6 +4,36 @@ $bg-cream: #F1EFE3;
 $card-border-pink: #D6A4A4; 
 $text-dark: #333333;        
 $text-white: #ffffff;
+$footer-bg: #333131;
+
+@mixin underline-decor($color, $height: 4px, $bottom: 0) {
+  position: relative;
+  display: inline-block;
+  width: fit-content;
+  padding-bottom: 0.5rem;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: $bottom;
+    left: 0;
+    width: 100%;
+    height: $height;
+    background-color: $color;
+    border-radius: $height / 2;
+  }
+}
+
+@mixin responsive-grid($min-width: 992px, $columns: 1fr 1fr) {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 3rem;
+  align-items: center;
+
+  @media (min-width: $min-width) {
+    grid-template-columns: $columns;
+  }
+}
 
 .home-principal {
   position: relative;
@@ -11,27 +41,15 @@ $text-white: #ffffff;
   min-height: 80vh; 
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  overflow: hidden;
   color: $text-white;
+  overflow: hidden;
 
   &-background {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    inset: 0; 
     z-index: 1;
-    
-    background-image: linear-gradient(
-      90deg, 
-      rgba(0, 0, 0, 0.7) 0%, 
-      rgba(0, 0, 0, 0.3) 100%
-    ), url('/ImagenPrincipalHome.jpg');
-    
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+    background: linear-gradient(90deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 100%), 
+                url('/ImagenPrincipalHome.jpg') center/cover no-repeat;
   }
 
   &-content {
@@ -41,7 +59,7 @@ $text-white: #ffffff;
     flex-direction: column;
     gap: 1.5rem;
     padding: 2rem;
-    max-width: 90%; 
+    max-width: 90%;
 
     @media (min-width: 768px) {
       margin-left: 10%; 
@@ -52,36 +70,19 @@ $text-white: #ffffff;
       font-family: 'Kaisei Opti', serif;
       font-size: clamp(2.5rem, 6vw, 6.875rem);
       line-height: 1.1;
-      margin: 0;
-      text-shadow: 2px 2px 4px rgba(0,0,0,0.3); 
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
     }
 
     .home-subtitle {
       font-family: 'Kadwa', serif;
       font-size: clamp(1.25rem, 2.5vw, 2.25rem);
-      margin: 0;
-      position: relative;
-      display: inline-block;
-      width: fit-content;
-      padding-bottom: 0.5rem;
-
-      &::after {
-        content: '';
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        height: 4px;
-        background-color: $accent-blue;
-        border-radius: 2px;
-      }
+      @include underline-decor($accent-blue);
     }
 
     p {
       font-family: 'Space Grotesk', sans-serif;
       font-size: clamp(1rem, 1.2vw, 1.25rem);
       line-height: 1.6;
-      margin: 0;
       max-width: 600px;
       opacity: 0.95;
     }
@@ -92,7 +93,6 @@ $text-white: #ffffff;
       font-family: 'Space Grotesk', sans-serif;
       font-size: 1.1rem;
       font-weight: 600;
-      
       padding: 1rem 2.5rem; 
       width: fit-content;
       border: none;
@@ -107,6 +107,140 @@ $text-white: #ffffff;
         box-shadow: 0 4px 15px rgba(0,0,0,0.3);
       }
     }
+  }
+}
+
+.content-sections {
+  padding: 4rem 1.5rem;
+  background-color: $bg-cream;
+  display: flex;
+  flex-direction: column;
+  gap: 6rem;
+
+  @media (min-width: 768px) { padding: 6rem 10%; }
+
+  .about-us {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    h2 { 
+      @include underline-decor($accent-blue);
+      font-family: 'Hanken Grotesk', sans-serif;
+      font-size: 64px;
+      font-weight: 700;
+      color: $primary-dark;
+      margin: 0 auto 3rem auto;
+      text-align: center;
+    }
+
+    &-container { @include responsive-grid(992px, 1fr 1.2fr); }
+
+    .home-aboutUs-image {
+      width: 100%;
+      height: 700px; 
+      border: $text-dark solid 5px;
+      border-radius: 40px; 
+      background: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.05)), 
+                  url('/Sobre-nosotros-image.jpg') center/cover;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1); 
+    }
+
+    &-text p {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 20px;
+      font-weight: 500;
+      line-height: 1.7;
+      color: $text-dark;
+      text-align: justify;
+      margin-bottom: 1.5rem;
+    }
+  }
+
+  .Questions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+
+    &-layout { @include responsive-grid(992px, 0.8fr 1.2fr); }
+
+    .questions-title h2 {
+      font-family: 'Kaisei Opti', serif;
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      color: $primary-dark;
+      text-align: center;
+      @media (min-width: 992px) { text-align: left; }
+    }
+
+    .faq-card {
+      background-color: $text-white;
+      padding: 2.5rem;
+      border-radius: 30px;
+      border: 1.5px solid $card-border-pink;
+      text-align: center;
+      transition: all 0.3s ease;
+      margin-bottom: 2rem;
+
+      &:hover { 
+        transform: translateY(-5px); 
+        box-shadow: 0 10px 20px rgba(0,0,0,0.05); 
+      }
+
+      h3 { 
+        font-family: 'Kadwa', serif; 
+        font-size: 1.25rem; 
+        color: $card-border-pink; 
+        margin-bottom: 1rem; 
+      }
+      p { 
+        font-family: 'Space Grotesk', sans-serif; 
+        color: #64748b; 
+        font-size: 1rem; 
+      }
+    }
+  }
+}
+
+.home-footer {
+  background-color: $footer-bg;
+  color: $text-white;
+  padding: 4rem 10% 2rem;
+  font-family: 'Space Grotesk', sans-serif;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 2rem;
+
+  .footer-col {
+    flex: 1;
+    min-width: 250px;
+
+    h4 {
+      @include underline-decor($text-white, 2px, 5px);
+      font-family: 'Hanken Grotesk', sans-serif;
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    p { font-size: 1rem; opacity: 0.9; margin: 0.8rem 0; line-height: 1.4; }
+  }
+
+  .social-icons-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 3rem;
+  }
+
+  .copyrigth {
+    width: 100%;
+    text-align: center;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 3px solid $text-white;
+    font-size: 0.9rem;
+    font-weight: 500;
   }
 }
 
@@ -129,146 +263,5 @@ $text-white: #ffffff;
     display: inline-block;
     max-width: 100%;
     overflow-x: auto;
-  }
-}
-.content-sections {
-  display: flex;
-  flex-direction: column;
-  gap: 6rem; 
-  padding: 4rem 1.5rem;
-  background-color: $bg-cream; 
-
-  @media (min-width: 768px) {
-    padding: 6rem 10%; 
-  }
-
-   @mixin section-title {
-    font-family: 'Hanken Grotesk';
-    font-size: clamp(2rem, 4vw, 3rem);
-    color: $primary-dark;
-    text-align: center;
-    position: relative;
-    display: inline-block;
-    width: fit-content;
-    margin: 0 auto 3rem auto; 
-    padding-bottom: 0.5rem;
-
-    &::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 4px;
-      background-color: $accent-blue;
-      border-radius: 2px;
-    }
-  }
-
-  .about-us {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-
-    h2 {
-      @include section-title; 
-    }
-
-    &-container {
-      display: grid;
-      grid-template-columns: 1fr; 
-      gap: 3rem;
-      align-items: center; 
-
-      @media (min-width: 992px) {
-        grid-template-columns: 1fr 1.2fr; 
-      }
-    }
-
-    .home-aboutUs-image {
-      width: 100%;
-      height: 700px; 
-      border:#333333 solid 5px;
-      border-radius: 40px; 
-      background-image: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.05)), url('/Sobre-nosotros-image.jpg'); 
-      background-size: cover;
-      background-position: center;
-      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1); 
-    }
-
-    &-text {
-      display: flex;
-      flex-direction: column;
-      gap: 1.5rem; 
-
-      p {
-        font-family: 'Space Grotesk', sans-serif;
-        font-size: 1.1rem;
-        line-height: 1.7;
-        color: $text-dark;
-        margin: 0;
-        text-align: justify; 
-      }
-    }
-  }
-
-  .Questions {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-
-    &-layout {
-      display: grid;
-      grid-template-columns: 1fr; 
-      gap: 3rem;
-      width: 100%;
-
-      @media (min-width: 992px) {
-        grid-template-columns: 0.8fr 1.2fr; 
-        align-items: center;
-      }
-    }
-
-    .questions-title h2 {
-      font-family: 'Kaisei Opti', serif;
-      font-size: clamp(2.5rem, 5vw, 4rem);
-      color: $primary-dark;
-      text-align: center;
-      margin: 0;
-
-      @media (min-width: 992px) {
-        text-align: left; 
-      }
-    }
-
-    .questions-cards {
-      display: flex;
-      flex-direction: column;
-      gap: 2rem; 
-    }
-
-    .faq-card {
-      background-color: $text-white; 
-      padding: 2.5rem; 
-      border-radius: 30px; 
-      border: 1.5px solid $card-border-pink; 
-      text-align: center;
-      transition: all 0.3s ease;
-
-      h3 {
-        font-family: 'Kadwa', serif; 
-        font-size: 1.25rem;
-        color: $card-border-pink; 
-        margin: 0 0 1rem 0;
-      }
-
-      p {
-        font-family: 'Space Grotesk', sans-serif;
-        font-size: 1rem;
-        line-height: 1.6;
-        color: #64748b; 
-        margin: 0;
-      }
-    }
   }
 }
