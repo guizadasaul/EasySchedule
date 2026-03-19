@@ -46,6 +46,18 @@
       "answer1": "EasySchedule utiliza un algoritmo inteligente para analizar tus requisitos académicos y objetivos. Procesa esta información en tiempo real para generar sugerencias personalizadas de cursos para tu próximo semestre, ayudándote a diseñar un camino académico eficiente.",
       "question2": "¿Es EasySchedule gratuito?",
       "answer2": "Sí, EasySchedule es completamente gratuito para los estudiantes. Creemos que cada estudiante debería tener acceso a herramientas que los ayuden a tener éxito académico sin ningún costo."
+    },
+    "footer":{
+      "subtitle1": "Términos y Políticas de Privacidad",
+      "subtitle2": "Contáctanos",
+      "subtitle3": "Ubicación",
+      "terms": "Términos y Condiciones",
+      "privacy": "Política de Privacidad",
+      "contact": "Para cualquier pregunta o soporte, por favor contáctanos en ",
+      "email": "support@easyschedule.com",
+      "phone": "+591 64363462",
+      "address": "123 Calle Universidad, Cochabamba, Bolivia",
+      "copyright": "Derechos de Autor @ 2022 Agency Creative. Todos los Derechos Reservados"
     }
   },
   "login": {

@@ -46,6 +46,18 @@
     "answer1": "EasySchedule uses an intelligent algorithm to analyze your academic requirements and goals. It processes this information in real time to generate personalized course suggestions for your next semester, helping you design an efficient academic path.",
     "question2": "Is EasySchedule free?",
     "answer2": "Yes, EasySchedule is completely free for students. We believe every student should have access to tools that help them succeed academically without any cost."
+  },
+  "footer":{
+    "subtitle1": "Terms and Privacy Policies",
+    "subtitle2": "Contact Us",
+    "subtitle3": "Ubication",
+    "terms": "Terms and Conditions",
+    "privacy": "Privacy Policy",
+    "contact": "For any questions or support, please contact us at ",
+    "email": "support@easyschedule.com",
+    "phone": "+591 64363462",
+    "address": "123 University Ave, Cochabamba, Bolivia",
+    "copyright": "Copyright @ 2022 Agency Creative. All Right Reserved"
   }
   },
   "login": {
