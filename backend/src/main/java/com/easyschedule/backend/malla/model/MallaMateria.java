@@ -7,6 +7,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Column;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
@@ -27,6 +28,9 @@ public class MallaMateria {
     @ManyToOne(optional = false)
     @JoinColumn(name = "materia_id", nullable = false)
     private Materia materia;
+
+    @Column(name = "semestre_sugerido", nullable = false)
+    private Short semestreSugerido;
 
     public MallaMateria() {
     }
@@ -59,5 +63,13 @@ public class MallaMateria {
 
     public void setMateria(Materia materia) {
         this.materia = materia;
+    }
+
+    public Short getSemestreSugerido() {
+        return semestreSugerido;
+    }
+
+    public void setSemestreSugerido(Short semestreSugerido) {
+        this.semestreSugerido = semestreSugerido;
     }
 }

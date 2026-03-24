@@ -16,6 +16,10 @@
     "tomaMaterias": "Toma de Materias",
     "login": "Iniciar sesion",
     "signup": "Registrarse",
+    "menu": {
+      "profile": "Ir al perfil",
+      "language": "Cambiar idioma"
+    },
     "aria": {
       "goHome": "Ir al inicio",
       "profile": "Ir al perfil"

@@ -13,7 +13,9 @@ public record EstudianteResponse(
     LocalDate fechaNacimiento,
     OffsetDateTime fechaRegistro,
     Short semestreActual,
-    String carrera,
-    Long mallaId
+    Long universidadId,
+    Long carreraId,
+    Long mallaId,
+    boolean profileCompleted
 ) {
 }

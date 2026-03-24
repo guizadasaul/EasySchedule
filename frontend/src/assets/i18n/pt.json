@@ -16,6 +16,10 @@
     "tomaMaterias": "Seleção de Disciplinas",
     "login": "Entrar",
     "signup": "Cadastrar-se",
+    "menu": {
+      "profile": "Ir para o perfil",
+      "language": "Mudar idioma"
+    },
     "aria": {
       "goHome": "Ir para a página inicial",
       "profile": "Ir para o perfil"

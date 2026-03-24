@@ -76,8 +76,8 @@ public class MateriaController {
     private Map<String, Long> toMap(Prerequisito prerequisito) {
         return Map.of(
             "id", prerequisito.getId(),
-            "materiaId", prerequisito.getMateria().getId(),
-            "prerequisitoId", prerequisito.getPrerequisito().getId()
+            "mallaMateriaId", prerequisito.getMallaMateria().getId(),
+            "prerequisitoMallaMateriaId", prerequisito.getPrerequisito().getId()
         );
     }
 }

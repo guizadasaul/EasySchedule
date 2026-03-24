@@ -3,6 +3,8 @@ package com.easyschedule.backend.materia.service;
 import com.easyschedule.backend.materia.dto.MateriaRequest;
 import com.easyschedule.backend.materia.dto.MateriaResponse;
 import com.easyschedule.backend.materia.dto.PrerequisitoRequest;
+import com.easyschedule.backend.malla.model.MallaMateria;
+import com.easyschedule.backend.malla.repository.MallaMateriaRepository;
 import com.easyschedule.backend.materia.model.Materia;
 import com.easyschedule.backend.materia.model.Prerequisito;
 import com.easyschedule.backend.materia.repository.MateriaRepository;
@@ -17,10 +19,16 @@ public class MateriaService {
 
     private final MateriaRepository materiaRepository;
     private final PrerequisitoRepository prerequisitoRepository;
+    private final MallaMateriaRepository mallaMateriaRepository;
 
-    public MateriaService(MateriaRepository materiaRepository, PrerequisitoRepository prerequisitoRepository) {
+    public MateriaService(
+        MateriaRepository materiaRepository,
+        PrerequisitoRepository prerequisitoRepository,
+        MallaMateriaRepository mallaMateriaRepository
+    ) {
         this.materiaRepository = materiaRepository;
         this.prerequisitoRepository = prerequisitoRepository;
+        this.mallaMateriaRepository = mallaMateriaRepository;
     }
 
     public List<MateriaResponse> findAllMaterias() {
@@ -35,8 +43,8 @@ public class MateriaService {
         Materia materia = new Materia();
         materia.setCodigo(request.codigo());
         materia.setNombre(request.nombre());
-        materia.setSemestreSugerido(request.semestreSugerido());
         materia.setCreditos(request.creditos());
+        materia.setActive(request.active() == null || request.active());
         return toResponse(materiaRepository.save(materia));
     }
 
@@ -44,8 +52,8 @@ public class MateriaService {
         Materia materia = getMateriaOrThrow(id);
         materia.setCodigo(request.codigo());
         materia.setNombre(request.nombre());
-        materia.setSemestreSugerido(request.semestreSugerido());
         materia.setCreditos(request.creditos());
+        materia.setActive(request.active() == null || request.active());
         return toResponse(materiaRepository.save(materia));
     }
 
@@ -59,12 +67,12 @@ public class MateriaService {
     }
 
     public Prerequisito createPrerequisito(PrerequisitoRequest request) {
-        Materia materia = getMateriaOrThrow(request.materiaId());
-        Materia prerequisitoMateria = getMateriaOrThrow(request.prerequisitoId());
+        MallaMateria mallaMateria = getMallaMateriaOrThrow(request.mallaMateriaId());
+        MallaMateria prerequisitoMallaMateria = getMallaMateriaOrThrow(request.prerequisitoMallaMateriaId());
 
         Prerequisito prerequisito = new Prerequisito();
-        prerequisito.setMateria(materia);
-        prerequisito.setPrerequisito(prerequisitoMateria);
+        prerequisito.setMallaMateria(mallaMateria);
+        prerequisito.setPrerequisito(prerequisitoMallaMateria);
         return prerequisitoRepository.save(prerequisito);
     }
 
@@ -79,13 +87,18 @@ public class MateriaService {
             .orElseThrow(() -> new ResourceNotFoundException("Materia no encontrada con id: " + id));
     }
 
+    private MallaMateria getMallaMateriaOrThrow(Long id) {
+        return mallaMateriaRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("MallaMateria no encontrada con id: " + id));
+    }
+
     private MateriaResponse toResponse(Materia materia) {
         return new MateriaResponse(
             materia.getId(),
             materia.getCodigo(),
             materia.getNombre(),
-            materia.getSemestreSugerido(),
-            materia.getCreditos()
+            materia.getCreditos(),
+            materia.isActive()
         );
     }
 }

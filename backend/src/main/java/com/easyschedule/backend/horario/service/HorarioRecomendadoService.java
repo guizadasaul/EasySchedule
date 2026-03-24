@@ -1,7 +1,7 @@
 package com.easyschedule.backend.horario.service;
 
-import com.easyschedule.backend.estudiante.model.Estudiante;
-import com.easyschedule.backend.estudiante.repository.EstudianteRepository;
+import com.easyschedule.backend.auth.models.User;
+import com.easyschedule.backend.auth.repositories.UserRepository;
 import com.easyschedule.backend.horario.dto.HorarioRecomendadoRequest;
 import com.easyschedule.backend.horario.dto.HorarioRecomendadoResponse;
 import com.easyschedule.backend.horario.model.HorarioRecomendado;
@@ -16,11 +16,14 @@ import java.util.List;
 public class HorarioRecomendadoService {
 
     private final HorarioRecomendadoRepository horarioRecomendadoRepository;
-    private final EstudianteRepository estudianteRepository;
+    private final UserRepository userRepository;
 
-    public HorarioRecomendadoService(HorarioRecomendadoRepository horarioRecomendadoRepository, EstudianteRepository estudianteRepository) {
+    public HorarioRecomendadoService(
+        HorarioRecomendadoRepository horarioRecomendadoRepository,
+        UserRepository userRepository
+    ) {
         this.horarioRecomendadoRepository = horarioRecomendadoRepository;
-        this.estudianteRepository = estudianteRepository;
+        this.userRepository = userRepository;
     }
 
     public List<HorarioRecomendadoResponse> findAll() {
@@ -32,10 +35,10 @@ public class HorarioRecomendadoService {
     }
 
     public HorarioRecomendadoResponse create(HorarioRecomendadoRequest request) {
-        Estudiante estudiante = getEstudianteOrThrow(request.estudianteId());
+        User user = getUserOrThrow(request.userId());
 
         HorarioRecomendado horario = new HorarioRecomendado();
-        horario.setEstudiante(estudiante);
+        horario.setUser(user);
         horario.setSemestre(request.semestre());
         horario.setJsonResultado(request.jsonResultado());
         horario.setFechaGeneracion(OffsetDateTime.now());
@@ -45,9 +48,9 @@ public class HorarioRecomendadoService {
 
     public HorarioRecomendadoResponse update(Long id, HorarioRecomendadoRequest request) {
         HorarioRecomendado horario = getOrThrow(id);
-        Estudiante estudiante = getEstudianteOrThrow(request.estudianteId());
+        User user = getUserOrThrow(request.userId());
 
-        horario.setEstudiante(estudiante);
+        horario.setUser(user);
         horario.setSemestre(request.semestre());
         horario.setJsonResultado(request.jsonResultado());
 
@@ -64,15 +67,15 @@ public class HorarioRecomendadoService {
             .orElseThrow(() -> new ResourceNotFoundException("HorarioRecomendado no encontrado con id: " + id));
     }
 
-    private Estudiante getEstudianteOrThrow(Long id) {
-        return estudianteRepository.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Estudiante no encontrado con id: " + id));
+    private User getUserOrThrow(Long id) {
+        return userRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con id: " + id));
     }
 
     private HorarioRecomendadoResponse toResponse(HorarioRecomendado horario) {
         return new HorarioRecomendadoResponse(
             horario.getId(),
-            horario.getEstudiante().getId(),
+            horario.getUser().getId(),
             horario.getSemestre(),
             horario.getJsonResultado(),
             horario.getFechaGeneracion()

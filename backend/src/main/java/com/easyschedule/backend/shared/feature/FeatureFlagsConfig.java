@@ -4,8 +4,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class FeatureFlagsConfig {
-    //here we have to activate the feature toggles
-    private final boolean malla = false;
+    private final boolean malla = true;
     private final boolean tomaMaterias = true;
 
     public boolean isMalla() {

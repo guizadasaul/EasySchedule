@@ -37,17 +37,19 @@ public class MallaService {
 
     public MallaResponse createMalla(MallaRequest request) {
         Malla malla = new Malla();
-        malla.setCarrera(request.carrera());
-        malla.setUniversidad(request.universidad());
+        malla.setCarreraId(request.carreraId());
+        malla.setNombre(request.nombre());
         malla.setVersion(request.version());
+        malla.setActive(request.active() == null || request.active());
         return toResponse(mallaRepository.save(malla));
     }
 
     public MallaResponse updateMalla(Long id, MallaRequest request) {
         Malla malla = getMallaOrThrow(id);
-        malla.setCarrera(request.carrera());
-        malla.setUniversidad(request.universidad());
+        malla.setCarreraId(request.carreraId());
+        malla.setNombre(request.nombre());
         malla.setVersion(request.version());
+        malla.setActive(request.active() == null || request.active());
         return toResponse(mallaRepository.save(malla));
     }
 
@@ -68,6 +70,7 @@ public class MallaService {
         MallaMateria mallaMateria = new MallaMateria();
         mallaMateria.setMalla(malla);
         mallaMateria.setMateria(materia);
+        mallaMateria.setSemestreSugerido(request.semestreSugerido());
         return mallaMateriaRepository.save(mallaMateria);
     }
 
@@ -83,6 +86,12 @@ public class MallaService {
     }
 
     private MallaResponse toResponse(Malla malla) {
-        return new MallaResponse(malla.getId(), malla.getCarrera(), malla.getUniversidad(), malla.getVersion());
+        return new MallaResponse(
+            malla.getId(),
+            malla.getCarreraId(),
+            malla.getNombre(),
+            malla.getVersion(),
+            malla.isActive()
+        );
     }
 }

@@ -9,7 +9,8 @@ public record EstudianteUpdateRequest(
     String carnetIdentidad,
     LocalDate fechaNacimiento,
     Short semestreActual,
-    String carrera,
+    Long universidadId,
+    Long carreraId,
     Long mallaId
 ) {
 }
