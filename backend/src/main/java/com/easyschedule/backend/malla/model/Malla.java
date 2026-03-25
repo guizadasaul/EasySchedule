@@ -14,8 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "malla", uniqueConstraints = {
-    @UniqueConstraint(name = "uq_malla", columnNames = {"carrera", "universidad", "version"})
+@Table(name = "mallas", uniqueConstraints = {
+    @UniqueConstraint(name = "uq_mallas_carrera_version", columnNames = {"carrera_id", "version"})
 })
 public class Malla {
 
@@ -23,14 +23,17 @@ public class Malla {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, length = 120)
-    private String carrera;
+    @Column(name = "carrera_id", nullable = false)
+    private Long carreraId;
 
-    @Column(nullable = false, length = 150)
-    private String universidad;
+    @Column(length = 150)
+    private String nombre;
 
     @Column(nullable = false, length = 30)
     private String version;
+
+    @Column(nullable = false)
+    private boolean active = true;
 
     @OneToMany(mappedBy = "malla")
     private List<Estudiante> estudiantes = new ArrayList<>();
@@ -41,10 +44,10 @@ public class Malla {
     public Malla() {
     }
 
-    public Malla(Long id, String carrera, String universidad, String version) {
+    public Malla(Long id, Long carreraId, String nombre, String version) {
         this.id = id;
-        this.carrera = carrera;
-        this.universidad = universidad;
+        this.carreraId = carreraId;
+        this.nombre = nombre;
         this.version = version;
     }
 
@@ -56,20 +59,20 @@ public class Malla {
         this.id = id;
     }
 
-    public String getCarrera() {
-        return carrera;
+    public Long getCarreraId() {
+        return carreraId;
     }
 
-    public void setCarrera(String carrera) {
-        this.carrera = carrera;
+    public void setCarreraId(Long carreraId) {
+        this.carreraId = carreraId;
     }
 
-    public String getUniversidad() {
-        return universidad;
+    public String getNombre() {
+        return nombre;
     }
 
-    public void setUniversidad(String universidad) {
-        this.universidad = universidad;
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
     }
 
     public String getVersion() {
@@ -78,6 +81,14 @@ public class Malla {
 
     public void setVersion(String version) {
         this.version = version;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 
     public List<Estudiante> getEstudiantes() {

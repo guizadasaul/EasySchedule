@@ -56,6 +56,21 @@ NO sobrescribir por variables de entorno:
 
 Referencia: `backend/.env.example`
 
+La estructura de base de datos se inicializa desde un unico archivo:
+
+- `backend/src/main/resources/db/schema.sql`
+
+Ese archivo contiene tablas, constraints e inserciones base de universidades.
+
+Si ya tenias una base previa del modelo anterior, recrea la base para evitar inconsistencias de esquema:
+
+```sql
+DROP DATABASE IF EXISTS "EasySchedule";
+CREATE DATABASE "EasySchedule";
+```
+
+Luego vuelve a levantar backend con `./gradlew bootRun` para que se aplique `schema.sql`.
+
 ## 2) Levantar backend
 
 ```bash

@@ -1,7 +1,7 @@
 package com.easyschedule.backend.toma_materia.model;
 
-import com.easyschedule.backend.estudiante.model.Estudiante;
-import com.easyschedule.backend.materia.model.Materia;
+import com.easyschedule.backend.auth.models.User;
+import com.easyschedule.backend.malla.model.MallaMateria;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -15,8 +15,8 @@ import jakarta.persistence.UniqueConstraint;
 import java.time.OffsetDateTime;
 
 @Entity
-@Table(name = "toma_materia", uniqueConstraints = {
-    @UniqueConstraint(name = "uq_toma_materia", columnNames = {"estudiante_id", "materia_id"})
+@Table(name = "estado_materia_estudiante", uniqueConstraints = {
+    @UniqueConstraint(name = "uq_estado_materia_estudiante", columnNames = {"user_id", "malla_materia_id"})
 })
 public class TomaMateria {
 
@@ -25,12 +25,12 @@ public class TomaMateria {
     private Long id;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "estudiante_id", nullable = false)
-    private Estudiante estudiante;
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "materia_id", nullable = false)
-    private Materia materia;
+    @JoinColumn(name = "malla_materia_id", nullable = false)
+    private MallaMateria mallaMateria;
 
     @Column(nullable = false, length = 20)
     private String estado;
@@ -49,20 +49,20 @@ public class TomaMateria {
         this.id = id;
     }
 
-    public Estudiante getEstudiante() {
-        return estudiante;
+    public User getUser() {
+        return user;
     }
 
-    public void setEstudiante(Estudiante estudiante) {
-        this.estudiante = estudiante;
+    public void setUser(User user) {
+        this.user = user;
     }
 
-    public Materia getMateria() {
-        return materia;
+    public MallaMateria getMallaMateria() {
+        return mallaMateria;
     }
 
-    public void setMateria(Materia materia) {
-        this.materia = materia;
+    public void setMallaMateria(MallaMateria mallaMateria) {
+        this.mallaMateria = mallaMateria;
     }
 
     public String getEstado() {

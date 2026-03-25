@@ -1,7 +1,7 @@
 package com.easyschedule.backend.horario.dto;
 
 public record HorarioRecomendadoRequest(
-    Long estudianteId,
+    Long userId,
     String semestre,
     String jsonResultado
 ) {

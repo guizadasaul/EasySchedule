@@ -1,42 +1,32 @@
 package com.easyschedule.backend.estudiante.model;
 
 import com.easyschedule.backend.auth.models.User;
-import com.easyschedule.backend.horario.model.HorarioRecomendado;
 import com.easyschedule.backend.malla.model.Malla;
-import com.easyschedule.backend.oferta.model.Oferta;
-import com.easyschedule.backend.toma_materia.model.TomaMateria;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
-@Table(name = "estudiante")
+@Table(name = "student_profiles")
 public class Estudiante {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "user_id")
     private Long id;
 
-    @Column(nullable = false, length = 20, unique = true)
+    @Column(nullable = false, unique = true, length = 20)
     private String username;
 
-    @Column(nullable = false, length = 50, unique = true)
+    @Column(name = "correo", nullable = false, unique = true, length = 50)
     private String correo;
-
-    @Column(name = "password_hash", nullable = false)
-    private String passwordHash;
 
     @Column(nullable = true, length = 100)
     private String nombre;
@@ -56,25 +46,23 @@ public class Estudiante {
     @Column(name = "semestre_actual", nullable = true)
     private Short semestreActual;
 
-    @Column(nullable = true, length = 120)
-    private String carrera;
+    @Column(name = "universidad_id")
+    private Long universidadId;
+
+    @Column(name = "carrera_id")
+    private Long carreraId;
 
     @ManyToOne(optional = true)
     @JoinColumn(name = "malla_id", nullable = true)
     private Malla malla;
 
+    @Column(name = "profile_completed", nullable = false)
+    private boolean profileCompleted;
+
+    @MapsId
     @OneToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
-
-    @OneToMany(mappedBy = "estudiante")
-    private List<TomaMateria> tomasMateria = new ArrayList<>();
-
-    @OneToMany(mappedBy = "estudiante")
-    private List<Oferta> ofertas = new ArrayList<>();
-
-    @OneToMany(mappedBy = "estudiante")
-    private List<HorarioRecomendado> horariosRecomendados = new ArrayList<>();
 
     public Estudiante() {
     }
@@ -85,10 +73,6 @@ public class Estudiante {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public String getNombre() {
-        return nombre;
     }
 
     public String getUsername() {
@@ -107,12 +91,8 @@ public class Estudiante {
         this.correo = correo;
     }
 
-    public String getPasswordHash() {
-        return passwordHash;
-    }
-
-    public void setPasswordHash(String passwordHash) {
-        this.passwordHash = passwordHash;
+    public String getNombre() {
+        return nombre;
     }
 
     public void setNombre(String nombre) {
@@ -159,12 +139,20 @@ public class Estudiante {
         this.semestreActual = semestreActual;
     }
 
-    public String getCarrera() {
-        return carrera;
+    public Long getUniversidadId() {
+        return universidadId;
     }
 
-    public void setCarrera(String carrera) {
-        this.carrera = carrera;
+    public void setUniversidadId(Long universidadId) {
+        this.universidadId = universidadId;
+    }
+
+    public Long getCarreraId() {
+        return carreraId;
+    }
+
+    public void setCarreraId(Long carreraId) {
+        this.carreraId = carreraId;
     }
 
     public Malla getMalla() {
@@ -183,15 +171,12 @@ public class Estudiante {
         this.user = user;
     }
 
-    public List<TomaMateria> getTomasMateria() {
-        return tomasMateria;
+    public boolean isProfileCompleted() {
+        return profileCompleted;
     }
 
-    public List<Oferta> getOfertas() {
-        return ofertas;
+    public void setProfileCompleted(boolean profileCompleted) {
+        this.profileCompleted = profileCompleted;
     }
 
-    public List<HorarioRecomendado> getHorariosRecomendados() {
-        return horariosRecomendados;
-    }
 }

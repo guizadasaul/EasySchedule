@@ -6,8 +6,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.Set;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,10 +18,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.easyschedule.backend.auth.models.ERole;
-import com.easyschedule.backend.auth.models.Role;
 import com.easyschedule.backend.auth.models.User;
-import com.easyschedule.backend.auth.repositories.RoleRepository;
 import com.easyschedule.backend.auth.repositories.UserRepository;
 
 @SpringBootTest
@@ -39,18 +34,11 @@ class AuthRegistrationIntegrationTest {
     private UserRepository userRepository;
 
     @Autowired
-    private RoleRepository roleRepository;
-
-    @Autowired
     private PasswordEncoder passwordEncoder;
-
-    private Role roleUser;
 
     @BeforeEach
     void setUp() {
         userRepository.deleteAll();
-        roleUser = roleRepository.findByName(ERole.ROLE_USER)
-                .orElseGet(() -> roleRepository.save(new Role(ERole.ROLE_USER)));
     }
 
     @AfterEach
@@ -59,13 +47,12 @@ class AuthRegistrationIntegrationTest {
     }
 
     @Test
-    void registerEndpointCreatesUserAndAssignsRole() throws Exception {
+    void registerEndpointCreatesUser() throws Exception {
         String requestBody = """
                 {
                   "username": "integration_user",
                   "email": "integration_user@mail.com",
-                  "password": "123456",
-                  "role": ["user"]
+                  "password": "123456"
                 }
                 """;
 
@@ -77,22 +64,19 @@ class AuthRegistrationIntegrationTest {
         User createdUser = userRepository.findByUsername("integration_user").orElseThrow();
 
         assertNotNull(createdUser.getId());
-        assertTrue(passwordEncoder.matches("123456", createdUser.getPassword()));
-        assertTrue(createdUser.getRoles().stream().map(Role::getName).anyMatch(name -> name == ERole.ROLE_USER));
+        assertTrue(passwordEncoder.matches("123456", createdUser.getPasswordHash()));
     }
 
     @Test
     void registerEndpointReturnsConflictWhenUsernameAlreadyExists() throws Exception {
         User existing = new User("integration_user", "first@mail.com", passwordEncoder.encode("123456"));
-        existing.setRoles(Set.of(roleUser));
         userRepository.save(existing);
 
         String requestBody = """
                 {
                   "username": "integration_user",
                   "email": "second@mail.com",
-                  "password": "123456",
-                  "role": ["user"]
+                  "password": "123456"
                 }
                 """;
 

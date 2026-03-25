@@ -4,7 +4,7 @@ public record MateriaResponse(
     Long id,
     String codigo,
     String nombre,
-    Short semestreSugerido,
-    Short creditos
+    Short creditos,
+    boolean active
 ) {
 }

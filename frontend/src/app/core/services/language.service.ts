@@ -6,10 +6,6 @@ import { TranslateService } from '@ngx-translate/core';
   providedIn: 'root',
 })
 export class LanguageService {
-    /* here we can add more languages in the future if needed
-    after that we go to navbar.component.html and add buttons 
-    to change the language and in the html files we change the 
-    text to use the translate pipe */
   private readonly supportedLanguages = ['es', 'en', 'pt'];
   private currentLanguage = 'es';
 

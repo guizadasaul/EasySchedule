@@ -16,6 +16,10 @@
     "tomaMaterias": "Course Selection",
     "login": "Sign In",
     "signup": "Sign Up",
+    "menu": {
+      "profile": "Go to profile",
+      "language": "Change language"
+    },
     "aria": {
       "goHome": "Go to home",
       "profile": "Go to profile"

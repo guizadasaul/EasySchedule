@@ -2,13 +2,10 @@ package com.easyschedule.backend.auth.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,10 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.easyschedule.backend.auth.dto.request.SignupRequest;
-import com.easyschedule.backend.auth.models.ERole;
-import com.easyschedule.backend.auth.models.Role;
 import com.easyschedule.backend.auth.models.User;
-import com.easyschedule.backend.auth.repositories.RoleRepository;
 import com.easyschedule.backend.auth.repositories.UserRepository;
 import com.easyschedule.backend.shared.exception.UserAlreadyExistsException;
 
@@ -32,9 +26,6 @@ class AuthServiceTest {
 
     @Mock
     private UserRepository userRepository;
-
-    @Mock
-    private RoleRepository roleRepository;
 
     @Mock
     private PasswordEncoder encoder;
@@ -53,13 +44,10 @@ class AuthServiceTest {
     }
 
     @Test
-    void registerUserSavesUserWithEncodedPasswordAndRole() {
-        Role roleUser = new Role(ERole.ROLE_USER);
-
+    void registerUserSavesUserWithEncodedPassword() {
         when(userRepository.existsByUsername("testuser")).thenReturn(false);
         when(userRepository.existsByEmail("testuser@mail.com")).thenReturn(false);
         when(encoder.encode("123456")).thenReturn("encoded-password");
-        when(roleRepository.findByName(ERole.ROLE_USER)).thenReturn(Optional.of(roleUser));
 
         authService.registerUser(request);
 
@@ -69,8 +57,7 @@ class AuthServiceTest {
 
         assertEquals("testuser", savedUser.getUsername());
         assertEquals("testuser@mail.com", savedUser.getEmail());
-        assertEquals("encoded-password", savedUser.getPassword());
-        assertTrue(savedUser.getRoles().contains(roleUser));
+        assertEquals("encoded-password", savedUser.getPasswordHash());
     }
 
     @Test
@@ -97,17 +84,4 @@ class AuthServiceTest {
         verify(userRepository, never()).save(any());
     }
 
-    @Test
-    void registerUserThrowsWhenRoleUserDoesNotExist() {
-        when(userRepository.existsByUsername("testuser")).thenReturn(false);
-        when(userRepository.existsByEmail("testuser@mail.com")).thenReturn(false);
-        when(encoder.encode("123456")).thenReturn("encoded-password");
-        when(roleRepository.findByName(ERole.ROLE_USER)).thenReturn(Optional.empty());
-
-        RuntimeException ex = assertThrows(RuntimeException.class,
-                () -> authService.registerUser(request));
-
-        assertTrue(ex.getMessage().contains("No se encontró el rol solicitado"));
-        verify(userRepository, never()).save(any());
-    }
 }
