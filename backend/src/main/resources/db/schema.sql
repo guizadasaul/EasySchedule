@@ -4,8 +4,8 @@ CREATE EXTENSION IF NOT EXISTS citext;
 
 CREATE TABLE IF NOT EXISTS users (
     id BIGSERIAL PRIMARY KEY,
-    username CITEXT NOT NULL UNIQUE,
-    email CITEXT NOT NULL UNIQUE,
+    username VARCHAR(20) NOT NULL UNIQUE,
+    email VARCHAR(50) NOT NULL UNIQUE,
     password_hash TEXT NOT NULL,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     token_version INTEGER NOT NULL DEFAULT 0,
@@ -71,8 +71,8 @@ CREATE TABLE IF NOT EXISTS prerequisitos (
 
 CREATE TABLE IF NOT EXISTS student_profiles (
     user_id BIGINT PRIMARY KEY,
-    username CITEXT NOT NULL UNIQUE,
-    correo CITEXT NOT NULL UNIQUE,
+    username VARCHAR(20) NOT NULL UNIQUE,
+    correo VARCHAR(50) NOT NULL UNIQUE,
     nombre VARCHAR(100),
     apellido VARCHAR(100),
     carnet_identidad VARCHAR(30) UNIQUE,
@@ -90,8 +90,8 @@ CREATE TABLE IF NOT EXISTS student_profiles (
     CONSTRAINT ck_student_semestre_actual CHECK (semestre_actual IS NULL OR semestre_actual BETWEEN 1 AND 50)
 );
 
-ALTER TABLE student_profiles ADD COLUMN IF NOT EXISTS username CITEXT;
-ALTER TABLE student_profiles ADD COLUMN IF NOT EXISTS correo CITEXT;
+ALTER TABLE student_profiles ADD COLUMN IF NOT EXISTS username VARCHAR(20);
+ALTER TABLE student_profiles ADD COLUMN IF NOT EXISTS correo VARCHAR(50);
 ALTER TABLE student_profiles ADD COLUMN IF NOT EXISTS universidad_id BIGINT;
 ALTER TABLE student_profiles ADD COLUMN IF NOT EXISTS profile_completed BOOLEAN NOT NULL DEFAULT FALSE;
 
