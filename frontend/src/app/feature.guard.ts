@@ -1,17 +1,19 @@
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 
-import { FeatureToggleService } from './services/feature-toggle.service';
+import { FeatureName, FeatureToggleService } from './services/feature-toggle.service';
 
-export const featureGuard = (featureName: string): CanActivateFn => {
+export const featureGuard = (featureName: FeatureName): CanActivateFn => {
   return () => {
     const featureToggleService = inject(FeatureToggleService);
     const router = inject(Router);
 
-    if (featureToggleService.isEnabled(featureName)) {
-      return true;
-    }
+    return featureToggleService.loadFlags().then(() => {
+      if (featureToggleService.isEnabled(featureName)) {
+        return true;
+      }
 
-    return router.createUrlTree(['/home']);
+      return router.createUrlTree(['/home']);
+    });
   };
 };

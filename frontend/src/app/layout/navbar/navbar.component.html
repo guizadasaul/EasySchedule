@@ -10,26 +10,26 @@
     <li>
       <a routerLink="/home" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">{{ 'navbar.home' | translate }}</a>
     </li>
-    <li *ngIf="mallaEnabled">
+    <li *ngIf="isLoggedIn() && mallaEnabled">
       <a routerLink="/malla" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">{{ 'navbar.malla' | translate }}</a>
     </li>
-    <li *ngIf="tomaMateriasEnabled">
+    <li *ngIf="isLoggedIn() && tomaMateriasEnabled">
       <a routerLink="/toma-de-materias" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">{{ 'navbar.tomaMaterias' | translate }}</a>
     </li>
   </ul>
 
   <div class="navbar__actions">
 <!-- NO logueado -->
-<a *ngIf="!isLoggedIn()" routerLink="/login">
+<a *ngIf="!isLoggedIn()" routerLink="/login" class="navbar__auth-link" routerLinkActive="active-auth">
   {{ 'navbar.login' | translate }}
 </a>
 
-<a *ngIf="!isLoggedIn()" routerLink="/registro">
+<a *ngIf="!isLoggedIn()" routerLink="/registro" class="navbar__auth-btn">
   {{ 'navbar.signup' | translate }}
 </a>
 
 <!-- LOGUEADO -->
-<a *ngIf="isLoggedIn()" (click)="logout()">
+<a *ngIf="isLoggedIn()" (click)="logout()" class="navbar__auth-link">
   {{ 'navbar.logout' | translate }}
 </a>
 

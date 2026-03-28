@@ -4,6 +4,7 @@ import { Router } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { CommonModule } from '@angular/common'; 
 import { RouterModule } from '@angular/router'; 
+import { FeatureToggleService } from '../../services/feature-toggle.service';
 
 @Component({
   selector: 'app-login',
@@ -23,7 +24,8 @@ export class LoginComponent {
 
   constructor(
     private fb: FormBuilder,
-    private router: Router
+    private router: Router,
+    private featureToggleService: FeatureToggleService,
   ) {
 
     this.form = this.fb.group({
@@ -63,6 +65,9 @@ export class LoginComponent {
 
       // Guardar token
       localStorage.setItem('token', data.token);
+
+      // Refrescar toggles para reflejar el estado en el navbar inmediatamente.
+      await this.featureToggleService.loadFlags();
 
       // Redirección
       this.router.navigate(['/home']);
