@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { NgIf } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
+import { Subscription } from 'rxjs';
 
 import { LanguageService } from '../../core/services/language.service';
 import { FeatureToggleService } from '../../services/feature-toggle.service';
@@ -12,9 +13,10 @@ import { FeatureToggleService } from '../../services/feature-toggle.service';
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.scss',
 })
-export class NavbarComponent implements OnInit {
+export class NavbarComponent implements OnInit, OnDestroy {
   protected mallaEnabled = false;
   protected tomaMateriasEnabled = false;
+  private flagsSubscription?: Subscription;
 
   constructor(
     private readonly languageService: LanguageService,
@@ -22,8 +24,16 @@ export class NavbarComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.mallaEnabled = this.featureToggleService.isEnabled('malla');
-    this.tomaMateriasEnabled = this.featureToggleService.isEnabled('tomaMaterias');
+    this.flagsSubscription = this.featureToggleService.flags$.subscribe((flags) => {
+      this.mallaEnabled = flags.malla;
+      this.tomaMateriasEnabled = flags.tomaMaterias;
+    });
+
+    void this.featureToggleService.loadFlags();
+  }
+
+  ngOnDestroy(): void {
+    this.flagsSubscription?.unsubscribe();
   }
 
   protected setLanguage(lang: string): void {

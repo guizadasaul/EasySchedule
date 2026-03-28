@@ -1,11 +1,20 @@
 package com.easyschedule.backend.shared.feature;
 
-import org.springframework.context.annotation.Configuration;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
-@Configuration
+@Component
 public class FeatureFlagsConfig {
-    private final boolean malla = true;
-    private final boolean tomaMaterias = true;
+    private final boolean malla;
+    private final boolean tomaMaterias;
+
+    public FeatureFlagsConfig(
+        @Value("${features.malla:true}") boolean malla,
+        @Value("${features.toma-materias:true}") boolean tomaMaterias
+    ) {
+        this.malla = malla;
+        this.tomaMaterias = tomaMaterias;
+    }
 
     public boolean isMalla() {
         return malla;

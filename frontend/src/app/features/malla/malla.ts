@@ -1,7 +1,8 @@
 import { NgIf } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
+import { Subscription } from 'rxjs';
 
 import { FeatureToggleService } from '../../services/feature-toggle.service';
 
@@ -11,12 +12,21 @@ import { FeatureToggleService } from '../../services/feature-toggle.service';
   templateUrl: './malla.html',
   styleUrl: './malla.scss',
 })
-export class Malla implements OnInit {
+export class Malla implements OnInit, OnDestroy {
   protected mallaEnabled = false;
+  private flagsSubscription?: Subscription;
 
   constructor(private readonly featureService: FeatureToggleService) {}
 
   ngOnInit(): void {
-    this.mallaEnabled = this.featureService.isEnabled('malla');
+    this.flagsSubscription = this.featureService.flags$.subscribe((flags) => {
+      this.mallaEnabled = flags.malla;
+    });
+
+    void this.featureService.loadFlags();
+  }
+
+  ngOnDestroy(): void {
+    this.flagsSubscription?.unsubscribe();
   }
 }
