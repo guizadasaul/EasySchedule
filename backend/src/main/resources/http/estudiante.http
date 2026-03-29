@@ -75,6 +75,7 @@ Authorization: Bearer {{token}}
 POST {{host}}/api/change-password
 Authorization: Bearer {{token}}
 Content-Type: application/json
+Authorization: Bearer {{token}}
 
 {
   "currentPassword": "{{password}}",
