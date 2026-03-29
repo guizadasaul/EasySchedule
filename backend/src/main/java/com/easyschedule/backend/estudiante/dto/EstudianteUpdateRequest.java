@@ -27,12 +27,8 @@ public record EstudianteUpdateRequest(
 
     @NotNull(message = "El semestre actual es obligatorio")
     Short semestreActual,
-
-    @NotBlank(message = "La carrera es obligatoria")
-    @Size(max = 120, message = "La carrera no puede exceder 120 caracteres")
-    String carrera,
-
-    @NotNull(message = "La malla es obligatoria")
+    Long universidadId,
+    Long carreraId,
     Long mallaId
 ) {
 }

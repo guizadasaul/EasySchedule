@@ -1,7 +1,7 @@
 package com.easyschedule.backend.materia.dto;
 
 public record PrerequisitoRequest(
-    Long materiaId,
-    Long prerequisitoId
+    Long mallaMateriaId,
+    Long prerequisitoMallaMateriaId
 ) {
 }

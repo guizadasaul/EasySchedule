@@ -39,8 +39,7 @@ class AuthControllerTest {
                 {
                   "username": "newuser",
                   "email": "newuser@mail.com",
-                  "password": "123456",
-                  "role": ["user"]
+                  "password": "123456"
                 }
                 """;
 

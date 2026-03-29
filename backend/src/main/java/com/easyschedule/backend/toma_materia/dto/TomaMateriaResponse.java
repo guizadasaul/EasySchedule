@@ -4,8 +4,8 @@ import java.time.OffsetDateTime;
 
 public record TomaMateriaResponse(
     Long id,
-    Long estudianteId,
-    Long materiaId,
+    Long userId,
+    Long mallaMateriaId,
     String estado,
     OffsetDateTime fechaActualizacion
 ) {

@@ -1,5 +1,81 @@
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@700&family=Space+Grotesk:wght@500&display=swap" rel="stylesheet">
+<section class="home-principal">
+  <div class="home-principal-background" aria-hidden="true"></div>
+  <div class="home-principal-content">
+    <h1>{{ 'home.title' | translate }}</h1>
+    <h3 class="home-subtitle">{{ 'home.subtitle' | translate }}</h3>
+    <p>{{ 'home.description' | translate }}</p>
+    <button class="btn-primary">{{ 'home.button.start' | translate }}</button>
+  </div>
+</section>
+
+<section class="content-sections">
+  
+  <div class="about-us">
+    <h2>{{'home.aboutUs.title' | translate}}</h2>
+    
+    <div class="about-us-container">
+      <div class="home-aboutUs-image" aria-hidden="true"></div>
+
+      <div class="about-us-text">
+        <p>{{ 'home.aboutUs.pharagraph1' | translate }}</p>
+        <p>{{ 'home.aboutUs.pharagraph2' | translate }}</p>
+        <p>{{ 'home.aboutUs.pharagraph3' | translate }}</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="Questions">
+    <div class="Questions-layout">
+      
+      <div class="questions-title">
+        <h2>{{'home.questions.title' | translate}}</h2>
+      </div>
+
+      <div class="questions-cards">
+        <div class="faq-card">
+          <h3>{{ 'home.questions.question1' | translate }}</h3>
+          <p>{{ 'home.questions.answer1' | translate }}</p>
+        </div>
+
+        <div class="faq-card">
+          <h3>{{ 'home.questions.question2' | translate }}</h3>
+          <p>{{ 'home.questions.answer2' | translate }}</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</section>
+
 <main class="home-status">
   <h1>{{ 'home.title' | translate }}</h1>
   <p>{{ 'home.backendStatusLabel' | translate }}</p>
   <pre>{{ healthStatusKey() | translate: healthStatusParams() }}</pre>
 </main>
+
+  <section class="home-footer">
+    <div class="footer-content1-terms-and-conditions">
+      <h4>{{ 'home.footer.subtitle1' | translate }}</h4>
+      <p>{{ 'home.footer.terms' | translate }}</p>
+      <p>{{ 'home.footer.privacy' | translate }}</p>
+    </div>
+    <div class="footer-content2-contact">
+      <h4>{{ 'home.footer.subtitle2' | translate }}</h4>
+      <p>{{ 'home.footer.email' | translate }}</p>
+      <p>{{ 'home.footer.phone' | translate }}</p>
+    </div>
+    <div class="footer-content3-ubication">
+      <h4>{{ 'home.footer.subtitle3' | translate }}</h4>
+      <p>{{ 'home.footer.address' | translate }}</p>
+    </div>
+    <div class="social-icons-container">
+      <img src="/Facebook Icon.png" alt="Facebook" class="social-icon">
+      <img src="/Instagram Icon.png" alt="Instagram" class="social-icon">
+      <img src="/Email Icon.png" alt="Email" class="social-icon">
+      <img src="/X Icon.png" alt="X" class="social-icon">
+      <img src="/LinkedIn Icon.png" alt="LinkedIn" class="social-icon">
+    </div>
+    <p class="copyrigth">{{ 'home.footer.copyright' | translate }}</p>
+  </section>

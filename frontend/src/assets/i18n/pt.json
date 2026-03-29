@@ -16,6 +16,11 @@
     "tomaMaterias": "Seleção de Disciplinas",
     "login": "Entrar",
     "signup": "Cadastrar-se",
+    "logout": "Sair",
+    "menu": {
+      "profile": "Ir para o perfil",
+      "language": "Mudar idioma"
+    },
     "aria": {
       "goHome": "Ir para a página inicial",
       "profile": "Ir para o perfil"
@@ -28,14 +33,63 @@
       "checkingConnection": "Verificando conexão...",
       "connectionSuccess": "Conexão realizada com sucesso",
       "connectionError": "Erro de conexão: {{message}}"
-    }
+    },
+    "subtitle": "Designe seu caminho acadêmico sem complicações",
+    "description":"Nossa plataforma analisa seus requisitos e objetivos em tempo real para oferecer você a combinação perfeita de matérias para seu próximo semestre. Nós não apenas criamos um horário; mostramos exatamente como cada escolha de hoje acelera sua graduação de amanhã. Assuma o controle do seu caminho acadêmico e pare de adivinhar!",
+      "button":{
+      "start": "Começar"
+      },
+      "aboutUs":{
+        "title": "Sobre Nós",
+      "pharagraph1": "Na Easy Schedule, entendemos que a vida universitária já é complexa o suficiente sem que o planejamento de cursos se torne um obstáculo adicional. Nascemos da visão de Lucas Alcoba e Adrian Claros, com o objetivo de capacitar estudantes de graduação e pós-graduação por meio da tecnologia inteligente.",
+      "pharagraph2": "Ao contrário das ferramentas tradicionais de consulta de currículos, oferecemos uma solução abrangente: uma plataforma web interativa que processa seus requisitos específicos e gera sugestões personalizadas. Acreditamos que todo estudante merece um caminho acadêmico claro, eficiente e livre de erros administrativos.",
+      "pharagraph3": "Nossa plataforma é projetada especificamente para se integrar com as realidades acadêmicas de instituições líderes, como a Universidad Católica Boliviana campus Cochabamba, a Universidad Mayor de San Simón e a Universidad Mayor de San Andrés."
+    },
+  "questions":{
+    "title": "Perguntas Frequentes",
+    "question1": "Como funciona o EasySchedule?",
+    "answer1": "O EasySchedule utiliza um algoritmo inteligente para analisar seus requisitos acadêmicos e objetivos. Ele processa essas informações em tempo real para gerar sugestões personalizadas de cursos para seu próximo semestre, ajudando você a desenhar um caminho acadêmico eficiente.",
+    "question2": "O EasySchedule é gratuito?",
+    "answer2": "Sim, o EasySchedule é completamente gratuito para os estudantes. Acreditamos que todo estudante deve ter acesso a ferramentas que os ajudem a ter sucesso acadêmico sem nenhum custo."
   },
-  "login": {
-    "title": "Entrar",
-    "email": "Email",
-    "password": "Senha",
-    "placeholder": "Login funcionando!"
+  "footer":{
+    "subtitle1": "Termos e Políticas de Privacidade",
+    "subtitle2": "Contate-nos",
+    "subtitle3": "Localização",
+    "terms": "Termos e Condições",
+    "privacy": "Política de Privacidade",
+    "contact": "Para qualquer dúvida ou suporte, entre em contato em ",
+    "email": "support@easyschedule.com",
+    "phone": "+591 64363462",
+    "address": "123 Rua da Universidade, Cochabamba, Bolivia",
+    "copyright": "Direitos Autorais @ 2022 Agency Creative. Todos os Direitos Reservados"
+  }
+
   },
+"login": {
+  "title": "Entrar",
+  "label": {
+    "identifier": "Email ou usuário",
+    "password": "Senha"
+  },
+  "placeholder": {
+    "identifier": "Digite seu email ou usuário",
+    "password": "Digite sua senha"
+  },
+  "button": {
+    "submit": "Entrar",
+    "gotoRegister": "Criar conta",
+    "backHome": "Voltar ao início"
+  },
+  "validation": {
+    "required": "Este campo é obrigatório"
+  },
+  "loading": "Entrando...",
+  "error": {
+    "invalidCredentials": "Credenciais inválidas",
+    "generic": "Erro inesperado"
+  }
+},
   "malla": {
     "placeholder": "Currículo funcionando!",
     "update": "Atualizar currículo",

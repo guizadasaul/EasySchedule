@@ -1,6 +1,6 @@
 package com.easyschedule.backend.horario.model;
 
-import com.easyschedule.backend.estudiante.model.Estudiante;
+import com.easyschedule.backend.auth.models.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -21,8 +21,8 @@ public class HorarioRecomendado {
     private Long id;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "estudiante_id", nullable = false)
-    private Estudiante estudiante;
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @Column(nullable = false, length = 30)
     private String semestre;
@@ -44,12 +44,12 @@ public class HorarioRecomendado {
         this.id = id;
     }
 
-    public Estudiante getEstudiante() {
-        return estudiante;
+    public User getUser() {
+        return user;
     }
 
-    public void setEstudiante(Estudiante estudiante) {
-        this.estudiante = estudiante;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public String getSemestre() {

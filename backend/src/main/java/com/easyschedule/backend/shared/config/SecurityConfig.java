@@ -22,24 +22,19 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            // Deshabilitar CSRF para APIs stateless
+            .cors(cors -> {}) 
             .csrf(csrf -> csrf.disable())
-            // Configurar la política de sesión como STATELESS
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            // Definir reglas de autorización
             .authorizeHttpRequests(auth -> auth
-                // Permitir acceso público al endpoint de registro
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll() 
+                .requestMatchers(HttpMethod.POST,"/api/login").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/registro").permitAll()
-                // Permitir acceso público a los endpoints de estudiantes (para pruebas)
-                .requestMatchers("/api/estudiantes/**").permitAll()
-                // Permitir acceso público a los endpoints de mallas (para pruebas)
-                .requestMatchers("/api/mallas/**").permitAll()
-                // Permitir acceso público al endpoint de feature flags
                 .requestMatchers(HttpMethod.GET, "/api/features").permitAll()
-                // Requerir autenticación para cualquier otra petición
+                .requestMatchers(HttpMethod.GET, "/health").permitAll()
+                .requestMatchers("/api/estudiantes/**").permitAll()
                 .anyRequest().authenticated()
             );
-
+    
         return http.build();
     }
 }

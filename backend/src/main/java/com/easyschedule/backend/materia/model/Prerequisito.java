@@ -1,5 +1,6 @@
 package com.easyschedule.backend.materia.model;
 
+import com.easyschedule.backend.malla.model.MallaMateria;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -13,7 +14,7 @@ import jakarta.persistence.UniqueConstraint;
 
 @Entity
 @Table(name = "prerequisitos", uniqueConstraints = {
-    @UniqueConstraint(name = "uq_prereq", columnNames = {"id_materia", "id_prerequisito"})
+    @UniqueConstraint(name = "uq_prereq", columnNames = {"malla_materia_id", "prereq_malla_materia_id"})
 })
 public class Prerequisito {
 
@@ -22,26 +23,26 @@ public class Prerequisito {
     private Long id;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "id_materia", nullable = false)
-    private Materia materia;
+    @JoinColumn(name = "malla_materia_id", nullable = false)
+    private MallaMateria mallaMateria;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "id_prerequisito", nullable = false)
-    private Materia prerequisito;
+    @JoinColumn(name = "prereq_malla_materia_id", nullable = false)
+    private MallaMateria prerequisito;
 
     public Prerequisito() {
     }
 
-    public Prerequisito(Long id, Materia materia, Materia prerequisito) {
+    public Prerequisito(Long id, MallaMateria mallaMateria, MallaMateria prerequisito) {
         this.id = id;
-        this.materia = materia;
+        this.mallaMateria = mallaMateria;
         this.prerequisito = prerequisito;
     }
 
     @PrePersist
     @PreUpdate
     public void validarDiferentes() {
-        if (materia != null && prerequisito != null && materia.getId() != null && materia.getId().equals(prerequisito.getId())) {
+        if (mallaMateria != null && prerequisito != null && mallaMateria.getId() != null && mallaMateria.getId().equals(prerequisito.getId())) {
             throw new IllegalArgumentException("Una materia no puede ser prerequisito de si misma.");
         }
     }
@@ -54,19 +55,19 @@ public class Prerequisito {
         this.id = id;
     }
 
-    public Materia getMateria() {
-        return materia;
+    public MallaMateria getMallaMateria() {
+        return mallaMateria;
     }
 
-    public void setMateria(Materia materia) {
-        this.materia = materia;
+    public void setMallaMateria(MallaMateria mallaMateria) {
+        this.mallaMateria = mallaMateria;
     }
 
-    public Materia getPrerequisito() {
+    public MallaMateria getPrerequisito() {
         return prerequisito;
     }
 
-    public void setPrerequisito(Materia prerequisito) {
+    public void setPrerequisito(MallaMateria prerequisito) {
         this.prerequisito = prerequisito;
     }
 }

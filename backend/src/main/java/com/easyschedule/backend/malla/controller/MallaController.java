@@ -74,10 +74,11 @@ public class MallaController {
     }
 
     private Map<String, Long> toMap(MallaMateria mallaMateria) {
-        return Map.of(
-            "id", mallaMateria.getId(),
-            "mallaId", mallaMateria.getMalla().getId(),
-            "materiaId", mallaMateria.getMateria().getId()
+        return Map.ofEntries(
+            Map.entry("id", mallaMateria.getId()),
+            Map.entry("mallaId", mallaMateria.getMalla().getId()),
+            Map.entry("materiaId", mallaMateria.getMateria().getId()),
+            Map.entry("semestreSugerido", Long.valueOf(mallaMateria.getSemestreSugerido()))
         );
     }
 }

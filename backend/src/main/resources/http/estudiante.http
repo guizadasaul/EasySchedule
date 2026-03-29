@@ -29,20 +29,12 @@ Content-Type: application/json
 GET {{host}}/api/estudiantes
 
 
-### 4. Perfil del estudiante registrado (ÉXITO - 200)
-GET {{host}}/api/estudiantes/perfil/test8user
-### 5. Editar el perfil del estudiante (ÉXITO - 200)
-PUT {{host}}/api/estudiantes/perfil/test8user
+
+### 4. Login (funcionando con credenciales correctas e incorrectas)
+POST {{host}}/api/login
 Content-Type: application/json
 
 {
-  "nombre": "Test User 8",
-  "apellido": "Apellido 8",
-  "universidad": "Universidad Catolica Boliviana San Pablo",
-  "carrera": "Ingenieria de Sistemas",
-  "carnetIdentidad": "CI-8888888",
-  "fechaNacimiento": "1998-08-08",
-  "email": "test8user@example.com",
-  "username": "test8user"
+  "identifier": "test6user",
+  "password": "password"
 }
-

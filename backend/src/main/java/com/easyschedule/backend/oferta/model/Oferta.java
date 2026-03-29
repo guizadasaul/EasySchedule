@@ -1,7 +1,7 @@
 package com.easyschedule.backend.oferta.model;
 
-import com.easyschedule.backend.estudiante.model.Estudiante;
-import com.easyschedule.backend.materia.model.Materia;
+import com.easyschedule.backend.auth.models.User;
+import com.easyschedule.backend.malla.model.MallaMateria;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -16,7 +16,7 @@ import java.time.OffsetDateTime;
 
 @Entity
 @Table(name = "ofertas", uniqueConstraints = {
-    @UniqueConstraint(name = "uq_ofertas", columnNames = {"estudiante_id", "materia_id", "semestre"})
+    @UniqueConstraint(name = "uq_ofertas", columnNames = {"user_id", "malla_materia_id", "semestre", "paralelo"})
 })
 public class Oferta {
 
@@ -25,15 +25,18 @@ public class Oferta {
     private Long id;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "estudiante_id", nullable = false)
-    private Estudiante estudiante;
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "materia_id", nullable = false)
-    private Materia materia;
+    @JoinColumn(name = "malla_materia_id", nullable = false)
+    private MallaMateria mallaMateria;
 
     @Column(nullable = false, length = 30)
     private String semestre;
+
+    @Column(length = 20)
+    private String paralelo;
 
     @Column(name = "horario_json", nullable = false, columnDefinition = "jsonb")
     private String horarioJson;
@@ -61,20 +64,20 @@ public class Oferta {
         this.id = id;
     }
 
-    public Estudiante getEstudiante() {
-        return estudiante;
+    public User getUser() {
+        return user;
     }
 
-    public void setEstudiante(Estudiante estudiante) {
-        this.estudiante = estudiante;
+    public void setUser(User user) {
+        this.user = user;
     }
 
-    public Materia getMateria() {
-        return materia;
+    public MallaMateria getMallaMateria() {
+        return mallaMateria;
     }
 
-    public void setMateria(Materia materia) {
-        this.materia = materia;
+    public void setMallaMateria(MallaMateria mallaMateria) {
+        this.mallaMateria = mallaMateria;
     }
 
     public String getSemestre() {
@@ -83,6 +86,14 @@ public class Oferta {
 
     public void setSemestre(String semestre) {
         this.semestre = semestre;
+    }
+
+    public String getParalelo() {
+        return paralelo;
+    }
+
+    public void setParalelo(String paralelo) {
+        this.paralelo = paralelo;
     }
 
     public String getHorarioJson() {

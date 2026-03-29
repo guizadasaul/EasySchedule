@@ -1,22 +1,19 @@
 
 package com.easyschedule.backend.auth.models;
-import java.util.HashSet;
-import java.util.Set;
+
 import com.easyschedule.backend.estudiante.model.Estudiante;
-import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import java.time.OffsetDateTime;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+
 @Entity
 @Table(name = "users")
 public class User {
@@ -25,18 +22,27 @@ public class User {
     private Long id;
     @NotBlank
     @Size(max = 20)
+    @Column(nullable = false, unique = true, length = 20)
     private String username;
     @NotBlank
     @Size(max = 50)
     @Email
+    @Column(nullable = false, unique = true, length = 50)
     private String email;
     @NotBlank
     @Size(max = 120)
-    private String password;
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private Set<Role> roles = new HashSet<>();
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @Column(name = "password_hash", nullable = false)
+    private String passwordHash;
+    @Column(name = "is_active", nullable = false)
+    private boolean active = true;
+    @Column(name = "token_version", nullable = false)
+    private int tokenVersion = 0;
+    @Column(name = "created_at", nullable = false)
+    private OffsetDateTime createdAt;
+    @Column(name = "updated_at", nullable = false)
+    private OffsetDateTime updatedAt;
+
+    @OneToOne(mappedBy = "user")
     private Estudiante estudiante;
 
     public User() {
@@ -44,7 +50,9 @@ public class User {
     public User(String username, String email, String password) {
         this.username = username;
         this.email = email;
-        this.password = password;
+        this.passwordHash = password;
+        this.createdAt = OffsetDateTime.now();
+        this.updatedAt = OffsetDateTime.now();
     }
     public Long getId() {
         return id;
@@ -64,17 +72,11 @@ public class User {
     public void setEmail(String email) {
         this.email = email;
     }
-    public String getPassword() {
-        return password;
+    public String getPasswordHash() {
+        return passwordHash;
     }
-    public void setPassword(String password) {
-        this.password = password;
-    }
-    public Set<Role> getRoles() {
-        return roles;
-    }
-    public void setRoles(Set<Role> roles) {
-        this.roles = roles;
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
     }
     public Estudiante getEstudiante() {
         return estudiante;
@@ -82,5 +84,28 @@ public class User {
     public void setEstudiante(Estudiante estudiante) {
         this.estudiante = estudiante;
     }
-    
+    public boolean isActive() {
+        return active;
+    }
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+    public int getTokenVersion() {
+        return tokenVersion;
+    }
+    public void setTokenVersion(int tokenVersion) {
+        this.tokenVersion = tokenVersion;
+    }
+    public OffsetDateTime getCreatedAt() {
+        return createdAt;
+    }
+    public void setCreatedAt(OffsetDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+    public OffsetDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+    public void setUpdatedAt(OffsetDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 }

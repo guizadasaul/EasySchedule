@@ -4,7 +4,7 @@ import java.time.OffsetDateTime;
 
 public record HorarioRecomendadoResponse(
     Long id,
-    Long estudianteId,
+    Long userId,
     String semestre,
     String jsonResultado,
     OffsetDateTime fechaGeneracion

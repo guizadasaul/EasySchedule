@@ -1,8 +1,6 @@
 package com.easyschedule.backend.materia.model;
 
 import com.easyschedule.backend.malla.model.MallaMateria;
-import com.easyschedule.backend.oferta.model.Oferta;
-import com.easyschedule.backend.toma_materia.model.TomaMateria;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -15,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "materia")
+@Table(name = "materias")
 public class Materia {
 
     @Id
@@ -28,35 +26,22 @@ public class Materia {
     @Column(nullable = false, length = 150)
     private String nombre;
 
-    @Column(name = "semestre_sugerido", nullable = false)
-    private Short semestreSugerido;
-
     @Column(nullable = false)
     private Short creditos;
+
+    @Column(nullable = false)
+    private boolean active = true;
 
     @OneToMany(mappedBy = "materia")
     private List<MallaMateria> mallaMaterias = new ArrayList<>();
 
-    @OneToMany(mappedBy = "materia")
-    private List<Prerequisito> prerequisitosDestino = new ArrayList<>();
-
-    @OneToMany(mappedBy = "prerequisito")
-    private List<Prerequisito> prerequisitosRequeridos = new ArrayList<>();
-
-    @OneToMany(mappedBy = "materia")
-    private List<TomaMateria> tomasMateria = new ArrayList<>();
-
-    @OneToMany(mappedBy = "materia")
-    private List<Oferta> ofertas = new ArrayList<>();
-
     public Materia() {
     }
 
-    public Materia(Long id, String codigo, String nombre, Short semestreSugerido, Short creditos) {
+    public Materia(Long id, String codigo, String nombre, Short creditos) {
         this.id = id;
         this.codigo = codigo;
         this.nombre = nombre;
-        this.semestreSugerido = semestreSugerido;
         this.creditos = creditos;
     }
 
@@ -84,14 +69,6 @@ public class Materia {
         this.nombre = nombre;
     }
 
-    public Short getSemestreSugerido() {
-        return semestreSugerido;
-    }
-
-    public void setSemestreSugerido(Short semestreSugerido) {
-        this.semestreSugerido = semestreSugerido;
-    }
-
     public Short getCreditos() {
         return creditos;
     }
@@ -100,23 +77,16 @@ public class Materia {
         this.creditos = creditos;
     }
 
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
     public List<MallaMateria> getMallaMaterias() {
         return mallaMaterias;
     }
 
-    public List<Prerequisito> getPrerequisitosDestino() {
-        return prerequisitosDestino;
-    }
-
-    public List<Prerequisito> getPrerequisitosRequeridos() {
-        return prerequisitosRequeridos;
-    }
-
-    public List<TomaMateria> getTomasMateria() {
-        return tomasMateria;
-    }
-
-    public List<Oferta> getOfertas() {
-        return ofertas;
-    }
 }

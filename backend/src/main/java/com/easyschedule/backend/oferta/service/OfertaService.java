@@ -1,9 +1,9 @@
 package com.easyschedule.backend.oferta.service;
 
-import com.easyschedule.backend.estudiante.model.Estudiante;
-import com.easyschedule.backend.estudiante.repository.EstudianteRepository;
-import com.easyschedule.backend.materia.model.Materia;
-import com.easyschedule.backend.materia.repository.MateriaRepository;
+import com.easyschedule.backend.auth.models.User;
+import com.easyschedule.backend.auth.repositories.UserRepository;
+import com.easyschedule.backend.malla.model.MallaMateria;
+import com.easyschedule.backend.malla.repository.MallaMateriaRepository;
 import com.easyschedule.backend.oferta.dto.OfertaRequest;
 import com.easyschedule.backend.oferta.dto.OfertaResponse;
 import com.easyschedule.backend.oferta.model.Oferta;
@@ -18,13 +18,17 @@ import java.util.List;
 public class OfertaService {
 
     private final OfertaRepository ofertaRepository;
-    private final EstudianteRepository estudianteRepository;
-    private final MateriaRepository materiaRepository;
+    private final UserRepository userRepository;
+    private final MallaMateriaRepository mallaMateriaRepository;
 
-    public OfertaService(OfertaRepository ofertaRepository, EstudianteRepository estudianteRepository, MateriaRepository materiaRepository) {
+    public OfertaService(
+        OfertaRepository ofertaRepository,
+        UserRepository userRepository,
+        MallaMateriaRepository mallaMateriaRepository
+    ) {
         this.ofertaRepository = ofertaRepository;
-        this.estudianteRepository = estudianteRepository;
-        this.materiaRepository = materiaRepository;
+        this.userRepository = userRepository;
+        this.mallaMateriaRepository = mallaMateriaRepository;
     }
 
     public List<OfertaResponse> findAll() {
@@ -36,13 +40,14 @@ public class OfertaService {
     }
 
     public OfertaResponse create(OfertaRequest request) {
-        Estudiante estudiante = getEstudianteOrThrow(request.estudianteId());
-        Materia materia = getMateriaOrThrow(request.materiaId());
+        User user = getUserOrThrow(request.userId());
+        MallaMateria mallaMateria = getMallaMateriaOrThrow(request.mallaMateriaId());
 
         Oferta oferta = new Oferta();
-        oferta.setEstudiante(estudiante);
-        oferta.setMateria(materia);
+        oferta.setUser(user);
+        oferta.setMallaMateria(mallaMateria);
         oferta.setSemestre(request.semestre());
+        oferta.setParalelo(request.paralelo());
         oferta.setHorarioJson(request.horarioJson());
         oferta.setDocente(request.docente());
         oferta.setAula(request.aula());
@@ -54,12 +59,13 @@ public class OfertaService {
 
     public OfertaResponse update(Long id, OfertaRequest request) {
         Oferta oferta = getOrThrow(id);
-        Estudiante estudiante = getEstudianteOrThrow(request.estudianteId());
-        Materia materia = getMateriaOrThrow(request.materiaId());
+        User user = getUserOrThrow(request.userId());
+        MallaMateria mallaMateria = getMallaMateriaOrThrow(request.mallaMateriaId());
 
-        oferta.setEstudiante(estudiante);
-        oferta.setMateria(materia);
+        oferta.setUser(user);
+        oferta.setMallaMateria(mallaMateria);
         oferta.setSemestre(request.semestre());
+        oferta.setParalelo(request.paralelo());
         oferta.setHorarioJson(request.horarioJson());
         oferta.setDocente(request.docente());
         oferta.setAula(request.aula());
@@ -78,22 +84,23 @@ public class OfertaService {
             .orElseThrow(() -> new ResourceNotFoundException("Oferta no encontrada con id: " + id));
     }
 
-    private Estudiante getEstudianteOrThrow(Long id) {
-        return estudianteRepository.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Estudiante no encontrado con id: " + id));
+    private User getUserOrThrow(Long id) {
+        return userRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado con id: " + id));
     }
 
-    private Materia getMateriaOrThrow(Long id) {
-        return materiaRepository.findById(id)
-            .orElseThrow(() -> new ResourceNotFoundException("Materia no encontrada con id: " + id));
+    private MallaMateria getMallaMateriaOrThrow(Long id) {
+        return mallaMateriaRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("MallaMateria no encontrada con id: " + id));
     }
 
     private OfertaResponse toResponse(Oferta oferta) {
         return new OfertaResponse(
             oferta.getId(),
-            oferta.getEstudiante().getId(),
-            oferta.getMateria().getId(),
+            oferta.getUser().getId(),
+            oferta.getMallaMateria().getId(),
             oferta.getSemestre(),
+            oferta.getParalelo(),
             oferta.getHorarioJson(),
             oferta.getDocente(),
             oferta.getAula(),

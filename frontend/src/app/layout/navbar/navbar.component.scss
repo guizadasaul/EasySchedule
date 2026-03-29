@@ -51,9 +51,16 @@
     color: #22395a;
     text-decoration: none;
     transition: background-color 0.2s ease;
+    background-color: transparent;
+    cursor: pointer;
+    list-style: none;
 
     &:hover {
       background-color: rgba(111, 137, 172, 0.12);
+    }
+
+    &::-webkit-details-marker {
+      display: none;
     }
 
     svg {
@@ -68,6 +75,85 @@
     display: inline-flex;
     align-items: center;
     gap: 0.65rem;
+    position: relative;
+  }
+
+  &__profile-menu {
+    position: relative;
+
+    &[open] .navbar__profile {
+      background-color: rgba(111, 137, 172, 0.2);
+    }
+  }
+
+  &__menu-panel {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 0.45rem);
+    width: 210px;
+    background: #f7f3e7;
+    border: 1px solid rgba(34, 57, 90, 0.2);
+    border-radius: 14px;
+    box-shadow: 0 10px 20px rgba(16, 16, 16, 0.12);
+    padding: 0.65rem;
+    display: grid;
+    gap: 0.55rem;
+    z-index: 40;
+  }
+
+  &__menu-link {
+    text-decoration: none;
+    color: #22395a;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    border: 1px solid rgba(34, 57, 90, 0.18);
+    border-radius: 10px;
+    padding: 0.45rem 0.6rem;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background-color: rgba(111, 137, 172, 0.14);
+    }
+  }
+
+  &__menu-language {
+    border: 1px solid rgba(34, 57, 90, 0.12);
+    border-radius: 10px;
+    padding: 0.45rem 0.55rem 0.55rem;
+  }
+
+  &__menu-label {
+    display: block;
+    color: #22395a;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 700;
+    margin-bottom: 0.45rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  &__language-options {
+    display: flex;
+    gap: 0.35rem;
+  }
+
+  &__language-btn {
+    border: 1px solid rgba(34, 57, 90, 0.25);
+    background-color: transparent;
+    border-radius: 999px;
+    color: #22395a;
+    font-family: 'Poppins', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 0.27rem 0.52rem;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+
+    &:hover {
+      background-color: rgba(111, 137, 172, 0.16);
+    }
   }
 
   &__auth-link,
@@ -150,6 +236,17 @@
       width: 100%;
       justify-content: center;
       margin-top: 0.2rem;
+    }
+
+    &__profile-menu {
+      position: static;
+    }
+
+    &__menu-panel {
+      right: auto;
+      left: 50%;
+      transform: translateX(-50%);
+      width: min(88vw, 240px);
     }
   }
 }

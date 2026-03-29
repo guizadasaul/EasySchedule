@@ -10,27 +10,50 @@
     <li>
       <a routerLink="/home" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">{{ 'navbar.home' | translate }}</a>
     </li>
-    <li *ngIf="mallaEnabled">
+    <li *ngIf="isLoggedIn() && mallaEnabled">
       <a routerLink="/malla" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">{{ 'navbar.malla' | translate }}</a>
     </li>
-    <li *ngIf="tomaMateriasEnabled">
+    <li *ngIf="isLoggedIn() && tomaMateriasEnabled">
       <a routerLink="/toma-de-materias" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">{{ 'navbar.tomaMaterias' | translate }}</a>
     </li>
   </ul>
 
   <div class="navbar__actions">
-    <button class="navbar__auth-link" type="button" (click)="setLanguage('es')">{{ 'common.language.es' | translate }}</button>
-    <button class="navbar__auth-link" type="button" (click)="setLanguage('en')">{{ 'common.language.en' | translate }}</button>
-    <button class="navbar__auth-link" type="button" (click)="setLanguage('pt')">{{ 'common.language.pt' | translate }}</button>
-    <a class="navbar__auth-link" routerLink="/login" routerLinkActive="active-auth">{{ 'navbar.login' | translate }}</a>
-    <a class="navbar__auth-btn" routerLink="/registro" routerLinkActive="active-auth">{{ 'navbar.signup' | translate }}</a>
+<!-- NO logueado -->
+<a *ngIf="!isLoggedIn()" routerLink="/login" class="navbar__auth-link" routerLinkActive="active-auth">
+  {{ 'navbar.login' | translate }}
+</a>
 
-    <a class="navbar__profile" routerLink="/perfil" [attr.aria-label]="'navbar.aria.profile' | translate">
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path
-          d="M12 2a10 10 0 1 0 10 10A10.01 10.01 0 0 0 12 2Zm0 3.2A3.4 3.4 0 1 1 8.6 8.6 3.41 3.41 0 0 1 12 5.2Zm0 13.8a7 7 0 0 1-5.2-2.32 6.2 6.2 0 0 1 10.4 0A7 7 0 0 1 12 19Z"
-        ></path>
-      </svg>
-    </a>
+<a *ngIf="!isLoggedIn()" routerLink="/registro" class="navbar__auth-btn">
+  {{ 'navbar.signup' | translate }}
+</a>
+
+<!-- LOGUEADO -->
+<a *ngIf="isLoggedIn()" (click)="logout()" class="navbar__auth-link">
+  {{ 'navbar.logout' | translate }}
+</a>
+
+    <details class="navbar__profile-menu">
+      <summary class="navbar__profile" [attr.aria-label]="'navbar.aria.profile' | translate">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            d="M12 2a10 10 0 1 0 10 10A10.01 10.01 0 0 0 12 2Zm0 3.2A3.4 3.4 0 1 1 8.6 8.6 3.41 3.41 0 0 1 12 5.2Zm0 13.8a7 7 0 0 1-5.2-2.32 6.2 6.2 0 0 1 10.4 0A7 7 0 0 1 12 19Z"
+          ></path>
+        </svg>
+      </summary>
+
+      <div class="navbar__menu-panel">
+        <a class="navbar__menu-link" routerLink="/perfil">{{ 'navbar.menu.profile' | translate }}</a>
+
+        <div class="navbar__menu-language">
+          <span class="navbar__menu-label">{{ 'navbar.menu.language' | translate }}</span>
+          <div class="navbar__language-options">
+            <button class="navbar__language-btn" type="button" (click)="setLanguage('es')">{{ 'common.language.es' | translate }}</button>
+            <button class="navbar__language-btn" type="button" (click)="setLanguage('en')">{{ 'common.language.en' | translate }}</button>
+            <button class="navbar__language-btn" type="button" (click)="setLanguage('pt')">{{ 'common.language.pt' | translate }}</button>
+          </div>
+        </div>
+      </div>
+    </details>
   </div>
 </nav>

@@ -67,7 +67,7 @@ describe('Registro Component', () => {
 
     req.flush({});
 
-    expect(component.successMessage).toContain('Registro exitoso');
+    expect(component.successMessageKey).toContain('Registro exitoso');
 
   });
 
@@ -89,7 +89,7 @@ describe('Registro Component', () => {
       { status: 409, statusText: 'Conflict' }
     );
 
-    expect(component.errorMessage).toContain('correo');
+    expect(component.errorMessageKey).toContain('correo');
 
   });
 

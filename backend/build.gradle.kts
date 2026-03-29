@@ -1,6 +1,3 @@
-import org.gradle.testing.jacoco.tasks.JacocoReport
-import org.gradle.testing.jacoco.tasks.JacocoCoverageVerification
-
 plugins {
 	java
 	id("org.springframework.boot") version "3.5.11"
@@ -65,7 +62,7 @@ val registroCoverageIncludes = listOf(
 	"com/easyschedule/backend/shared/config/SecurityConfig*"
 )
 
-tasks.register<JacocoReport>("jacocoRegistroReport") {
+tasks.register<org.gradle.testing.jacoco.tasks.JacocoReport>("jacocoRegistroReport") {
 	dependsOn(tasks.test)
 
 	classDirectories.setFrom(
@@ -85,7 +82,7 @@ tasks.register<JacocoReport>("jacocoRegistroReport") {
 	}
 }
 
-tasks.register<JacocoCoverageVerification>("jacocoRegistroCoverageVerification") {
+tasks.register<org.gradle.testing.jacoco.tasks.JacocoCoverageVerification>("jacocoRegistroCoverageVerification") {
 	dependsOn(tasks.test)
 
 	classDirectories.setFrom(

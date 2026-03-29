@@ -1,27 +1,267 @@
-.home-status {
-  min-height: calc(100vh - var(--navbar-height));
-  display: grid;
-  place-content: center;
-  gap: 0.8rem;
-  text-align: center;
-  padding: 1.5rem;
+$primary-dark: #1D2D44;    
+$accent-blue: #22395a;      
+$bg-cream: #F1EFE3;         
+$card-border-pink: #D6A4A4; 
+$text-dark: #333333;        
+$text-white: #ffffff;
+$footer-bg: #333131;
 
-  h1 {
-    font-family: 'Poppins', sans-serif;
-    font-size: clamp(2rem, 2vw + 1.2rem, 3rem);
-    color: #22395a;
-  }
+@mixin underline-decor($color, $height: 4px, $bottom: 0) {
+  position: relative;
+  display: inline-block;
+  width: fit-content;
+  padding-bottom: 0.5rem;
 
-  p {
-    font-size: 1rem;
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: $bottom;
+    left: 0;
+    width: 100%;
+    height: $height;
+    background-color: $color;
+    border-radius: $height / 2;
   }
 }
 
-pre {
-  background-color: #f5f7fa;
-  border: 1px solid #d9e2ec;
-  border-radius: 8px;
-  padding: 0.75rem;
-  white-space: pre-wrap;
-  max-width: 760px;
+@mixin responsive-grid($min-width: 992px, $columns: 1fr 1fr) {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 3rem;
+  align-items: center;
+
+  @media (min-width: $min-width) {
+    grid-template-columns: $columns;
+  }
+}
+
+.home-principal {
+  position: relative;
+  width: 100%;
+  min-height: 80vh; 
+  display: flex;
+  align-items: center;
+  color: $text-white;
+  overflow: hidden;
+
+  &-background {
+    position: absolute;
+    inset: 0; 
+    z-index: 1;
+    background: linear-gradient(90deg, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 100%), 
+                url('/ImagenPrincipalHome.jpg') center/cover no-repeat;
+  }
+
+  &-content {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 2rem;
+    max-width: 90%;
+
+    @media (min-width: 768px) {
+      margin-left: 10%; 
+      max-width: 700px;
+    }
+
+    h1 {
+      font-family: 'Kaisei Opti', serif;
+      font-size: clamp(2.5rem, 6vw, 6.875rem);
+      line-height: 1.1;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+
+    .home-subtitle {
+      font-family: 'Kadwa', serif;
+      font-size: clamp(1.25rem, 2.5vw, 2.25rem);
+      @include underline-decor($accent-blue);
+    }
+
+    p {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(1rem, 1.2vw, 1.25rem);
+      line-height: 1.6;
+      max-width: 600px;
+      opacity: 0.95;
+    }
+
+    .btn-primary {
+      background-color: $primary-dark;
+      color: $text-white;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      padding: 1rem 2.5rem; 
+      width: fit-content;
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin-top: 1rem;
+
+      &:hover {
+        background-color: lighten($primary-dark, 10%);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      }
+    }
+  }
+}
+
+.content-sections {
+  padding: 4rem 1.5rem;
+  background-color: $bg-cream;
+  display: flex;
+  flex-direction: column;
+  gap: 6rem;
+
+  @media (min-width: 768px) { padding: 6rem 10%; }
+
+  .about-us {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    h2 { 
+      @include underline-decor($accent-blue);
+      font-family: 'Hanken Grotesk', sans-serif;
+      font-size: 64px;
+      font-weight: 700;
+      color: $primary-dark;
+      margin: 0 auto 3rem auto;
+      text-align: center;
+    }
+
+    &-container { @include responsive-grid(992px, 1fr 1.2fr); }
+
+    .home-aboutUs-image {
+      width: 100%;
+      height: 700px; 
+      border: $text-dark solid 5px;
+      border-radius: 40px; 
+      background: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.05)), 
+                  url('/Sobre-nosotros-image.jpg') center/cover;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1); 
+    }
+
+    &-text p {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 20px;
+      font-weight: 500;
+      line-height: 1.7;
+      color: $text-dark;
+      text-align: justify;
+      margin-bottom: 1.5rem;
+    }
+  }
+
+  .Questions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+
+    &-layout { @include responsive-grid(992px, 0.8fr 1.2fr); }
+
+    .questions-title h2 {
+      font-family: 'Kaisei Opti', serif;
+      font-size: clamp(2.5rem, 5vw, 4rem);
+      color: $primary-dark;
+      text-align: center;
+      @media (min-width: 992px) { text-align: left; }
+    }
+
+    .faq-card {
+      background-color: $text-white;
+      padding: 2.5rem;
+      border-radius: 30px;
+      border: 1.5px solid $card-border-pink;
+      text-align: center;
+      transition: all 0.3s ease;
+      margin-bottom: 2rem;
+
+      &:hover { 
+        transform: translateY(-5px); 
+        box-shadow: 0 10px 20px rgba(0,0,0,0.05); 
+      }
+
+      h3 { 
+        font-family: 'Kadwa', serif; 
+        font-size: 1.25rem; 
+        color: $card-border-pink; 
+        margin-bottom: 1rem; 
+      }
+      p { 
+        font-family: 'Space Grotesk', sans-serif; 
+        color: #64748b; 
+        font-size: 1rem; 
+      }
+    }
+  }
+}
+
+.home-footer {
+  background-color: $footer-bg;
+  color: $text-white;
+  padding: 4rem 10% 2rem;
+  font-family: 'Space Grotesk', sans-serif;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 2rem;
+
+  .footer-col {
+    flex: 1;
+    min-width: 250px;
+
+    h4 {
+      @include underline-decor($text-white, 2px, 5px);
+      font-family: 'Hanken Grotesk', sans-serif;
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+    p { font-size: 1rem; opacity: 0.9; margin: 0.8rem 0; line-height: 1.4; }
+  }
+
+  .social-icons-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 3rem;
+  }
+
+  .copyrigth {
+    width: 100%;
+    text-align: center;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 3px solid $text-white;
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+}
+
+.home-status {
+  padding: 4rem 2rem;
+  text-align: center;
+  background-color: #f8fafc;
+
+  h1 {
+    font-family: 'Poppins', sans-serif;
+    color: $accent-blue;
+    margin-bottom: 1rem;
+  }
+
+  pre {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    padding: 1rem;
+    border-radius: 8px;
+    display: inline-block;
+    max-width: 100%;
+    overflow-x: auto;
+  }
 }
