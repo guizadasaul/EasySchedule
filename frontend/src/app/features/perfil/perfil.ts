@@ -2,12 +2,12 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { NgbDateStruct, NgbDatepickerModule } from '@ng-bootstrap/ng-bootstrap';
-import { TranslatePipe } from '@ngx-translate/core';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 
 import { AuthSessionService } from '../../core/services/auth-session.service';
 import { LanguageService } from '../../core/services/language.service';
-import {MallaResponse, PerfilResponse, PerfilUpdateRequest } from './perfil.model';
+import { ToastService } from '../../core/services/toast.service';
+import { PerfilResponse, PerfilUpdateRequest } from './perfil.model';
 import { PerfilService } from './perfil.service';
 
 type PerfilEditForm = FormGroup<{
@@ -33,17 +33,18 @@ export class Perfil implements OnInit {
   protected loading = true;
   protected saving = false;
   protected errorKey = '';
-  protected showSuccessModal = false;
+  protected showIdentityConfirmModal = false;
   protected readonly fechaNacimientoMinDate: NgbDateStruct = { year: 1950, month: 1, day: 1 };
   protected readonly fechaNacimientoMaxDate: NgbDateStruct;
   protected readonly editForm: PerfilEditForm;
-  private mallasDisponibles: MallaResponse[] = [];
+  private pendingUpdatePayload: PerfilUpdateRequest | null = null;
 
   constructor(
     private readonly fb: FormBuilder,
     private readonly perfilService: PerfilService,
     private readonly authSessionService: AuthSessionService,
     private readonly languageService: LanguageService,
+    private readonly toastService: ToastService,
     private readonly translateService: TranslateService,
   ) {
     const today = new Date();
@@ -74,20 +75,13 @@ export class Perfil implements OnInit {
       return;
     }
 
-    // El endpoint de perfil espera username; evitar usar emails guardados como identificador.
-    if (username.includes('@')) {
-      this.authSessionService.clearSession();
-      this.loading = false;
-      this.errorKey = 'perfil.error.noSession';
-      return;
-    }
-
     this.perfilService.getPerfilByUsername(username).subscribe({
       next: (perfilResponse) => {
         this.loading = false;
         this.perfil = perfilResponse;
         this.cargarFormulario(perfilResponse);
         this.authSessionService.setCurrentUsername(perfilResponse.username);
+        this.authSessionService.setProfileCompleted(Boolean(perfilResponse.profileCompleted));
       },
       error: (error: { status?: number }) => {
         this.loading = false;
@@ -114,26 +108,30 @@ export class Perfil implements OnInit {
     this.cargarFormulario(this.perfil);
   }
 
-  protected activarEdicionDesdeCampo(fieldName: string): void {
-    if (this.esCampoSoloLectura(fieldName)) {
-      return;
-    }
-
-    this.activarEdicion();
-  }
-
   protected esCampoSoloLectura(fieldName: string): boolean {
     return fieldName === 'carrera' || fieldName === 'universidad';
   }
 
-  protected cerrarModalExito(): void {
-    this.showSuccessModal = false;
+  protected cerrarConfirmacionCambioIdentidad(): void {
+    this.showIdentityConfirmModal = false;
+    this.pendingUpdatePayload = null;
   }
 
-  protected cerrarModalExitoBackdrop(event: MouseEvent): void {
+  protected cerrarConfirmacionCambioIdentidadBackdrop(event: MouseEvent): void {
     if (event.target === event.currentTarget) {
-      this.cerrarModalExito();
+      this.cerrarConfirmacionCambioIdentidad();
     }
+  }
+
+  protected confirmarCambioIdentidadYGuardar(): void {
+    if (!this.pendingUpdatePayload) {
+      return;
+    }
+
+    const payload = this.pendingUpdatePayload;
+    this.showIdentityConfirmModal = false;
+    this.pendingUpdatePayload = null;
+    this.ejecutarGuardado(payload);
   }
 
   protected cancelarEdicion(): void {
@@ -169,21 +167,73 @@ export class Perfil implements OnInit {
       universidad,
     };
 
+    if (this.huboCambioIdentidadCritica(username, email)) {
+      this.pendingUpdatePayload = updatePayload;
+      this.showIdentityConfirmModal = true;
+      return;
+    }
+
+    this.ejecutarGuardado(updatePayload);
+  }
+
+  private ejecutarGuardado(updatePayload: PerfilUpdateRequest): void {
+    if (!this.perfil) {
+      return;
+    }
+
     this.saving = true;
     this.perfilService.updatePerfil(this.perfil.username, updatePayload).subscribe({
       next: (updatedPerfil) => {
         this.saving = false;
         this.editMode = false;
         this.perfil = updatedPerfil;
-        this.showSuccessModal = true;
+        this.toastService.success('perfil.success.updated');
         this.authSessionService.setCurrentUsername(this.perfil.username);
+        this.authSessionService.setProfileCompleted(Boolean(this.perfil.profileCompleted));
         this.cargarFormulario(this.perfil);
       },
-      error: () => {
+      error: (error: { status?: number; error?: { message?: string } }) => {
         this.saving = false;
+
+        if (error.status === 409) {
+          const backendMessage = this.extractBackendMessage(error);
+
+          if (backendMessage.includes('usuario')) {
+            this.toastService.error('perfil.error.usernameTaken');
+            return;
+          }
+
+          if (backendMessage.includes('correo')) {
+            this.toastService.error('perfil.error.emailTaken');
+            return;
+          }
+
+          if (backendMessage.includes('carnet')) {
+            this.toastService.error('perfil.error.carnetTaken');
+            return;
+          }
+        }
+
         this.errorKey = 'perfil.error.saveFailed';
+        this.toastService.error('perfil.error.saveFailed');
       },
     });
+  }
+
+  private huboCambioIdentidadCritica(username: string, email: string): boolean {
+    if (!this.perfil) {
+      return false;
+    }
+
+    const currentUsername = this.perfil.username.trim().toLowerCase();
+    const currentEmail = (this.perfil.email ?? '').trim().toLowerCase();
+
+    return currentUsername !== username.toLowerCase() || currentEmail !== email.toLowerCase();
+  }
+
+  private extractBackendMessage(error: { error?: { message?: string } }): string {
+    const message = error.error?.message;
+    return typeof message === 'string' ? message.toLowerCase() : '';
   }
 
   protected getNombreCompleto(): string {
@@ -200,7 +250,7 @@ export class Perfil implements OnInit {
 
   protected getFechaNacimientoFormateada(): string {
     if (!this.perfil?.fechaNacimiento) {
-      return '-';
+      return '—';
     }
 
     const fechaNacimiento = new Date(`${this.perfil.fechaNacimiento}T00:00:00`);
@@ -213,22 +263,19 @@ export class Perfil implements OnInit {
     }).format(fechaNacimiento);
   }
 
-  protected getValorSeguro(value: string | null, fieldName?: string): string {
+  protected getValorSeguro(value: string | null): string {
     const valueNormalized = (value ?? '').trim();
     
     if (valueNormalized) {
       return valueNormalized;
     }
 
-    // Si no hay valor y se especifica el nombre del campo, retornar placeholder informativo
-    if (fieldName) {
-      const placeholderKey = `perfil.placeholders.${fieldName}`;
-      const placeholder = this.translateService.instant(placeholderKey);
-      // Verificar si la traducción existe (si no existe, instant retorna la clave)
-      return placeholder !== placeholderKey ? placeholder : '-';
-    }
+    return '—';
+  }
 
-    return '-';
+  protected getReadonlyMallaValue(value: string | null): string {
+    const valueNormalized = (value ?? '').trim();
+    return valueNormalized || this.translateService.instant('perfil.readOnly');
   }
 
   protected esCampoEditablePendiente(value: string | null, fieldName: string): boolean {
@@ -285,17 +332,5 @@ export class Perfil implements OnInit {
     const month = String(dateStruct.month).padStart(2, '0');
     const day = String(dateStruct.day).padStart(2, '0');
     return `${dateStruct.year}-${month}-${day}`;
-  }
-
-  private buscarMalla(carrera: string, universidad: string): MallaResponse | undefined {
-    const carreraNormalizada = carrera.toLowerCase();
-    const universidadNormalizada = universidad.toLowerCase();
-
-    return this.mallasDisponibles.find((malla) => {
-      return (
-        malla.carrera.trim().toLowerCase() === carreraNormalizada &&
-        malla.universidad.trim().toLowerCase() === universidadNormalizada
-      );
-    });
   }
 }

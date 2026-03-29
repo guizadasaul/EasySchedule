@@ -45,15 +45,10 @@
 	font-weight: 700;
 }
 
-.perfil-page__status--success {
-	color: #166534;
-	font-weight: 700;
-}
-
 .perfil-layout {
 	display: grid;
 	gap: 1.5rem;
-	grid-template-columns: minmax(240px, 360px) 1fr;
+	grid-template-columns: minmax(220px, 320px) 1fr;
 	align-items: start;
 }
 
@@ -66,7 +61,7 @@
 .perfil-avatar-card__media {
 	display: grid;
 	place-items: center;
-	min-height: clamp(260px, 40vh, 480px);
+	min-height: clamp(220px, 34vh, 380px);
 	padding: 1.5rem;
 	background:
 		linear-gradient(180deg, rgb(25 35 55 / 28%), rgb(20 33 61 / 16%)),
@@ -104,30 +99,39 @@
 }
 
 .perfil-field span {
-	font-size: 0.92rem;
-	font-weight: 700;
-	color: #1f2937;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: #1f2937;
 }
 
-.perfil-readonly-badge {
-	width: fit-content;
-	padding: 0.15rem 0.5rem;
-	border-radius: 999px;
-	font-size: 0.72rem;
-	font-weight: 700;
+.perfil-field--text p {
+	min-height: 2rem;
+	margin: 0;
+	padding: 0.15rem 0.1rem;
+	font-size: 0.97rem;
+	line-height: 1.45;
+	color: #0f172a;
+	border-bottom: 1px solid rgb(30 41 59 / 18%);
+}
+
+.perfil-field--text .perfil-value--pending {
+	color: #6b3f00;
+	font-style: italic;
+}
+
+.perfil-field--text .perfil-value--auto {
 	color: #1e3a8a;
-	background: #dbeafe;
-	border: 1px solid #93c5fd;
+	font-style: italic;
 }
 
 .perfil-field input {
-	height: 2.7rem;
+	height: 2.35rem;
 	border-radius: 999px;
 	border: 1.5px solid rgb(30 41 59 / 55%);
-	padding: 0 1rem;
+	padding: 0 0.9rem;
 	background: color-mix(in srgb, var(--perfil-bg) 88%, white);
 	color: var(--perfil-text);
-	font-size: 0.95rem;
+	font-size: 0.9rem;
 	transition: all 150ms ease;
 }
 
@@ -170,41 +174,31 @@
 }
 
 .perfil-field--readonly input {
-	background: #e2e8f0;
-	border-color: #94a3b8;
-	color: #475569;
+	background: #dbeafe;
+	border-color: #93c5fd;
+	color: #0f172a;
 	cursor: default;
+	font-weight: 600;
+	pointer-events: none;
+}
+
+.perfil-field--readonly input::placeholder {
+	color: #1e3a8a;
+	opacity: 0.92;
 }
 
 .perfil-date-picker {
-	display: grid;
-	grid-template-columns: 1fr auto;
-	gap: 0.45rem;
-	align-items: center;
+	display: block;
 }
 
 .perfil-datepicker-input {
 	min-width: 0;
-}
-
-.perfil-date-toggle {
-	height: 2.7rem;
-	min-width: 2.7rem;
-	border-radius: 999px;
-	border: 1.5px solid rgb(30 41 59 / 55%);
-	background: color-mix(in srgb, var(--perfil-bg) 80%, white);
-	color: #1f3658;
+	padding-right: 2.5rem !important;
+	background-image: url('/assets/img/calendar.webp');
+	background-repeat: no-repeat;
+	background-position: right 0.75rem center;
+	background-size: 0.95rem 0.95rem;
 	cursor: pointer;
-	font-size: 1rem;
-	line-height: 1;
-}
-
-.perfil-date-toggle img {
-	width: 1.1rem;
-	height: 1.1rem;
-	object-fit: contain;
-	display: block;
-	margin: 0 auto;
 }
 
 :host ::ng-deep .ngb-dp-months {
@@ -236,8 +230,8 @@
 	display: inline-grid;
 	place-items: center;
 	border: none;
-	min-width: 9.2rem;
-	height: 2.4rem;
+	min-width: 8.6rem;
+	height: 2.25rem;
 	padding: 0 1.3rem;
 	border-radius: 0.5rem;
 	background: var(--perfil-primary);
@@ -247,7 +241,7 @@
 	font-size: 1rem;
 	line-height: 1;
 	cursor: pointer;
-	transition: transform 150ms ease, background-color 150ms ease;
+	transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .perfil-actions {
@@ -261,11 +255,12 @@
 .perfil-edit-btn:hover {
 	background: #5e7aa0;
 	transform: translateY(-1px);
+	box-shadow: 0 6px 16px rgba(16, 32, 52, 0.16);
 }
 
 .perfil-password-btn {
-	min-width: 11.4rem;
-	height: 2.4rem;
+	min-width: 10.6rem;
+	height: 2.25rem;
 	padding: 0 1.3rem;
 	border-radius: 0.5rem;
 	border: 1px solid #0f2748;
@@ -275,12 +270,12 @@
 	font-size: 1rem;
 	line-height: 1;
 	cursor: pointer;
-	transition: transform 150ms ease, background-color 150ms ease;
+	transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .perfil-cancel-btn {
-	min-width: 9.2rem;
-	height: 2.4rem;
+	min-width: 8.6rem;
+	height: 2.25rem;
 	padding: 0 1.3rem;
 	border-radius: 0.5rem;
 	border: 1px solid #64748b;
@@ -290,18 +285,13 @@
 	font-size: 1rem;
 	line-height: 1;
 	cursor: pointer;
-	transition: transform 150ms ease, background-color 150ms ease;
+	transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .perfil-cancel-btn:hover {
 	background: #cbd5e1;
 	transform: translateY(-1px);
-}
-
-.perfil-validation {
-	margin: 0.8rem 0 0;
-	font-weight: 600;
-	color: #b91c1c;
+	box-shadow: 0 6px 16px rgba(16, 32, 52, 0.16);
 }
 
 .perfil-modal-backdrop {
@@ -363,17 +353,43 @@
 	font-weight: 700;
 	font-size: 0.95rem;
 	cursor: pointer;
-	transition: transform 150ms ease, background-color 150ms ease;
+	transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.perfil-modal__actions {
+	display: flex;
+	justify-content: center;
+	gap: 0.65rem;
+}
+
+.perfil-modal__btn--ghost {
+	border: 1px solid #64748b;
+	background: #e2e8f0;
+	color: #0f172a;
+}
+
+.perfil-modal__btn--ghost:hover {
+	background: #cbd5e1;
 }
 
 .perfil-modal__btn:hover {
 	background: #5e7aa0;
 	transform: translateY(-1px);
+	box-shadow: 0 6px 16px rgba(16, 32, 52, 0.16);
 }
 
 .perfil-password-btn:hover {
 	background: #162a47;
 	transform: translateY(-1px);
+	box-shadow: 0 6px 16px rgba(16, 32, 52, 0.16);
+}
+
+.perfil-edit-btn:active,
+.perfil-password-btn:active,
+.perfil-cancel-btn:active,
+.perfil-modal__btn:active {
+	transform: translateY(0);
+	box-shadow: none;
 }
 
 

@@ -21,7 +21,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.OffsetDateTime;
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class EstudianteService {
@@ -63,6 +63,16 @@ public class EstudianteService {
         estudiante.setUniversidadId(request.universidadId());
         estudiante.setCarreraId(request.carreraId());
         estudiante.setMalla(malla);
+
+        if (estudiante.getUser() != null) {
+            if (estudiante.getUsername() == null || estudiante.getUsername().isBlank()) {
+                estudiante.setUsername(estudiante.getUser().getUsername());
+            }
+            if (estudiante.getCorreo() == null || estudiante.getCorreo().isBlank()) {
+                estudiante.setCorreo(estudiante.getUser().getEmail());
+            }
+        }
+
         estudiante.setProfileCompleted(isProfileCompleted(estudiante));
 
         return toResponse(estudianteRepository.save(estudiante));
@@ -110,19 +120,27 @@ public class EstudianteService {
             && !estudiante.getNombre().isBlank()
             && estudiante.getApellido() != null
             && !estudiante.getApellido().isBlank()
+            && estudiante.getUsername() != null
+            && !estudiante.getUsername().isBlank()
+            && estudiante.getCorreo() != null
+            && !estudiante.getCorreo().isBlank()
             && estudiante.getCarnetIdentidad() != null
             && !estudiante.getCarnetIdentidad().isBlank()
-            && estudiante.getFechaNacimiento() != null
-            && estudiante.getSemestreActual() != null
-            && estudiante.getUniversidadId() != null
-            && estudiante.getCarreraId() != null
-            && Objects.nonNull(estudiante.getMalla());
+            && estudiante.getFechaNacimiento() != null;
     }
 
     private EstudianteResponse toResponse(Estudiante estudiante) {
         Long mallaId = estudiante.getMalla() != null ? estudiante.getMalla().getId() : null;
         String username = estudiante.getUsername();
         String email = estudiante.getCorreo();
+
+        if ((username == null || username.isBlank()) && estudiante.getUser() != null) {
+            username = estudiante.getUser().getUsername();
+        }
+
+        if ((email == null || email.isBlank()) && estudiante.getUser() != null) {
+            email = estudiante.getUser().getEmail();
+        }
 
         return new EstudianteResponse(
             estudiante.getId(),
@@ -141,16 +159,20 @@ public class EstudianteService {
         );
     }
     public EstudianteResponse findByUsername(String username) {
-        Estudiante estudiante = estudianteRepository.findByUsernameIgnoreCase(username)
-            .orElseThrow(() -> new ResourceNotFoundException("Estudiante no encontrado con username: " + username));
+        return toResponse(getOrCreateByIdentifier(username));
+    }
 
-        return toResponse(estudiante);
+    public boolean canAccessProfile(String identifier, Long userId) {
+        return userRepository.findByUsernameIgnoreCase(identifier)
+            .or(() -> userRepository.findByEmailIgnoreCase(identifier))
+            .map(User::getId)
+            .filter((id) -> id.equals(userId))
+            .isPresent();
     }
 
     @Transactional
     public EstudianteResponse updateProfile(String username, PerfilUpdateRequest request) {
-        Estudiante estudiante = estudianteRepository.findByUsernameIgnoreCase(username)
-            .orElseThrow(() -> new ResourceNotFoundException("Estudiante no encontrado con username: " + username));
+        Estudiante estudiante = getOrCreateByIdentifier(username);
 
         User user = estudiante.getUser();
         if (user == null) {
@@ -161,11 +183,15 @@ public class EstudianteService {
         String emailNormalizado = request.email().trim().toLowerCase();
         String carnetNormalizado = request.carnetIdentidad().trim();
 
-        if (!user.getUsername().equalsIgnoreCase(usernameNormalizado) && userRepository.existsByUsername(usernameNormalizado)) {
+        if (!user.getUsername().equalsIgnoreCase(usernameNormalizado)
+            && (Boolean.TRUE.equals(userRepository.existsByUsernameIgnoreCase(usernameNormalizado))
+                || estudianteRepository.existsByUsernameIgnoreCase(usernameNormalizado))) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Error: El nombre de usuario ya está en uso");
         }
 
-        if (!user.getEmail().equalsIgnoreCase(emailNormalizado) && userRepository.existsByEmail(emailNormalizado)) {
+        if (!user.getEmail().equalsIgnoreCase(emailNormalizado)
+            && (Boolean.TRUE.equals(userRepository.existsByEmailIgnoreCase(emailNormalizado))
+                || estudianteRepository.existsByCorreoIgnoreCase(emailNormalizado))) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Error: El correo electrónico ya está registrado");
         }
 
@@ -189,5 +215,51 @@ public class EstudianteService {
         userRepository.save(user);
         Estudiante estudianteActualizado = estudianteRepository.save(estudiante);
         return toResponse(estudianteActualizado);
+    }
+
+    private Estudiante getOrCreateByIdentifier(String identifier) {
+        User user = userRepository.findByUsernameIgnoreCase(identifier)
+            .or(() -> userRepository.findByEmailIgnoreCase(identifier))
+            .orElseThrow(() -> new ResourceNotFoundException(
+                "Usuario no encontrado con username o correo: " + identifier
+            ));
+
+        Optional<Estudiante> existing = estudianteRepository.findById(user.getId());
+        if (existing.isPresent()) {
+            Estudiante estudiante = existing.get();
+            boolean changed = false;
+
+            if (estudiante.getUser() == null) {
+                estudiante.setUser(user);
+                changed = true;
+            }
+
+            if (estudiante.getUsername() == null || !estudiante.getUsername().equalsIgnoreCase(user.getUsername())) {
+                estudiante.setUsername(user.getUsername());
+                changed = true;
+            }
+
+            if (estudiante.getCorreo() == null || !estudiante.getCorreo().equalsIgnoreCase(user.getEmail())) {
+                estudiante.setCorreo(user.getEmail());
+                changed = true;
+            }
+
+            return changed ? estudianteRepository.save(estudiante) : estudiante;
+        }
+
+        Estudiante estudiante = new Estudiante();
+        estudiante.setUsername(user.getUsername());
+        estudiante.setCorreo(user.getEmail());
+        estudiante.setFechaRegistro(OffsetDateTime.now());
+        estudiante.setProfileCompleted(false);
+        estudiante.setUser(user);
+
+        try {
+            return estudianteRepository.save(estudiante);
+        } catch (RuntimeException ex) {
+            return estudianteRepository.findByUsernameIgnoreCase(user.getUsername())
+                .or(() -> estudianteRepository.findByCorreoIgnoreCase(user.getEmail()))
+                .orElseThrow(() -> ex);
+        }
     }
 }

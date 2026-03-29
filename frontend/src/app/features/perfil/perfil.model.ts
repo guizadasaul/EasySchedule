@@ -9,8 +9,11 @@ export interface PerfilResponse {
 	fechaRegistro: string | null;
 	semestreActual: number | null;
 	carrera: string | null;
+	carreraId?: number | null;
 	mallaId: number | null;
 	universidad: string | null;
+	universidadId?: number | null;
+	profileCompleted?: boolean;
 }
 
 export interface MallaResponse {

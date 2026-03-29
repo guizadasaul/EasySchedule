@@ -22,48 +22,49 @@
 
 		<article class="perfil-data-card" *ngIf="!editMode">
 			<div class="perfil-grid">
-				<label class="perfil-field">
+				<div class="perfil-field perfil-field--text">
 					<span>{{ 'perfil.fields.username' | translate }}</span>
-					<input [value]="getValorSeguro(perfil.username)" readonly (click)="activarEdicionDesdeCampo('username')" [class.perfil-input--pending]="esCampoEditablePendiente(perfil.username, 'username')" />
-				</label>
+					<p>{{ getValorSeguro(perfil.username) }}</p>
+				</div>
 
-				<label class="perfil-field">
+				<div class="perfil-field perfil-field--text">
 					<span>{{ 'perfil.fields.email' | translate }}</span>
-					<input [value]="getValorSeguro(perfil.email, 'email')" readonly (click)="activarEdicionDesdeCampo('email')" [class.perfil-input--pending]="esCampoEditablePendiente(perfil.email, 'email')" />
-				</label>
+					<p [class.perfil-value--pending]="esCampoEditablePendiente(perfil.email, 'email')">{{ getValorSeguro(perfil.email) }}</p>
+				</div>
 
-				<label class="perfil-field">
+				<div class="perfil-field perfil-field--text">
 					<span>{{ 'perfil.fields.nombre' | translate }}</span>
-					<input [value]="getValorSeguro(perfil.nombre, 'nombre')" readonly (click)="activarEdicionDesdeCampo('nombre')" [class.perfil-input--pending]="esCampoEditablePendiente(perfil.nombre, 'nombre')" />
-				</label>
+					<p [class.perfil-value--pending]="esCampoEditablePendiente(perfil.nombre, 'nombre')">{{ getValorSeguro(perfil.nombre) }}</p>
+				</div>
 
-				<label class="perfil-field">
+				<div class="perfil-field perfil-field--text">
 					<span>{{ 'perfil.fields.universidad' | translate }}</span>
-					<input [value]="getValorSeguro(perfil.universidad, 'universidad')" readonly [class.perfil-input--auto]="esCampoAutoPendiente(perfil.universidad, 'universidad')" />
-				</label>
+					<p class="perfil-value--auto">{{ getReadonlyMallaValue(perfil.universidad) }}</p>
+				</div>
 
-				<label class="perfil-field">
+				<div class="perfil-field perfil-field--text">
 					<span>{{ 'perfil.fields.apellido' | translate }}</span>
-					<input [value]="getValorSeguro(perfil.apellido, 'apellido')" readonly (click)="activarEdicionDesdeCampo('apellido')" [class.perfil-input--pending]="esCampoEditablePendiente(perfil.apellido, 'apellido')" />
-				</label>
+					<p [class.perfil-value--pending]="esCampoEditablePendiente(perfil.apellido, 'apellido')">{{ getValorSeguro(perfil.apellido) }}</p>
+				</div>
 
-				<label class="perfil-field">
+				<div class="perfil-field perfil-field--text">
 					<span>{{ 'perfil.fields.carrera' | translate }}</span>
-					<input [value]="getValorSeguro(perfil.carrera, 'carrera')" readonly [class.perfil-input--auto]="esCampoAutoPendiente(perfil.carrera, 'carrera')" />
-				</label>
+					<p class="perfil-value--auto">{{ getReadonlyMallaValue(perfil.carrera) }}</p>
+				</div>
 
-				<label class="perfil-field">
+				<div class="perfil-field perfil-field--text">
 					<span>{{ 'perfil.fields.carnet' | translate }}</span>
-					<input [value]="getValorSeguro(perfil.carnetIdentidad, 'carnetIdentidad')" readonly (click)="activarEdicionDesdeCampo('carnetIdentidad')" [class.perfil-input--pending]="esCampoEditablePendiente(perfil.carnetIdentidad, 'carnetIdentidad')" />
-				</label>
+					<p [class.perfil-value--pending]="esCampoEditablePendiente(perfil.carnetIdentidad, 'carnetIdentidad')">{{ getValorSeguro(perfil.carnetIdentidad) }}</p>
+				</div>
 
-				<label class="perfil-field">
+				<div class="perfil-field perfil-field--text">
 					<span>{{ 'perfil.fields.fechaNacimiento' | translate }}</span>
-					<input [value]="getFechaNacimientoFormateada()" readonly (click)="activarEdicionDesdeCampo('fechaNacimiento')" />
-				</label>
+					<p>{{ getFechaNacimientoFormateada() }}</p>
+				</div>
 			</div>
 
 			<div class="perfil-actions">
+				<button class="perfil-edit-btn" type="button" (click)="activarEdicion()">{{ 'perfil.actions.edit' | translate }}</button>
 				<button class="perfil-password-btn" type="button">{{ 'perfil.actions.changePassword' | translate }}</button>
 			</div>
 		</article>
@@ -73,38 +74,54 @@
 				<label class="perfil-field">
 					<span>{{ 'perfil.fields.username' | translate }}</span>
 					<input type="text" formControlName="username" />
+					<small class="form-error" *ngIf="editForm.controls.username.touched && editForm.controls.username.invalid">
+						{{ 'perfil.validation.required' | translate }}
+					</small>
 				</label>
 
 				<label class="perfil-field">
 					<span>{{ 'perfil.fields.email' | translate }}</span>
 					<input type="email" formControlName="email" />
+					<small class="form-error" *ngIf="editForm.controls.email.touched && editForm.controls.email.errors?.['required']">
+						{{ 'perfil.validation.required' | translate }}
+					</small>
+					<small class="form-error" *ngIf="editForm.controls.email.touched && editForm.controls.email.errors?.['email']">
+						{{ 'perfil.validation.emailInvalid' | translate }}
+					</small>
 				</label>
 
 				<label class="perfil-field">
 					<span>{{ 'perfil.fields.nombre' | translate }}</span>
 					<input type="text" formControlName="nombre" />
+					<small class="form-error" *ngIf="editForm.controls.nombre.touched && editForm.controls.nombre.invalid">
+						{{ 'perfil.validation.required' | translate }}
+					</small>
 				</label>
 
 				<label class="perfil-field perfil-field--readonly">
 					<span>{{ 'perfil.fields.universidad' | translate }}</span>
-					<small class="perfil-readonly-badge">{{ 'perfil.readOnly' | translate }}</small>
-					<input type="text" formControlName="universidad" readonly aria-readonly="true" />
+					<input type="text" formControlName="universidad" [placeholder]="'perfil.readOnly' | translate" readonly aria-readonly="true" tabindex="-1" />
 				</label>
 
 				<label class="perfil-field">
 					<span>{{ 'perfil.fields.apellido' | translate }}</span>
 					<input type="text" formControlName="apellido" />
+					<small class="form-error" *ngIf="editForm.controls.apellido.touched && editForm.controls.apellido.invalid">
+						{{ 'perfil.validation.required' | translate }}
+					</small>
 				</label>
 
 				<label class="perfil-field perfil-field--readonly">
 					<span>{{ 'perfil.fields.carrera' | translate }}</span>
-					<small class="perfil-readonly-badge">{{ 'perfil.readOnly' | translate }}</small>
-					<input type="text" formControlName="carrera" readonly aria-readonly="true" />
+					<input type="text" formControlName="carrera" [placeholder]="'perfil.readOnly' | translate" readonly aria-readonly="true" tabindex="-1" />
 				</label>
 
 				<label class="perfil-field">
 					<span>{{ 'perfil.fields.carnet' | translate }}</span>
 					<input type="text" formControlName="carnetIdentidad" />
+					<small class="form-error" *ngIf="editForm.controls.carnetIdentidad.touched && editForm.controls.carnetIdentidad.invalid">
+						{{ 'perfil.validation.required' | translate }}
+					</small>
 				</label>
 
 				<label class="perfil-field">
@@ -124,17 +141,14 @@
 							placement="auto"
 							[container]="'body'"
 							[readonly]="true"
+							(click)="fechaNacimientoPicker.toggle()"
 						/>
-						<button type="button" class="perfil-date-toggle" (click)="fechaNacimientoPicker.toggle()">
-							<img src="assets/img/calendar.webp" alt="calendar icon" />
-						</button>
 					</div>
+					<small class="form-error" *ngIf="editForm.controls.fechaNacimiento.touched && editForm.controls.fechaNacimiento.invalid">
+						{{ 'perfil.validation.required' | translate }}
+					</small>
 				</label>
 			</div>
-
-			<p class="perfil-validation" *ngIf="editForm.invalid && editForm.touched">
-				{{ 'perfil.validation.required' | translate }}
-			</p>
 
 			<div class="perfil-actions">
 				<button class="perfil-edit-btn" type="submit" [disabled]="saving">
@@ -146,12 +160,19 @@
 		</form>
 	</div>
 
-	<div class="perfil-modal-backdrop" *ngIf="showSuccessModal" (click)="cerrarModalExitoBackdrop($event)">
-		<section class="perfil-modal" role="dialog" aria-modal="true" [attr.aria-label]="'perfil.modal.updatedTitle' | translate">
-			<div class="perfil-modal__icon" aria-hidden="true">✓</div>
-			<h2 class="perfil-modal__title">{{ 'perfil.modal.updatedTitle' | translate }}</h2>
-			<p class="perfil-modal__text">{{ 'perfil.success.updated' | translate }}</p>
-			<button type="button" class="perfil-modal__btn" (click)="cerrarModalExito()">{{ 'perfil.modal.accept' | translate }}</button>
+	<div class="perfil-modal-backdrop" *ngIf="showIdentityConfirmModal" (click)="cerrarConfirmacionCambioIdentidadBackdrop($event)">
+		<section class="perfil-modal" role="dialog" aria-modal="true" [attr.aria-label]="'perfil.modal.identityChangeTitle' | translate">
+			<div class="perfil-modal__icon" aria-hidden="true">!</div>
+			<h2 class="perfil-modal__title">{{ 'perfil.modal.identityChangeTitle' | translate }}</h2>
+			<p class="perfil-modal__text">{{ 'perfil.modal.identityChangeBody' | translate }}</p>
+			<div class="perfil-modal__actions">
+				<button type="button" class="perfil-modal__btn perfil-modal__btn--ghost" (click)="cerrarConfirmacionCambioIdentidad()">
+					{{ 'perfil.modal.cancel' | translate }}
+				</button>
+				<button type="button" class="perfil-modal__btn" (click)="confirmarCambioIdentidadYGuardar()">
+					{{ 'perfil.modal.confirm' | translate }}
+				</button>
+			</div>
 		</section>
 	</div>
 </section>

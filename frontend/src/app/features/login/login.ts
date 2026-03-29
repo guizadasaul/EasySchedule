@@ -4,8 +4,18 @@ import { Router } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { CommonModule } from '@angular/common'; 
 import { RouterModule } from '@angular/router'; 
+import { firstValueFrom } from 'rxjs';
+
 import { FeatureToggleService } from '../../services/feature-toggle.service';
 import { AuthSessionService } from '../../core/services/auth-session.service';
+import { PerfilService } from '../perfil/perfil.service';
+import { ApiService } from '../../services/api.service';
+import { ToastService } from '../../core/services/toast.service';
+
+interface LoginResponse {
+  token?: string;
+  username?: string;
+}
 
 @Component({
   selector: 'app-login',
@@ -18,7 +28,6 @@ import { AuthSessionService } from '../../core/services/auth-session.service';
 export class LoginComponent {
 
   loading = false;
-  errorMessageKey: string | null = null;
 
 
   form!: FormGroup;
@@ -28,6 +37,9 @@ export class LoginComponent {
     private router: Router,
     private featureToggleService: FeatureToggleService,
     private authSessionService: AuthSessionService,
+    private perfilService: PerfilService,
+    private apiService: ApiService,
+    private toastService: ToastService,
   ) {
 
     this.form = this.fb.group({
@@ -41,53 +53,56 @@ export class LoginComponent {
     // Validacion
     if (this.form.invalid) {
       this.form.markAllAsTouched();
-      this.errorMessageKey = 'login.validation.required';
       return;
     }
 
     this.loading = true;
-    this.errorMessageKey = null;
     this.authSessionService.clearSession();
 
     try {
-      const res = await fetch('http://localhost:8080/api/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(this.form.value)
-      });
-
-      // Manejo de errores HTTP
-      if (!res.ok) {
-        this.errorMessageKey = res.status === 401
-          ? 'login.error.invalidCredentials'
-          : 'login.error.generic';
-        return;
-      }
-
-      const data = await res.json();
+      const data = await firstValueFrom(
+        this.apiService.post<LoginResponse, { identifier: string; password: string }>(
+          '/api/login',
+          this.form.value,
+        ),
+      );
       const rawIdentifier = this.form.get('identifier')?.value;
       const identifier = typeof rawIdentifier === 'string' ? rawIdentifier.trim() : '';
 
-      // Guardar token
-      localStorage.setItem('token', data.token);
+      this.authSessionService.setAuthToken(String(data.token ?? ''));
 
-      // Guardar username real para que Perfil pueda resolver /perfil/{username}.
       const backendUsername = typeof data.username === 'string' ? data.username.trim() : '';
-      const fallbackUsername = identifier && !identifier.includes('@') ? identifier : '';
-      const usernameToStore = backendUsername || fallbackUsername;
+      const identifierToUse = backendUsername || identifier;
 
-      if (usernameToStore) {
-        this.authSessionService.setCurrentUsername(usernameToStore);
+      if (!identifierToUse) {
+        this.toastService.error('login.error.generic');
+        this.authSessionService.clearSession();
+        return;
       }
+
+      const perfil = await firstValueFrom(this.perfilService.getPerfilByUsername(identifierToUse));
+
+      this.authSessionService.setCurrentUsername(perfil.username);
+      this.authSessionService.setProfileCompleted(perfil.profileCompleted ?? false);
 
       // Refrescar toggles para reflejar el estado en el navbar inmediatamente.
       await this.featureToggleService.loadFlags();
 
-      // Redirección
-      this.router.navigate(['/perfil']);
+      if (perfil.profileCompleted) {
+        this.toastService.success('login.success.loggedIn');
+        this.router.navigate(['/home']);
+      } else {
+        this.toastService.success('login.success.completeProfile');
+        this.router.navigate(['/perfil']);
+      }
 
-    } catch {
-      this.errorMessageKey = 'login.error.generic';
+    } catch (error: any) {
+      const status = Number(error?.status ?? 0);
+      const messageKey = status === 401
+        ? 'login.error.invalidCredentials'
+        : 'login.error.generic';
+      this.toastService.error(messageKey);
+      this.authSessionService.clearSession();
     } finally {
       this.loading = false;
     }

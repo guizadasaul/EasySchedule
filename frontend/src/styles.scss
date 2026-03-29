@@ -15,6 +15,7 @@
   --color-blue-rgb: 111, 137, 172;
   --color-blue-dark: #2f4f73;
   --color-text: #111111;
+  --color-error: #9f2017;
 }
 
 html,
@@ -81,4 +82,13 @@ body {
   .perfil-datepicker-theme.ngb-datepicker {
     width: min(19rem, calc(100vw - 1rem));
   }
+}
+
+.form-error {
+  display: block;
+  margin-top: 0.2rem;
+  color: var(--color-error);
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.2;
 }

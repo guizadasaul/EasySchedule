@@ -6,6 +6,7 @@ import { Perfil } from './perfil';
 import { PerfilService } from './perfil.service';
 import { AuthSessionService } from '../../core/services/auth-session.service';
 import { LanguageService } from '../../core/services/language.service';
+import { ToastService } from '../../core/services/toast.service';
 import { PerfilResponse } from './perfil.model';
 
 describe('Perfil Component', () => {
@@ -14,6 +15,7 @@ describe('Perfil Component', () => {
   let perfilServiceSpy: jasmine.SpyObj<PerfilService>;
   let authSessionSpy: jasmine.SpyObj<AuthSessionService>;
   let languageServiceSpy: jasmine.SpyObj<LanguageService>;
+  let toastServiceSpy: jasmine.SpyObj<ToastService>;
 
   const perfilMock: PerfilResponse = {
     id: 1,
@@ -31,9 +33,13 @@ describe('Perfil Component', () => {
   };
 
   beforeEach(async () => {
-    perfilServiceSpy = jasmine.createSpyObj<PerfilService>('PerfilService', ['getPerfilByUsername', 'updatePerfil', 'getMallas']);
-    authSessionSpy = jasmine.createSpyObj<AuthSessionService>('AuthSessionService', ['getCurrentUsername', 'setCurrentUsername', 'clearSession']);
+    perfilServiceSpy = jasmine.createSpyObj<PerfilService>('PerfilService', ['getPerfilByUsername', 'updatePerfil']);
+    authSessionSpy = jasmine.createSpyObj<AuthSessionService>(
+      'AuthSessionService',
+      ['getCurrentUsername', 'setCurrentUsername', 'setProfileCompleted', 'clearSession'],
+    );
     languageServiceSpy = jasmine.createSpyObj<LanguageService>('LanguageService', ['getCurrentLanguage']);
+    toastServiceSpy = jasmine.createSpyObj<ToastService>('ToastService', ['success', 'error']);
 
     perfilServiceSpy.getPerfilByUsername.and.returnValue(of(perfilMock));
     languageServiceSpy.getCurrentLanguage.and.returnValue('es');
@@ -45,6 +51,7 @@ describe('Perfil Component', () => {
         { provide: PerfilService, useValue: perfilServiceSpy },
         { provide: AuthSessionService, useValue: authSessionSpy },
         { provide: LanguageService, useValue: languageServiceSpy },
+        { provide: ToastService, useValue: toastServiceSpy },
       ],
     }).compileComponents();
 
@@ -84,17 +91,14 @@ describe('Perfil Component', () => {
     expect(perfilServiceSpy.getPerfilByUsername).not.toHaveBeenCalled();
   });
 
-  it('enters edit mode when clicking editable field and not for readonly field', () => {
+  it('enters edit mode when clicking edit button action', () => {
     fixture.detectChanges();
 
-    (component as any).activarEdicionDesdeCampo('carrera');
-    expect((component as any).editMode).toBeFalse();
-
-    (component as any).activarEdicionDesdeCampo('nombre');
+    (component as any).activarEdicion();
     expect((component as any).editMode).toBeTrue();
   });
 
-  it('saves profile update and opens success modal', () => {
+  it('saves profile update and emits success toast', () => {
     const updatedPerfil: PerfilResponse = {
       ...perfilMock,
       username: 'diego2',
@@ -121,9 +125,12 @@ describe('Perfil Component', () => {
     });
 
     (component as any).guardarEdicion();
+    expect((component as any).showIdentityConfirmModal).toBeTrue();
+
+    (component as any).confirmarCambioIdentidadYGuardar();
 
     expect(perfilServiceSpy.updatePerfil).toHaveBeenCalled();
-    expect((component as any).showSuccessModal).toBeTrue();
+    expect(toastServiceSpy.success).toHaveBeenCalledWith('perfil.success.updated');
     expect((component as any).editMode).toBeFalse();
     expect(authSessionSpy.setCurrentUsername).toHaveBeenCalledWith('diego2');
   });

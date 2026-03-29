@@ -28,6 +28,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 @ExtendWith(MockitoExtension.class)
 class EstudianteServiceTest {
@@ -108,8 +110,14 @@ class EstudianteServiceTest {
 
     @Test
     void findByUsernameReturnsProfileWhenUserExists() {
+        User user = new User("diego", "diego@mail.com", "hashed");
+        user.setId(40L);
         Estudiante estudiante = buildProfile("diego", "diego@mail.com");
-        when(estudianteRepository.findByUsernameIgnoreCase("diego")).thenReturn(Optional.of(estudiante));
+        estudiante.setId(40L);
+        estudiante.setUser(user);
+
+        when(userRepository.findByUsernameIgnoreCase("diego")).thenReturn(Optional.of(user));
+        when(estudianteRepository.findById(40L)).thenReturn(Optional.of(estudiante));
 
         var response = estudianteService.findByUsername("diego");
 
@@ -119,7 +127,8 @@ class EstudianteServiceTest {
 
     @Test
     void findByUsernameThrowsWhenUserDoesNotExist() {
-        when(estudianteRepository.findByUsernameIgnoreCase("missing")).thenReturn(Optional.empty());
+        when(userRepository.findByUsernameIgnoreCase("missing")).thenReturn(Optional.empty());
+        when(userRepository.findByEmailIgnoreCase("missing")).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> estudianteService.findByUsername("missing"));
     }
@@ -144,9 +153,12 @@ class EstudianteServiceTest {
             ""
         );
 
-        when(estudianteRepository.findByUsernameIgnoreCase("diego")).thenReturn(Optional.of(estudiante));
-        when(userRepository.existsByUsername("diego2")).thenReturn(false);
-        when(userRepository.existsByEmail("diego2@mail.com")).thenReturn(false);
+        when(userRepository.findByUsernameIgnoreCase("diego")).thenReturn(Optional.of(user));
+        when(estudianteRepository.findById(30L)).thenReturn(Optional.of(estudiante));
+        when(userRepository.existsByUsernameIgnoreCase("diego2")).thenReturn(false);
+        when(userRepository.existsByEmailIgnoreCase("diego2@mail.com")).thenReturn(false);
+        when(estudianteRepository.existsByUsernameIgnoreCase("diego2")).thenReturn(false);
+        when(estudianteRepository.existsByCorreoIgnoreCase("diego2@mail.com")).thenReturn(false);
         when(estudianteRepository.existsByCarnetIdentidadIgnoreCase("998877")).thenReturn(false);
         when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
         when(estudianteRepository.save(any(Estudiante.class))).thenAnswer(invocation -> invocation.getArgument(0));
@@ -160,6 +172,38 @@ class EstudianteServiceTest {
         assertEquals("998877", response.carnetIdentidad());
         verify(userRepository).save(any(User.class));
         verify(estudianteRepository).save(any(Estudiante.class));
+    }
+
+    @Test
+    void updateProfileThrowsConflictWhenUsernameAlreadyExistsIgnoreCase() {
+        User user = new User("diego", "diego@mail.com", "hashed");
+        user.setId(30L);
+
+        Estudiante estudiante = buildProfile("diego", "diego@mail.com");
+        estudiante.setId(30L);
+        estudiante.setUser(user);
+
+        PerfilUpdateRequest request = new PerfilUpdateRequest(
+            "DiegoNuevo",
+            "Diego",
+            "Suarez",
+            "diego@mail.com",
+            "998877",
+            LocalDate.of(2001, 5, 10),
+            "",
+            ""
+        );
+
+        when(userRepository.findByUsernameIgnoreCase("diego")).thenReturn(Optional.of(user));
+        when(estudianteRepository.findById(30L)).thenReturn(Optional.of(estudiante));
+        when(userRepository.existsByUsernameIgnoreCase("DiegoNuevo")).thenReturn(true);
+
+        ResponseStatusException ex = assertThrows(
+            ResponseStatusException.class,
+            () -> estudianteService.updateProfile("diego", request)
+        );
+
+        assertEquals(HttpStatus.CONFLICT, ex.getStatusCode());
     }
 
     private Estudiante buildProfile(String username, String email) {
