@@ -11,11 +11,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.server.ResponseStatusException;
@@ -77,34 +79,43 @@ public class EstudianteController {
         @PathVariable("username") String username,
         Principal principal
     ) {
-        validateProfileOwnership(username, principal);
+        Long userId = getAuthenticatedUserId(principal);
+        validateProfileOwnership(username, userId);
+        log.info("[PERFIL] Carga de perfil solicitada para el estudiante con ID: {}", userId);
         return estudianteService.findByUsername(username);
     }
 
-    @PutMapping("/perfil/{username}")
+    @RequestMapping(value = "/perfil/{username}", method = {RequestMethod.PUT, RequestMethod.PATCH})
     public EstudianteResponse updateProfile(
         @PathVariable("username") String username,
         @Valid @RequestBody PerfilUpdateRequest request,
         Principal principal
     ) {
-        validateProfileOwnership(username, principal);
+        Long userId = getAuthenticatedUserId(principal);
+        validateProfileOwnership(username, userId);
+        log.info("[PERFIL-EDICION] Intento de actualización de perfil para el estudiante con ID: {}", userId);
         return estudianteService.updateProfile(username, request);
     }
 
-    private void validateProfileOwnership(String username, Principal principal) {
-        if (principal == null || principal.getName() == null) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Sesión inválida");
-        }
-
-        Long userId;
-        try {
-            userId = Long.valueOf(principal.getName());
-        } catch (NumberFormatException ex) {
+    private void validateProfileOwnership(String username, Long userId) {
+        if (userId == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Sesión inválida");
         }
 
         if (!estudianteService.canAccessProfile(username, userId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "No tienes permisos para acceder a este perfil");
+        }
+    }
+
+    private Long getAuthenticatedUserId(Principal principal) {
+        if (principal == null || principal.getName() == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Sesión inválida");
+        }
+
+        try {
+            return Long.valueOf(principal.getName());
+        } catch (NumberFormatException ex) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Sesión inválida");
         }
     }
 }

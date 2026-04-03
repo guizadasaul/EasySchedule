@@ -21,8 +21,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 @Service
@@ -178,49 +181,131 @@ public class EstudianteService {
 
     @Transactional
     public EstudianteResponse updateProfile(String username, PerfilUpdateRequest request) {
-        Estudiante estudiante = getOrCreateByIdentifier(username);
+        Long estudianteId = null;
+        try {
+            Estudiante estudiante = getOrCreateByIdentifier(username);
+            estudianteId = estudiante.getId();
 
-        User user = estudiante.getUser();
-        if (user == null) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "El estudiante no tiene un usuario asociado");
+            User user = estudiante.getUser();
+            if (user == null) {
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "El estudiante no tiene un usuario asociado");
+            }
+
+            String usernameActual = user.getUsername();
+            String emailActual = user.getEmail();
+            String nombreActual = estudiante.getNombre();
+            String apellidoActual = estudiante.getApellido();
+            String carnetActual = estudiante.getCarnetIdentidad();
+            LocalDate fechaNacimientoActual = estudiante.getFechaNacimiento();
+
+            String usernameNormalizado = request.username().trim();
+            String emailNormalizado = request.email().trim().toLowerCase(Locale.ROOT);
+            String carnetNormalizado = request.carnetIdentidad().trim();
+            String nombreNormalizado = request.nombre().trim();
+            String apellidoNormalizado = request.apellido().trim();
+
+            if (!user.getUsername().equalsIgnoreCase(usernameNormalizado)
+                && (Boolean.TRUE.equals(userRepository.existsByUsernameIgnoreCase(usernameNormalizado))
+                    || estudianteRepository.existsByUsernameIgnoreCase(usernameNormalizado))) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Error: El nombre de usuario ya está en uso");
+            }
+
+            if (!user.getEmail().equalsIgnoreCase(emailNormalizado)
+                && (Boolean.TRUE.equals(userRepository.existsByEmailIgnoreCase(emailNormalizado))
+                    || estudianteRepository.existsByCorreoIgnoreCase(emailNormalizado))) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Error: El correo electrónico ya está registrado");
+            }
+
+            String carnetActualNormalizado = carnetActual == null ? "" : carnetActual;
+            if (!carnetActualNormalizado.equalsIgnoreCase(carnetNormalizado)
+                && estudianteRepository.existsByCarnetIdentidadIgnoreCase(carnetNormalizado)) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Error: El carnet de identidad ya está en uso");
+            }
+
+            user.setUsername(usernameNormalizado);
+            user.setEmail(emailNormalizado);
+
+            estudiante.setUsername(usernameNormalizado);
+            estudiante.setCorreo(emailNormalizado);
+            estudiante.setNombre(nombreNormalizado);
+            estudiante.setApellido(apellidoNormalizado);
+            estudiante.setCarnetIdentidad(carnetNormalizado);
+            estudiante.setFechaNacimiento(request.fechaNacimiento());
+            estudiante.setProfileCompleted(isProfileCompleted(estudiante));
+
+            List<String> camposModificados = new ArrayList<>();
+            if (!equalsIgnoreCase(usernameActual, usernameNormalizado)) {
+                camposModificados.add("username");
+            }
+            if (!equalsIgnoreCase(emailActual, emailNormalizado)) {
+                camposModificados.add("correo");
+            }
+            if (!equalsNullable(nombreActual, nombreNormalizado)) {
+                camposModificados.add("nombre");
+            }
+            if (!equalsNullable(apellidoActual, apellidoNormalizado)) {
+                camposModificados.add("apellido");
+            }
+            if (!equalsIgnoreCase(carnetActual, carnetNormalizado)) {
+                camposModificados.add("carnetIdentidad");
+            }
+            if (!equalsNullable(fechaNacimientoActual, request.fechaNacimiento())) {
+                camposModificados.add("fechaNacimiento");
+            }
+
+            userRepository.save(user);
+            Estudiante estudianteActualizado = estudianteRepository.save(estudiante);
+
+            log.info(
+                "[PERFIL-EDICION] Perfil actualizado exitosamente para el estudiante con ID: {}. Campos modificados: {}",
+                estudianteActualizado.getId(),
+                camposModificados
+            );
+
+            return toResponse(estudianteActualizado);
+        } catch (ResourceNotFoundException ex) {
+            log.warn(
+                "[PERFIL-EDICION] Fallo en actualización de perfil para el estudiante con ID: {}. Causa: {}",
+                estudianteId == null ? "N/A" : estudianteId,
+                ex.getMessage()
+            );
+            throw ex;
+        } catch (ResponseStatusException ex) {
+            log.warn(
+                "[PERFIL-EDICION] Fallo en actualización de perfil para el estudiante con ID: {}. Causa: {}",
+                estudianteId == null ? "N/A" : estudianteId,
+                ex.getReason()
+            );
+            throw ex;
+        } catch (RuntimeException ex) {
+            log.error(
+                "[PERFIL-EDICION] Fallo en actualización de perfil para el estudiante con ID: {}. Causa: {}",
+                estudianteId == null ? "N/A" : estudianteId,
+                ex.getMessage(),
+                ex
+            );
+            throw ex;
         }
+    }
 
-        String usernameNormalizado = request.username().trim();
-        String emailNormalizado = request.email().trim().toLowerCase();
-        String carnetNormalizado = request.carnetIdentidad().trim();
-
-        if (!user.getUsername().equalsIgnoreCase(usernameNormalizado)
-            && (Boolean.TRUE.equals(userRepository.existsByUsernameIgnoreCase(usernameNormalizado))
-                || estudianteRepository.existsByUsernameIgnoreCase(usernameNormalizado))) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Error: El nombre de usuario ya está en uso");
+    private boolean equalsIgnoreCase(String left, String right) {
+        if (left == null && right == null) {
+            return true;
         }
-
-        if (!user.getEmail().equalsIgnoreCase(emailNormalizado)
-            && (Boolean.TRUE.equals(userRepository.existsByEmailIgnoreCase(emailNormalizado))
-                || estudianteRepository.existsByCorreoIgnoreCase(emailNormalizado))) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Error: El correo electrónico ya está registrado");
+        if (left == null || right == null) {
+            return false;
         }
+        return left.equalsIgnoreCase(right);
+    }
 
-        String carnetActual = estudiante.getCarnetIdentidad() == null ? "" : estudiante.getCarnetIdentidad();
-        if (!carnetActual.equalsIgnoreCase(carnetNormalizado)
-            && estudianteRepository.existsByCarnetIdentidadIgnoreCase(carnetNormalizado)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Error: El carnet de identidad ya está en uso");
+    private boolean equalsNullable(Object left, Object right) {
+        if (left == null && right == null) {
+            return true;
         }
-
-        user.setUsername(usernameNormalizado);
-        user.setEmail(emailNormalizado);
-
-        estudiante.setUsername(usernameNormalizado);
-        estudiante.setCorreo(emailNormalizado);
-        estudiante.setNombre(request.nombre().trim());
-        estudiante.setApellido(request.apellido().trim());
-        estudiante.setCarnetIdentidad(carnetNormalizado);
-        estudiante.setFechaNacimiento(request.fechaNacimiento());
-        estudiante.setProfileCompleted(isProfileCompleted(estudiante));
-
-        userRepository.save(user);
-        Estudiante estudianteActualizado = estudianteRepository.save(estudiante);
-        return toResponse(estudianteActualizado);
+        if (left == null || right == null) {
+            return false;
+        }
+        return left.equals(right);
     }
 
     private Estudiante getOrCreateByIdentifier(String identifier) {
