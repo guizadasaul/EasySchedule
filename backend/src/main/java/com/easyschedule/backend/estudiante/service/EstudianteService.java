@@ -21,8 +21,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.time.OffsetDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 @Service
@@ -48,14 +51,20 @@ public class EstudianteService {
     }
 
     public List<EstudianteResponse> findAll() {
-        return estudianteRepository.findAll().stream().map(this::toResponse).toList();
+        List<EstudianteResponse> estudiantes = estudianteRepository.findAll().stream().map(this::toResponse).toList();
+        log.debug("[ESTUDIANTE_LISTA] consulta general completada | total={}", estudiantes.size());
+        return estudiantes;
     }
 
     public EstudianteResponse findById(Long id) {
-        return toResponse(getEstudianteOrThrow(id));
+        log.debug("[ESTUDIANTE_BUSQUEDA] consulta por id iniciada | id={}", id);
+        EstudianteResponse response = toResponse(getEstudianteOrThrow(id));
+        log.debug("[ESTUDIANTE_BUSQUEDA] consulta por id finalizada | id={}", id);
+        return response;
     }
 
     public EstudianteResponse update(Long id, EstudianteUpdateRequest request) {
+        log.debug("[ESTUDIANTE_UPDATE] inicio actualización administrativa | id={} mallaId={}", id, request.mallaId());
         Estudiante estudiante = getEstudianteOrThrow(id);
         Malla malla = request.mallaId() == null ? null : getMallaOrThrow(request.mallaId());
 
@@ -79,16 +88,21 @@ public class EstudianteService {
 
         estudiante.setProfileCompleted(isProfileCompleted(estudiante));
 
-        return toResponse(estudianteRepository.save(estudiante));
+        EstudianteResponse response = toResponse(estudianteRepository.save(estudiante));
+        log.info("[ESTUDIANTE_UPDATE] estudiante actualizado correctamente | id={}", id);
+        return response;
     }
 
     public void delete(Long id) {
+        log.debug("[ESTUDIANTE_DELETE] inicio eliminación | id={}", id);
         Estudiante estudiante = getEstudianteOrThrow(id);
         estudianteRepository.delete(estudiante);
+        log.info("[ESTUDIANTE_DELETE] estudiante eliminado correctamente | id={}", id);
     }
 
     @Transactional
     public EstudianteResponse register(RegistroRequest request) {
+        log.debug("[ESTUDIANTE_REGISTRO] inicio creación de perfil estudiante | username={}", request.username());
         SignupRequest signupRequest = new SignupRequest();
         signupRequest.setUsername(request.username());
         signupRequest.setEmail(request.email());
@@ -165,65 +179,154 @@ public class EstudianteService {
         );
     }
     public EstudianteResponse findByUsername(String username) {
-        return toResponse(getOrCreateByIdentifier(username));
+        log.debug("[PERFIL] búsqueda por identificador iniciada | identifier={}", username);
+        EstudianteResponse response = toResponse(getOrCreateByIdentifier(username));
+        log.debug("[PERFIL] búsqueda por identificador finalizada | identifier={}", username);
+        return response;
     }
 
     public boolean canAccessProfile(String identifier, Long userId) {
-        return userRepository.findByUsernameIgnoreCase(identifier)
+        boolean canAccess = userRepository.findByUsernameIgnoreCase(identifier)
             .or(() -> userRepository.findByEmailIgnoreCase(identifier))
             .map(User::getId)
             .filter((id) -> id.equals(userId))
             .isPresent();
+        log.trace("[PERFIL] validación de acceso | identifier={} userId={} allowed={}", identifier, userId, canAccess);
+        return canAccess;
     }
 
     @Transactional
     public EstudianteResponse updateProfile(String username, PerfilUpdateRequest request) {
-        Estudiante estudiante = getOrCreateByIdentifier(username);
+        Long estudianteId = null;
+        try {
+            log.debug("[PERFIL-EDICION] inicio actualización de perfil | identifier={}", username);
+            Estudiante estudiante = getOrCreateByIdentifier(username);
+            estudianteId = estudiante.getId();
 
-        User user = estudiante.getUser();
-        if (user == null) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "El estudiante no tiene un usuario asociado");
+            User user = estudiante.getUser();
+            if (user == null) {
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "El estudiante no tiene un usuario asociado");
+            }
+
+            String usernameActual = user.getUsername();
+            String emailActual = user.getEmail();
+            String nombreActual = estudiante.getNombre();
+            String apellidoActual = estudiante.getApellido();
+            String carnetActual = estudiante.getCarnetIdentidad();
+            LocalDate fechaNacimientoActual = estudiante.getFechaNacimiento();
+
+            String usernameNormalizado = request.username().trim();
+            String emailNormalizado = request.email().trim().toLowerCase(Locale.ROOT);
+            String carnetNormalizado = request.carnetIdentidad().trim();
+            String nombreNormalizado = request.nombre().trim();
+            String apellidoNormalizado = request.apellido().trim();
+
+            if (!user.getUsername().equalsIgnoreCase(usernameNormalizado)
+                && (Boolean.TRUE.equals(userRepository.existsByUsernameIgnoreCase(usernameNormalizado))
+                    || estudianteRepository.existsByUsernameIgnoreCase(usernameNormalizado))) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Error: El nombre de usuario ya está en uso");
+            }
+
+            if (!user.getEmail().equalsIgnoreCase(emailNormalizado)
+                && (Boolean.TRUE.equals(userRepository.existsByEmailIgnoreCase(emailNormalizado))
+                    || estudianteRepository.existsByCorreoIgnoreCase(emailNormalizado))) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Error: El correo electrónico ya está registrado");
+            }
+
+            String carnetActualNormalizado = carnetActual == null ? "" : carnetActual;
+            if (!carnetActualNormalizado.equalsIgnoreCase(carnetNormalizado)
+                && estudianteRepository.existsByCarnetIdentidadIgnoreCase(carnetNormalizado)) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Error: El carnet de identidad ya está en uso");
+            }
+
+            user.setUsername(usernameNormalizado);
+            user.setEmail(emailNormalizado);
+
+            estudiante.setUsername(usernameNormalizado);
+            estudiante.setCorreo(emailNormalizado);
+            estudiante.setNombre(nombreNormalizado);
+            estudiante.setApellido(apellidoNormalizado);
+            estudiante.setCarnetIdentidad(carnetNormalizado);
+            estudiante.setFechaNacimiento(request.fechaNacimiento());
+            estudiante.setProfileCompleted(isProfileCompleted(estudiante));
+
+            List<String> camposModificados = new ArrayList<>();
+            if (!equalsIgnoreCase(usernameActual, usernameNormalizado)) {
+                camposModificados.add("username");
+            }
+            if (!equalsIgnoreCase(emailActual, emailNormalizado)) {
+                camposModificados.add("correo");
+            }
+            if (!equalsNullable(nombreActual, nombreNormalizado)) {
+                camposModificados.add("nombre");
+            }
+            if (!equalsNullable(apellidoActual, apellidoNormalizado)) {
+                camposModificados.add("apellido");
+            }
+            if (!equalsIgnoreCase(carnetActual, carnetNormalizado)) {
+                camposModificados.add("carnetIdentidad");
+            }
+            if (!equalsNullable(fechaNacimientoActual, request.fechaNacimiento())) {
+                camposModificados.add("fechaNacimiento");
+            }
+
+            userRepository.save(user);
+            Estudiante estudianteActualizado = estudianteRepository.save(estudiante);
+
+            log.info(
+                "[PERFIL-EDICION] Perfil actualizado exitosamente para el estudiante con ID: {}. Campos modificados: {}",
+                estudianteActualizado.getId(),
+                camposModificados
+            );
+
+            return toResponse(estudianteActualizado);
+        } catch (ResourceNotFoundException ex) {
+            log.warn(
+                "[PERFIL-EDICION] Fallo en actualización de perfil para el estudiante con ID: {}. Causa: {}",
+                estudianteId == null ? "N/A" : estudianteId,
+                ex.getMessage()
+            );
+            throw ex;
+        } catch (ResponseStatusException ex) {
+            log.warn(
+                "[PERFIL-EDICION] Fallo en actualización de perfil para el estudiante con ID: {}. Causa: {}",
+                estudianteId == null ? "N/A" : estudianteId,
+                ex.getReason()
+            );
+            throw ex;
+        } catch (RuntimeException ex) {
+            log.error(
+                "[PERFIL-EDICION] Fallo en actualización de perfil para el estudiante con ID: {}. Causa: {}",
+                estudianteId == null ? "N/A" : estudianteId,
+                ex.getMessage(),
+                ex
+            );
+            throw ex;
         }
+    }
 
-        String usernameNormalizado = request.username().trim();
-        String emailNormalizado = request.email().trim().toLowerCase();
-        String carnetNormalizado = request.carnetIdentidad().trim();
-
-        if (!user.getUsername().equalsIgnoreCase(usernameNormalizado)
-            && (Boolean.TRUE.equals(userRepository.existsByUsernameIgnoreCase(usernameNormalizado))
-                || estudianteRepository.existsByUsernameIgnoreCase(usernameNormalizado))) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Error: El nombre de usuario ya está en uso");
+    private boolean equalsIgnoreCase(String left, String right) {
+        if (left == null && right == null) {
+            return true;
         }
-
-        if (!user.getEmail().equalsIgnoreCase(emailNormalizado)
-            && (Boolean.TRUE.equals(userRepository.existsByEmailIgnoreCase(emailNormalizado))
-                || estudianteRepository.existsByCorreoIgnoreCase(emailNormalizado))) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Error: El correo electrónico ya está registrado");
+        if (left == null || right == null) {
+            return false;
         }
+        return left.equalsIgnoreCase(right);
+    }
 
-        String carnetActual = estudiante.getCarnetIdentidad() == null ? "" : estudiante.getCarnetIdentidad();
-        if (!carnetActual.equalsIgnoreCase(carnetNormalizado)
-            && estudianteRepository.existsByCarnetIdentidadIgnoreCase(carnetNormalizado)) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Error: El carnet de identidad ya está en uso");
+    private boolean equalsNullable(Object left, Object right) {
+        if (left == null && right == null) {
+            return true;
         }
-
-        user.setUsername(usernameNormalizado);
-        user.setEmail(emailNormalizado);
-
-        estudiante.setUsername(usernameNormalizado);
-        estudiante.setCorreo(emailNormalizado);
-        estudiante.setNombre(request.nombre().trim());
-        estudiante.setApellido(request.apellido().trim());
-        estudiante.setCarnetIdentidad(carnetNormalizado);
-        estudiante.setFechaNacimiento(request.fechaNacimiento());
-        estudiante.setProfileCompleted(isProfileCompleted(estudiante));
-
-        userRepository.save(user);
-        Estudiante estudianteActualizado = estudianteRepository.save(estudiante);
-        return toResponse(estudianteActualizado);
+        if (left == null || right == null) {
+            return false;
+        }
+        return left.equals(right);
     }
 
     private Estudiante getOrCreateByIdentifier(String identifier) {
+        log.trace("[PERFIL] resolviendo estudiante por identificador | identifier={}", identifier);
         User user = userRepository.findByUsernameIgnoreCase(identifier)
             .or(() -> userRepository.findByEmailIgnoreCase(identifier))
             .orElseThrow(() -> new ResourceNotFoundException(
@@ -250,6 +353,7 @@ public class EstudianteService {
                 changed = true;
             }
 
+            log.trace("[PERFIL] estudiante existente reutilizado | userId={} changed={}", user.getId(), changed);
             return changed ? estudianteRepository.save(estudiante) : estudiante;
         }
 
@@ -261,8 +365,11 @@ public class EstudianteService {
         estudiante.setUser(user);
 
         try {
-            return estudianteRepository.save(estudiante);
+            Estudiante saved = estudianteRepository.save(estudiante);
+            log.trace("[PERFIL] nuevo estudiante creado desde identificador | userId={}", user.getId());
+            return saved;
         } catch (RuntimeException ex) {
+            log.debug("[PERFIL] fallo al crear estudiante, intentando recuperar registro existente | userId={} message={}", user.getId(), ex.getMessage());
             return estudianteRepository.findByUsernameIgnoreCase(user.getUsername())
                 .or(() -> estudianteRepository.findByCorreoIgnoreCase(user.getEmail()))
                 .orElseThrow(() -> ex);

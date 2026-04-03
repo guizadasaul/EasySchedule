@@ -22,6 +22,7 @@ public class SessionTokenService {
     private final SecureRandom secureRandom = new SecureRandom();
 
     public String issueToken(Long userId) {
+        log.debug("[SESSION_TOKEN] inicio emision | userId={}", userId);
         cleanupExpiredTokens();
 
         byte[] randomBytes = new byte[48];
@@ -37,10 +38,12 @@ public class SessionTokenService {
             tokenRef(token),
             expiresAt
         );
+        log.debug("[SESSION_TOKEN] token almacenado en memoria | userId={} tokenRef={}", userId, tokenRef(token));
         return token;
     }
 
     public Optional<Long> validateAndGetUserId(String token) {
+        log.debug("[SESSION_TOKEN] validacion iniciada | tokenRef={}", tokenRef(token));
         if (token == null || token.isBlank()) {
             log.warn("[SESSION_TOKEN] validacion invalida | motivo=token_vacio");
             return Optional.empty();
@@ -64,10 +67,12 @@ public class SessionTokenService {
         }
 
         log.info("[SESSION_TOKEN] validacion exitosa | userId={} tokenRef={}", record.userId(), tokenRef(token));
+        log.debug("[SESSION_TOKEN] validacion completada | userId={} tokenRef={}", record.userId(), tokenRef(token));
         return Optional.of(record.userId());
     }
 
     public void revokeToken(String token) {
+        log.debug("[SESSION_TOKEN] revocacion solicitada | tokenRef={}", tokenRef(token));
         if (token == null || token.isBlank()) {
             log.warn("[SESSION_TOKEN] revocacion ignorada | motivo=token_vacio");
             return;
@@ -83,6 +88,7 @@ public class SessionTokenService {
     }
 
     private void cleanupExpiredTokens() {
+        log.trace("[SESSION_TOKEN] limpieza de tokens expirados iniciada | totalActual={}", tokenStore.size());
         Instant now = Instant.now();
         tokenStore.entrySet().removeIf((entry) -> {
             boolean expired = entry.getValue().expiresAt().isBefore(now);
@@ -97,6 +103,7 @@ public class SessionTokenService {
             }
             return expired;
         });
+        log.trace("[SESSION_TOKEN] limpieza de tokens expirados finalizada | totalRestante={}", tokenStore.size());
     }
 
     private String tokenRef(String token) {
