@@ -51,14 +51,20 @@ public class EstudianteService {
     }
 
     public List<EstudianteResponse> findAll() {
-        return estudianteRepository.findAll().stream().map(this::toResponse).toList();
+        List<EstudianteResponse> estudiantes = estudianteRepository.findAll().stream().map(this::toResponse).toList();
+        log.debug("[ESTUDIANTE_LISTA] consulta general completada | total={}", estudiantes.size());
+        return estudiantes;
     }
 
     public EstudianteResponse findById(Long id) {
-        return toResponse(getEstudianteOrThrow(id));
+        log.debug("[ESTUDIANTE_BUSQUEDA] consulta por id iniciada | id={}", id);
+        EstudianteResponse response = toResponse(getEstudianteOrThrow(id));
+        log.debug("[ESTUDIANTE_BUSQUEDA] consulta por id finalizada | id={}", id);
+        return response;
     }
 
     public EstudianteResponse update(Long id, EstudianteUpdateRequest request) {
+        log.debug("[ESTUDIANTE_UPDATE] inicio actualización administrativa | id={} mallaId={}", id, request.mallaId());
         Estudiante estudiante = getEstudianteOrThrow(id);
         Malla malla = request.mallaId() == null ? null : getMallaOrThrow(request.mallaId());
 
@@ -82,16 +88,21 @@ public class EstudianteService {
 
         estudiante.setProfileCompleted(isProfileCompleted(estudiante));
 
-        return toResponse(estudianteRepository.save(estudiante));
+        EstudianteResponse response = toResponse(estudianteRepository.save(estudiante));
+        log.info("[ESTUDIANTE_UPDATE] estudiante actualizado correctamente | id={}", id);
+        return response;
     }
 
     public void delete(Long id) {
+        log.debug("[ESTUDIANTE_DELETE] inicio eliminación | id={}", id);
         Estudiante estudiante = getEstudianteOrThrow(id);
         estudianteRepository.delete(estudiante);
+        log.info("[ESTUDIANTE_DELETE] estudiante eliminado correctamente | id={}", id);
     }
 
     @Transactional
     public EstudianteResponse register(RegistroRequest request) {
+        log.debug("[ESTUDIANTE_REGISTRO] inicio creación de perfil estudiante | username={}", request.username());
         SignupRequest signupRequest = new SignupRequest();
         signupRequest.setUsername(request.username());
         signupRequest.setEmail(request.email());
@@ -168,21 +179,27 @@ public class EstudianteService {
         );
     }
     public EstudianteResponse findByUsername(String username) {
-        return toResponse(getOrCreateByIdentifier(username));
+        log.debug("[PERFIL] búsqueda por identificador iniciada | identifier={}", username);
+        EstudianteResponse response = toResponse(getOrCreateByIdentifier(username));
+        log.debug("[PERFIL] búsqueda por identificador finalizada | identifier={}", username);
+        return response;
     }
 
     public boolean canAccessProfile(String identifier, Long userId) {
-        return userRepository.findByUsernameIgnoreCase(identifier)
+        boolean canAccess = userRepository.findByUsernameIgnoreCase(identifier)
             .or(() -> userRepository.findByEmailIgnoreCase(identifier))
             .map(User::getId)
             .filter((id) -> id.equals(userId))
             .isPresent();
+        log.trace("[PERFIL] validación de acceso | identifier={} userId={} allowed={}", identifier, userId, canAccess);
+        return canAccess;
     }
 
     @Transactional
     public EstudianteResponse updateProfile(String username, PerfilUpdateRequest request) {
         Long estudianteId = null;
         try {
+            log.debug("[PERFIL-EDICION] inicio actualización de perfil | identifier={}", username);
             Estudiante estudiante = getOrCreateByIdentifier(username);
             estudianteId = estudiante.getId();
 
@@ -309,6 +326,7 @@ public class EstudianteService {
     }
 
     private Estudiante getOrCreateByIdentifier(String identifier) {
+        log.trace("[PERFIL] resolviendo estudiante por identificador | identifier={}", identifier);
         User user = userRepository.findByUsernameIgnoreCase(identifier)
             .or(() -> userRepository.findByEmailIgnoreCase(identifier))
             .orElseThrow(() -> new ResourceNotFoundException(
@@ -335,6 +353,7 @@ public class EstudianteService {
                 changed = true;
             }
 
+            log.trace("[PERFIL] estudiante existente reutilizado | userId={} changed={}", user.getId(), changed);
             return changed ? estudianteRepository.save(estudiante) : estudiante;
         }
 
@@ -346,8 +365,11 @@ public class EstudianteService {
         estudiante.setUser(user);
 
         try {
-            return estudianteRepository.save(estudiante);
+            Estudiante saved = estudianteRepository.save(estudiante);
+            log.trace("[PERFIL] nuevo estudiante creado desde identificador | userId={}", user.getId());
+            return saved;
         } catch (RuntimeException ex) {
+            log.debug("[PERFIL] fallo al crear estudiante, intentando recuperar registro existente | userId={} message={}", user.getId(), ex.getMessage());
             return estudianteRepository.findByUsernameIgnoreCase(user.getUsername())
                 .or(() -> estudianteRepository.findByCorreoIgnoreCase(user.getEmail()))
                 .orElseThrow(() -> ex);

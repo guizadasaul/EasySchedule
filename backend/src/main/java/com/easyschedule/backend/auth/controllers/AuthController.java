@@ -36,6 +36,7 @@ public class AuthController {
     public ResponseEntity<Void> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
         String identifier = signUpRequest.getUsername() == null ? "" : signUpRequest.getUsername().trim();
         String email = signUpRequest.getEmail() == null ? "" : signUpRequest.getEmail().trim().toLowerCase();
+        log.debug("[AUTH_REGISTRO] request recibido | username={} email={}", identifier, email);
         log.info("[AUTH_REGISTRO] Intento de registro de nuevo usuario: {} / {}", identifier, email);
         try {
             authService.registerUser(signUpRequest);
@@ -49,12 +50,14 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest request) {
         String identifier = request.getIdentifier() == null ? "" : request.getIdentifier().trim();
+        log.debug("[AUTH_LOGIN] request recibido | identifier={}", identifier);
         log.info("[AUTH_LOGIN] request recibido | identifier={}", identifier);
         return authService.login(request);
     }
 
     @PostMapping("/logout")
     public ResponseEntity<?> logout(HttpServletRequest request) {
+        log.debug("[AUTH_LOGOUT] request recibido | authorizationHeaderPresent={}", request.getHeader("Authorization") != null);
         return authService.logout(request.getHeader("Authorization"));
     }
 
@@ -73,6 +76,7 @@ public class AuthController {
         } catch (NumberFormatException ex) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Sesion invalida");
         }
+        log.debug("[AUTH_CHANGE_PASSWORD] principal resuelto | userId={}", userId);
         log.info("[AUTH_CHANGE_PASSWORD] intento | userId={}", userId);
         return authService.changePassword(userId, request);
     }

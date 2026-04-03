@@ -38,6 +38,7 @@ public class AuthService {
     public void registerUser(SignupRequest signUpRequest) {
         String normalizedUsername = signUpRequest.getUsername().trim();
         String normalizedEmail = signUpRequest.getEmail().trim().toLowerCase();
+        log.debug("[AUTH_REGISTRO] datos normalizados | username={} email={}", normalizedUsername, normalizedEmail);
         log.info("[AUTH_REGISTRO] Intento de registro de nuevo usuario: {} / {}", normalizedUsername, normalizedEmail);
 
         if (Boolean.TRUE.equals(userRepository.existsByUsernameIgnoreCase(normalizedUsername))) {
@@ -61,10 +62,13 @@ public class AuthService {
     }
     public ResponseEntity<?> login(LoginRequest request) {
         String identifier = request.getIdentifier().trim();
+        log.debug("[AUTH_LOGIN] normalizando identificador | identifier={}", identifier);
         log.info("[AUTH_LOGIN] intento autenticacion | identifier={}", identifier);
 
         Optional<User> userOpt = userRepository.findByUsernameIgnoreCase(identifier)
             .or(() -> userRepository.findByEmailIgnoreCase(identifier));
+
+        log.debug("[AUTH_LOGIN] resultado busqueda usuario | identifier={} encontrado={}", identifier, userOpt.isPresent());
 
         if (userOpt.isEmpty()) {
             log.warn("[AUTH_LOGIN] fallo autenticacion | identifier={} motivo=usuario_no_encontrado", identifier);
@@ -83,6 +87,8 @@ public class AuthService {
                     .body("Credenciales incorrectas");
         }
 
+    log.debug("[AUTH_LOGIN] credenciales validadas | userId={}", user.getId());
+
         String token = sessionTokenService.issueToken(user.getId());
         log.info("[AUTH_LOGIN] autenticacion exitosa | userId={} username={}", user.getId(), user.getUsername());
 
@@ -97,11 +103,13 @@ public class AuthService {
 
     public ResponseEntity<?> logout(String authorizationHeader) {
         String token = extractBearerToken(authorizationHeader);
+        log.debug("[AUTH_LOGOUT] token extraido para revocacion | tokenPresent={}", !token.isBlank());
         sessionTokenService.revokeToken(token);
         return ResponseEntity.ok().body(Map.of("message", "Sesion cerrada correctamente"));
     }
 
     public ResponseEntity<?> changePassword(Long userId, ChangePasswordRequest request) {
+        log.debug("[AUTH_CHANGE_PASSWORD] inicio de cambio de contraseña | userId={}", userId);
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
     
