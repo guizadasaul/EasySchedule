@@ -1,10 +1,19 @@
 <ng-container *ngIf="mallaEnabled">
   <section class="malla-page">
-    <header class="malla-page__header" *ngIf="step !== 'resumen'">
+    <header class="malla-page__header">
       <h1>{{ 'malla.title' | translate }}</h1>
       <p>{{ 'malla.description' | translate }}</p>
 
-      <div class="malla-stepper">
+      <div class="malla-page__actions" *ngIf="step === 'resumen'">
+        <button type="button" class="malla-button malla-button--outline" (click)="onCambiarMallaClick()">
+          {{ 'malla.actions.changeMalla' | translate }}
+        </button>
+        <button type="button" class="malla-button malla-button--outline" (click)="onCambiarUniversidadClick()">
+          {{ 'malla.actions.changeUniversidad' | translate }}
+        </button>
+      </div>
+
+      <div class="malla-stepper" *ngIf="step !== 'resumen'">
         <span class="malla-step" [class.malla-step--active]="step === 'universidad'">1. {{ 'malla.steps.universidad' | translate }}</span>
         <span class="malla-step" [class.malla-step--active]="step === 'carrera'">2. {{ 'malla.steps.carrera' | translate }}</span>
         <span class="malla-step" [class.malla-step--active]="step === 'malla'">3. {{ 'malla.steps.malla' | translate }}</span>
@@ -23,29 +32,36 @@
     </div>
 
     <div class="malla-card" *ngIf="!loadingUniversidades && !loadUniversidadesError && step !== 'resumen'">
-      <label class="malla-label" for="universidad-select">{{ 'malla.universidad.label' | translate }}</label>
-      <select
-        id="universidad-select"
-        class="malla-select"
-        [(ngModel)]="selectedUniversidadId"
-        (ngModelChange)="onUniversidadChange($event)"
-        required
-      >
-        <option [ngValue]="null" disabled>{{ 'malla.universidad.placeholder' | translate }}</option>
-        <option *ngFor="let universidad of universidades" [ngValue]="universidad.id">
-          {{ universidad.nombre }}
-        </option>
-      </select>
+      <ng-container *ngIf="editMode !== 'malla'">
+        <label class="malla-label" for="universidad-select">{{ 'malla.universidad.label' | translate }}</label>
+        <select
+          id="universidad-select"
+          class="malla-select"
+          [(ngModel)]="selectedUniversidadId"
+          (ngModelChange)="onUniversidadChange($event)"
+          required
+        >
+          <option [ngValue]="null" disabled>{{ 'malla.universidad.placeholder' | translate }}</option>
+          <option *ngFor="let universidad of universidades" [ngValue]="universidad.id">
+            {{ universidad.nombre }}
+          </option>
+        </select>
 
-      <p *ngIf="universidadRequiredError" class="malla-field-error">
-        {{ 'malla.validation.universidadRequired' | translate }}
-      </p>
+        <p *ngIf="universidadRequiredError" class="malla-field-error">
+          {{ 'malla.validation.universidadRequired' | translate }}
+        </p>
 
-      <button type="button" class="malla-button malla-button--save" (click)="onGuardarUniversidadClick()">
-        {{ 'malla.actions.saveUniversidad' | translate }}
-      </button>
+        <button type="button" class="malla-button malla-button--save" (click)="onGuardarUniversidadClick()">
+          {{ 'malla.actions.saveUniversidad' | translate }}
+        </button>
+      </ng-container>
 
-      <div *ngIf="step === 'carrera' || step === 'malla'" class="malla-section">
+      <div *ngIf="editMode === 'malla' && mallaChangeWarningVisible" class="malla-warning">
+        <strong>{{ 'malla.warning.title' | translate }}</strong>
+        <p>{{ 'malla.warning.progressReset' | translate }}</p>
+      </div>
+
+      <div *ngIf="(step === 'carrera' || step === 'malla') && editMode !== 'malla'" class="malla-section">
         <label class="malla-label" for="carrera-select">{{ 'malla.carrera.label' | translate }}</label>
         <select
           id="carrera-select"
@@ -99,10 +115,17 @@
         >
           {{ savingSeleccion ? ('malla.actions.saving' | translate) : ('malla.actions.saveMalla' | translate) }}
         </button>
+
+        <button type="button" class="malla-button malla-button--ghost" *ngIf="editMode !== null" (click)="onCancelChangeClick()">
+          {{ 'malla.actions.cancelChange' | translate }}
+        </button>
       </div>
     </div>
 
     <div class="malla-resumen" *ngIf="!loadingUniversidades && !loadUniversidadesError && step === 'resumen'">
+      <p *ngIf="saveSeleccionError" class="malla-field-error">
+        {{ 'malla.error.saveSeleccion' | translate }}
+      </p>
       <p class="malla-resumen__universidad">{{ getResumenUniversidad() }}</p>
       <h2>{{ getResumenCarrera() }}</h2>
       <p>{{ 'malla.summary.curriculum' | translate: { malla: getResumenMalla() } }}</p>

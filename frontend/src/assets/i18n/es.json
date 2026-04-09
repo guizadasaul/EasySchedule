@@ -120,7 +120,10 @@
       "saveUniversidad": "Guardar universidad",
       "saveCarrera": "Guardar carrera",
       "saveMalla": "Guardar malla",
-      "saving": "Guardando..."
+      "saving": "Guardando...",
+      "changeMalla": "Cambiar Malla",
+      "changeUniversidad": "Cambiar Universidad",
+      "cancelChange": "Cancelar"
     },
     "error": {
       "loadUniversidades": "No se pudieron cargar las universidades disponibles.",
@@ -142,6 +145,10 @@
     },
     "summary": {
       "curriculum": "Malla curricular {{malla}}"
+    },
+    "warning": {
+      "title": "Advertencia",
+      "progressReset": "El progreso de la malla anterior no se transferira al confirmar este cambio."
     },
     "validation": {
       "universidadRequired": "Debes seleccionar una universidad.",

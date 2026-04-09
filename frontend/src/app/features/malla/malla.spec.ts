@@ -80,15 +80,75 @@ describe('Malla component logic', () => {
   });
 
   it('marks save error when guardarSeleccion fails', async () => {
+    (component as any).editMode = 'malla';
+    (component as any).step = 'malla';
+    (component as any).selectedResumen = {
+      universidadId: 1,
+      universidad: 'UCB',
+      carreraId: 2,
+      carrera: 'Sistemas',
+      mallaId: 3,
+      malla: 'Malla 2017',
+    };
+    (component as any).previousSelectionSnapshot = { universidadId: 1, carreraId: 2, mallaId: 3 };
     (component as any).selectedUniversidadId = 1;
     (component as any).selectedCarreraId = 2;
     (component as any).selectedMallaId = 3;
     seleccionAcademicaServiceSpy.guardarSeleccion.and.returnValue(throwError(() => new Error('fail')));
+    spyOn(window, 'confirm').and.returnValue(true);
 
     (component as any).onGuardarMallaClick();
     await Promise.resolve();
 
     expect((component as any).saveSeleccionError).toBeTrue();
     expect((component as any).savingSeleccion).toBeFalse();
+    expect((component as any).step).toBe('resumen');
+    expect((component as any).selectedMallaId).toBe(3);
+  });
+
+  it('enables university change flow and resets dependent selectors', () => {
+    (component as any).selectedUniversidadId = 1;
+    (component as any).selectedCarreraId = 2;
+    (component as any).selectedMallaId = 3;
+
+    (component as any).onCambiarUniversidadClick();
+
+    expect((component as any).editMode).toBe('universidad');
+    expect((component as any).step).toBe('universidad');
+    expect((component as any).selectedCarreraId).toBeNull();
+    expect((component as any).selectedMallaId).toBeNull();
+  });
+
+  it('loads mallas for current university when changing malla', async () => {
+    (component as any).selectedUniversidadId = 1;
+    (component as any).selectedCarreraId = 11;
+    (component as any).selectedMallaId = 101;
+    carreraServiceSpy.getCarrerasActivasPorUniversidad.and.returnValue(of([{ id: 11, universidadId: 1, nombre: 'Sistemas', codigo: 'SIS' }]));
+    mallaCatalogoServiceSpy.getMallasActivasPorCarrera.and.returnValue(
+      of([
+        { id: 101, carreraId: 11, nombre: 'Malla 2017', version: '2017', active: true },
+        { id: 102, carreraId: 11, nombre: 'Malla 2024', version: '2024', active: true },
+      ]),
+    );
+
+    await (component as any).prepareMallaEditMode();
+
+    expect((component as any).editMode).toBe('malla');
+    expect((component as any).step).toBe('malla');
+    expect((component as any).mallaChangeWarningVisible).toBeTrue();
+    expect((component as any).mallas.length).toBe(2);
+  });
+
+  it('keeps selection unchanged when user cancels warning confirmation', () => {
+    (component as any).editMode = 'malla';
+    (component as any).selectedUniversidadId = 1;
+    (component as any).selectedCarreraId = 11;
+    (component as any).selectedMallaId = 102;
+    (component as any).previousSelectionSnapshot = { universidadId: 1, carreraId: 11, mallaId: 101 };
+    spyOn(window, 'confirm').and.returnValue(false);
+
+    (component as any).onGuardarMallaClick();
+
+    expect(seleccionAcademicaServiceSpy.guardarSeleccion).not.toHaveBeenCalled();
   });
 });

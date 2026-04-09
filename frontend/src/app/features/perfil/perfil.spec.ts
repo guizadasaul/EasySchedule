@@ -7,6 +7,7 @@ import { PerfilService } from './perfil.service';
 import { AuthSessionService } from '../../core/services/auth-session.service';
 import { LanguageService } from '../../core/services/language.service';
 import { ToastService } from '../../core/services/toast.service';
+import { SeleccionAcademicaService } from '../../services/academico/seleccion-academica.service';
 import { PerfilResponse } from './perfil.model';
 
 describe('Perfil Component', () => {
@@ -16,6 +17,7 @@ describe('Perfil Component', () => {
   let authSessionSpy: jasmine.SpyObj<AuthSessionService>;
   let languageServiceSpy: jasmine.SpyObj<LanguageService>;
   let toastServiceSpy: jasmine.SpyObj<ToastService>;
+  let seleccionAcademicaServiceSpy: jasmine.SpyObj<SeleccionAcademicaService>;
 
   const perfilMock: PerfilResponse = {
     id: 1,
@@ -40,9 +42,18 @@ describe('Perfil Component', () => {
     );
     languageServiceSpy = jasmine.createSpyObj<LanguageService>('LanguageService', ['getCurrentLanguage']);
     toastServiceSpy = jasmine.createSpyObj<ToastService>('ToastService', ['success', 'error']);
+    seleccionAcademicaServiceSpy = jasmine.createSpyObj<SeleccionAcademicaService>('SeleccionAcademicaService', ['getSeleccionActual']);
 
     perfilServiceSpy.getPerfilByUsername.and.returnValue(of(perfilMock));
     perfilServiceSpy.changePassword.and.returnValue(of({ message: 'ok' }));
+    seleccionAcademicaServiceSpy.getSeleccionActual.and.returnValue(of({
+      universidadId: 1,
+      universidad: 'Universidad Privada Boliviana',
+      carreraId: 2,
+      carrera: 'Ingenieria Comercial',
+      mallaId: 5,
+      malla: 'Malla 2024',
+    }));
     languageServiceSpy.getCurrentLanguage.and.returnValue('es');
     authSessionSpy.getCurrentUsername.and.returnValue('diego');
 
@@ -53,6 +64,7 @@ describe('Perfil Component', () => {
         { provide: AuthSessionService, useValue: authSessionSpy },
         { provide: LanguageService, useValue: languageServiceSpy },
         { provide: ToastService, useValue: toastServiceSpy },
+        { provide: SeleccionAcademicaService, useValue: seleccionAcademicaServiceSpy },
       ],
     }).compileComponents();
 
@@ -75,11 +87,15 @@ describe('Perfil Component', () => {
     translateService.use('es');
   });
 
-  it('loads profile on init when session has username', () => {
+  it('loads profile on init when session has username', async () => {
     fixture.detectChanges();
+    await fixture.whenStable();
 
     expect(perfilServiceSpy.getPerfilByUsername).toHaveBeenCalledWith('diego');
+    expect(seleccionAcademicaServiceSpy.getSeleccionActual).toHaveBeenCalled();
     expect((component as any).perfil?.username).toBe('diego');
+    expect((component as any).perfil?.universidad).toBe('Universidad Privada Boliviana');
+    expect((component as any).perfil?.carrera).toBe('Ingenieria Comercial');
     expect((component as any).loading).toBeFalse();
   });
 
