@@ -3,10 +3,12 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { NgbDateStruct, NgbDatepickerModule } from '@ng-bootstrap/ng-bootstrap';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
+import { firstValueFrom } from 'rxjs';
 
 import { AuthSessionService } from '../../core/services/auth-session.service';
 import { LanguageService } from '../../core/services/language.service';
 import { ToastService } from '../../core/services/toast.service';
+import { SeleccionAcademicaService } from '../../services/academico/seleccion-academica.service';
 import { ChangePasswordRequest, PerfilResponse, PerfilUpdateRequest } from './perfil.model';
 import { PerfilService } from './perfil.service';
 
@@ -51,6 +53,7 @@ export class Perfil implements OnInit {
   constructor(
     private readonly fb: FormBuilder,
     private readonly perfilService: PerfilService,
+    private readonly seleccionAcademicaService: SeleccionAcademicaService,
     private readonly authSessionService: AuthSessionService,
     private readonly languageService: LanguageService,
     private readonly toastService: ToastService,
@@ -100,6 +103,7 @@ export class Perfil implements OnInit {
         this.cargarFormulario(perfilResponse);
         this.authSessionService.setCurrentUsername(perfilResponse.username);
         this.authSessionService.setProfileCompleted(Boolean(perfilResponse.profileCompleted));
+        void this.sincronizarCamposAcademicos();
       },
       error: (error: { status?: number }) => {
         this.loading = false;
@@ -291,6 +295,7 @@ export class Perfil implements OnInit {
         this.authSessionService.setCurrentUsername(this.perfil.username);
         this.authSessionService.setProfileCompleted(Boolean(this.perfil.profileCompleted));
         this.cargarFormulario(this.perfil);
+        void this.sincronizarCamposAcademicos();
       },
       error: (error: { status?: number; error?: { message?: string } }) => {
         this.saving = false;
@@ -413,6 +418,35 @@ export class Perfil implements OnInit {
       carrera: perfil.carrera ?? '',
       universidad: perfil.universidad ?? '',
     });
+  }
+
+  private async sincronizarCamposAcademicos(): Promise<void> {
+    if (!this.perfil) {
+      return;
+    }
+
+    try {
+      const seleccion = await firstValueFrom(this.seleccionAcademicaService.getSeleccionActual());
+      const universidadSeleccion = (seleccion.universidad ?? '').trim();
+      const carreraSeleccion = (seleccion.carrera ?? '').trim();
+
+      if (!universidadSeleccion && !carreraSeleccion) {
+        return;
+      }
+
+      this.perfil = {
+        ...this.perfil,
+        universidad: universidadSeleccion || this.perfil.universidad,
+        carrera: carreraSeleccion || this.perfil.carrera,
+      };
+
+      this.editForm.patchValue({
+        universidad: this.perfil.universidad ?? '',
+        carrera: this.perfil.carrera ?? '',
+      });
+    } catch {
+      // Si falla la consulta academica, se mantiene el valor actual del perfil.
+    }
   }
 
   private toDateStruct(rawDate: string | null): NgbDateStruct | null {

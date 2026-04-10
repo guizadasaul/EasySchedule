@@ -16,6 +16,13 @@
   color: rgba(17, 17, 17, 0.76);
 }
 
+.malla-page__actions {
+  display: flex;
+  gap: 0.65rem;
+  margin-top: 0.9rem;
+  flex-wrap: wrap;
+}
+
 .malla-stepper {
   display: flex;
   flex-wrap: wrap;
@@ -96,10 +103,35 @@
   display: inline-block;
 }
 
+.malla-button--ghost {
+  margin-left: 0.55rem;
+  border: 1px solid rgba(47, 79, 115, 0.25);
+  background: transparent;
+  color: var(--color-blue-dark);
+}
+
 .malla-section {
   margin-top: 1.3rem;
   border-top: 1px solid rgba(47, 79, 115, 0.15);
   padding-top: 1rem;
+}
+
+.malla-warning {
+  margin-top: 1rem;
+  padding: 0.75rem 0.85rem;
+  border-radius: 10px;
+  border: 1px solid rgba(163, 32, 23, 0.28);
+  background: #fff3ef;
+
+  strong {
+    color: #7e2018;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  p {
+    margin: 0.4rem 0 0;
+    color: #7e2018;
+  }
 }
 
 .malla-field-help {

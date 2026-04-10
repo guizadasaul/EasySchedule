@@ -113,7 +113,10 @@
       "saveUniversidad": "Save university",
       "saveCarrera": "Save career",
       "saveMalla": "Save curriculum",
-      "saving": "Saving..."
+      "saving": "Saving...",
+      "changeMalla": "Change Curriculum",
+      "changeUniversidad": "Change University",
+      "cancelChange": "Cancel"
     },
     "error": {
       "loadUniversidades": "Could not load available universities.",
@@ -147,6 +150,10 @@
     },
     "summary": {
       "curriculum": "Curriculum {{malla}}"
+    },
+    "warning": {
+      "title": "Warning",
+      "progressReset": "Progress from your previous curriculum will not be transferred after confirming this change."
     }
   },
   "tomaMaterias": {

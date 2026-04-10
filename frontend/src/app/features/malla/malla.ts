@@ -14,6 +14,13 @@ import {
 import { UniversidadCatalogoItem, UniversidadService } from '../../services/academico/universidad.service';
 
 type SeleccionStep = 'universidad' | 'carrera' | 'malla' | 'resumen';
+type EditMode = 'universidad' | 'malla' | null;
+
+interface SeleccionSnapshot {
+  universidadId: number | null;
+  carreraId: number | null;
+  mallaId: number | null;
+}
 
 @Component({
   selector: 'app-malla',
@@ -24,6 +31,7 @@ type SeleccionStep = 'universidad' | 'carrera' | 'malla' | 'resumen';
 export class Malla implements OnInit, OnDestroy {
   protected mallaEnabled = false;
   protected step: SeleccionStep = 'universidad';
+  protected editMode: EditMode = null;
 
   protected universidades: UniversidadCatalogoItem[] = [];
   protected carreras: CarreraCatalogoItem[] = [];
@@ -48,8 +56,10 @@ export class Malla implements OnInit, OnDestroy {
   protected universidadRequiredError = false;
   protected carreraRequiredError = false;
   protected mallaRequiredError = false;
+  protected mallaChangeWarningVisible = false;
 
   private flagsSubscription?: Subscription;
+  private previousSelectionSnapshot: SeleccionSnapshot | null = null;
 
   constructor(
     private readonly featureService: FeatureToggleService,
@@ -74,6 +84,31 @@ export class Malla implements OnInit, OnDestroy {
 
   protected retryLoadUniversidades(): void {
     void this.loadUniversidades();
+  }
+
+  protected onCambiarUniversidadClick(): void {
+    this.editMode = 'universidad';
+    this.step = 'universidad';
+    this.mallaChangeWarningVisible = false;
+    this.clearErrors();
+    this.createSelectionSnapshot();
+    this.onUniversidadChange(null);
+  }
+
+  protected onCambiarMallaClick(): void {
+    if (this.selectedUniversidadId === null) {
+      return;
+    }
+
+    void this.prepareMallaEditMode();
+  }
+
+  protected onCancelChangeClick(): void {
+    this.restoreSelectionSnapshot();
+    this.clearErrors();
+    this.editMode = null;
+    this.step = 'resumen';
+    this.mallaChangeWarningVisible = false;
   }
 
   protected onUniversidadChange(selectedUniversidadId: number | null): void {
@@ -105,6 +140,11 @@ export class Malla implements OnInit, OnDestroy {
     this.selectedMallaId = selectedMallaId;
     this.mallaRequiredError = false;
     this.saveSeleccionError = false;
+
+    if (this.editMode === 'malla' && selectedMallaId !== null) {
+      const selectedMalla = this.mallas.find((malla) => malla.id === selectedMallaId);
+      this.selectedCarreraId = selectedMalla?.carreraId ?? null;
+    }
   }
 
   protected onGuardarUniversidadClick(): void {
@@ -129,6 +169,17 @@ export class Malla implements OnInit, OnDestroy {
     if (this.selectedUniversidadId === null || this.selectedCarreraId === null || this.selectedMallaId === null) {
       this.mallaRequiredError = this.selectedMallaId === null;
       return;
+    }
+
+    if (this.editMode === 'malla' && this.previousSelectionSnapshot !== null) {
+      const mallaAnteriorId = this.previousSelectionSnapshot.mallaId;
+      const isChangingMalla = mallaAnteriorId !== null && this.selectedMallaId !== mallaAnteriorId;
+      if (isChangingMalla) {
+        const confirmed = window.confirm('Cambiar de malla reiniciara tu progreso en la malla anterior. ¿Deseas continuar?');
+        if (!confirmed) {
+          return;
+        }
+      }
     }
 
     void this.guardarSeleccion();
@@ -179,8 +230,46 @@ export class Malla implements OnInit, OnDestroy {
       await this.loadCarreras(seleccion.universidadId, false);
       await this.loadMallas(seleccion.carreraId, false);
       this.step = 'resumen';
+      this.editMode = null;
+      this.mallaChangeWarningVisible = false;
+      this.previousSelectionSnapshot = null;
     } catch {
       // Si no existe selección previa o falla la carga, se mantiene el flujo normal.
+    }
+  }
+
+  private async prepareMallaEditMode(): Promise<void> {
+    if (this.selectedUniversidadId === null || this.selectedMallaId === null) {
+      return;
+    }
+
+    this.editMode = 'malla';
+    this.step = 'malla';
+    this.mallaChangeWarningVisible = true;
+    this.clearErrors();
+    this.createSelectionSnapshot();
+
+    this.loadingMallas = true;
+    this.loadMallasError = false;
+
+    try {
+      const carreras = await firstValueFrom(this.carreraService.getCarrerasActivasPorUniversidad(this.selectedUniversidadId));
+      this.carreras = carreras;
+      const mallasPorCarrera = await Promise.all(
+        carreras.map((carrera) => firstValueFrom(this.mallaCatalogoService.getMallasActivasPorCarrera(carrera.id))),
+      );
+
+      const mallasPlanas = mallasPorCarrera.flat();
+      this.mallas = mallasPlanas.filter((malla, index, source) => source.findIndex((candidate) => candidate.id === malla.id) === index);
+
+      if (!this.mallas.some((malla) => malla.id === this.selectedMallaId)) {
+        this.selectedMallaId = null;
+      }
+    } catch {
+      this.mallas = [];
+      this.loadMallasError = true;
+    } finally {
+      this.loadingMallas = false;
     }
   }
 
@@ -234,11 +323,45 @@ export class Malla implements OnInit, OnDestroy {
           mallaId: this.selectedMallaId,
         }),
       );
+      await this.loadSeleccionActual();
       this.step = 'resumen';
     } catch {
       this.saveSeleccionError = true;
+      if (this.editMode === 'malla') {
+        this.restoreSelectionSnapshot();
+        this.editMode = null;
+        this.mallaChangeWarningVisible = false;
+        this.step = 'resumen';
+      }
     } finally {
       this.savingSeleccion = false;
     }
+  }
+
+  private clearErrors(): void {
+    this.universidadRequiredError = false;
+    this.carreraRequiredError = false;
+    this.mallaRequiredError = false;
+    this.loadCarrerasError = false;
+    this.loadMallasError = false;
+    this.saveSeleccionError = false;
+  }
+
+  private createSelectionSnapshot(): void {
+    this.previousSelectionSnapshot = {
+      universidadId: this.selectedUniversidadId,
+      carreraId: this.selectedCarreraId,
+      mallaId: this.selectedMallaId,
+    };
+  }
+
+  private restoreSelectionSnapshot(): void {
+    if (this.previousSelectionSnapshot === null) {
+      return;
+    }
+
+    this.selectedUniversidadId = this.previousSelectionSnapshot.universidadId;
+    this.selectedCarreraId = this.previousSelectionSnapshot.carreraId;
+    this.selectedMallaId = this.previousSelectionSnapshot.mallaId;
   }
 }
