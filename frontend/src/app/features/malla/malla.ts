@@ -1,6 +1,7 @@
 import { NgFor, NgIf, NgClass } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { firstValueFrom, Subscription } from 'rxjs';
 
@@ -73,6 +74,8 @@ export class Malla implements OnInit, OnDestroy {
     private readonly carreraService: CarreraService,
     private readonly mallaCatalogoService: MallaCatalogoService,
     private readonly seleccionAcademicaService: SeleccionAcademicaService,
+    private readonly router: Router,
+    private readonly route: ActivatedRoute,
   ) {}
 
   ngOnInit(): void {
@@ -109,6 +112,14 @@ export class Malla implements OnInit, OnDestroy {
     void this.prepareMallaEditMode();
   }
 
+  protected onActualizarMallaClick(): void {
+    if (this.selectedMallaId === null) {
+      return;
+    }
+
+    void this.router.navigate(['actualizar'], { relativeTo: this.route });
+  }
+
   protected onCancelChangeClick(): void {
     this.restoreSelectionSnapshot();
     this.clearErrors();
@@ -121,7 +132,6 @@ export class Malla implements OnInit, OnDestroy {
     this.selectedUniversidadId = selectedUniversidadId;
     this.universidadRequiredError = false;
 
-    // Al cambiar universidad, se reinicia la selección dependiente.
     this.selectedCarreraId = null;
     this.selectedMallaId = null;
     this.carreras = [];
@@ -241,7 +251,6 @@ export class Malla implements OnInit, OnDestroy {
       this.previousSelectionSnapshot = null;
       void this.loadMaterias(this.selectedMallaId);
     } catch {
-      // Si no existe selección previa o falla la carga, se mantiene el flujo normal.
     }
   }
 
@@ -382,14 +391,11 @@ export class Malla implements OnInit, OnDestroy {
 
     try {
       this.materias = await firstValueFrom(this.mallaCatalogoService.getMateriasPorMalla(mallaId));
-      
-      // Mocking status for features demonstration
-      // Using deterministic logic based on ID and semestreSugerido to remain consistent
+
       this.materias.forEach(m => {
         if (m.semestreSugerido < this.semestreActual) {
           m.estado = 'APROBADA';
         } else if (m.semestreSugerido === this.semestreActual) {
-          // Half of current semester is approved, rest cursando
           m.estado = m.id % 2 === 0 ? 'APROBADA' : 'CURSANDO';
         } else {
           m.estado = 'PENDIENTE';
@@ -405,7 +411,7 @@ export class Malla implements OnInit, OnDestroy {
         this.materiasPorSemestre.get(sem)!.push(materia);
       });
       this.semestres.sort((a, b) => a - b);
-      
+
     } catch {
       this.loadMateriasError = true;
     } finally {
