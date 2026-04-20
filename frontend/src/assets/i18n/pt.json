@@ -108,13 +108,17 @@
     "title": "Configuração acadêmica",
     "description": "Selecione sua universidade para iniciar a configuração da grade curricular.",
     "loadingUniversidades": "Carregando universidades...",
+    "loadingMaterias": "Carregando matérias...",
     "retry": "Tentar novamente",
     "actions": {
       "saveUniversidad": "Salvar universidade",
       "saveCarrera": "Salvar carreira",
       "saveMalla": "Salvar grade curricular",
       "saving": "Salvando...",
-      "changeStatus": "Mudar estado de matérias"
+      "changeMalla": "Alterar grade curricular",
+      "changeUniversidad": "Alterar universidade",
+      "cancelChange": "Cancelar",
+      "changeStatus": "Atualizar estado de matérias"
     },
     "error": {
       "loadUniversidades": "Não foi possível carregar as universidades disponíveis.",
@@ -148,6 +152,30 @@
     },
     "summary": {
       "curriculum": "Grade curricular {{malla}}"
+    },
+    "UpdateCourse": {
+      "title": "Estado de matérias",
+      "subtitle": "Grade curricular",
+      "noMalla": "Você não tem uma grade selecionada.",
+      "selectMallaFirst": "Primeiro você precisa selecionar sua universidade, carreira e grade.",
+      "goToSelectMalla": "Ir para Selecionar Grade",
+      "errorLoading": "Erro ao carregar os dados.",
+      "errorLoadingMsg": "Não foi possível carregar as matérias.",
+      "materia": "Matéria",
+      "estado": "Estado",
+      "pendiente": "Pendente",
+      "cursando": "Em curso",
+      "aprobada": "Completada",
+      "success": "Estado da Matéria Atualizado!",
+      "errorUpdate": "Erro ao atualizar.",
+      "errorUpdateMsg": "Tente novamente.",
+      "volver": "Voltar",
+      "save": "Atualizar Matéria",
+      "saving": "Atualizando..."
+    },
+    "warning": {
+      "title": "Aviso",
+      "progressReset": "O progresso da grade anterior não será transferido após confirmar esta alteração."
     }
   },
   "tomaMaterias": {
@@ -278,10 +306,5 @@
       "backendConnection": "Não foi possível conectar ao backend",
       "server": "Erro no servidor. Tente novamente"
     }
-  },
-  "Toma de materias":{
-    "Materias disponibles": "Materias disponíveis",
-    "Materias Agregadas": "Materias Adicionados",
-    "Materias en curso": "Materias em andamento"
   }
 }
