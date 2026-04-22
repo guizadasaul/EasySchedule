@@ -5,5 +5,6 @@ public record MallaMateriaResponse(
 	Long materiaId,
 	String codigoMateria,
 	String nombreMateria,
-	Short semestreSugerido
+	Short semestreSugerido,
+	String estado
 ) {}
