@@ -132,3 +132,27 @@ Reportes:
 
 - Backend: `backend/build/reports/jacoco/test/html/index.html`
 - Frontend: `frontend/coverage/frontend/index.html`
+
+## 7) CI/CD con GitHub Actions
+
+Se incluye el workflow `.github/workflows/ci-cd.yml` con estas reglas:
+
+- En cada PR hacia `master`: ejecuta CI de backend y frontend.
+- En cada push a `master`: ejecuta CI y, si todo pasa, dispara el deploy a producción.
+- El job de deploy usa `environment: production` y falla si falla Netlify o Render.
+
+### Qué bloquea el merge
+
+Para que un PR no se pueda mergear si fallan validaciones, protege la rama `master` en GitHub y exige los checks del workflow.
+
+Importante: el deploy ocurre después del merge, en el push a `master`. Por eso, el merge se bloquea por CI, mientras que cualquier falla de deploy queda visible en GitHub Actions y hace fallar el job `deploy`.
+
+### Proteger la rama `master`
+
+Configura en `Settings > Branches > Branch protection rules`:
+
+- Regla para `master`.
+- Activar `Require status checks to pass before merging`.
+- Marcar como requeridos los checks del workflow:
+	- `Backend CI (build + tests)`
+	- `Frontend CI (test + build)`
