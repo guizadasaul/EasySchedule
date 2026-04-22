@@ -5,6 +5,7 @@ import { HttpClientTestingModule, HttpTestingController } from '@angular/common/
 import { provideRouter } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { ToastService } from '../../core/services/toast.service';
+import { environment } from '../../../environments/environment';
 
 describe('Registro Component', () => {
 
@@ -12,6 +13,8 @@ describe('Registro Component', () => {
   let fixture: ComponentFixture<Registro>;
   let httpMock: HttpTestingController;
   let toastServiceSpy: jasmine.SpyObj<ToastService>;
+  const registerPath = '/api/estudiantes/registro';
+  const registerUrl = `${environment.backendUrl.replace(/\/$/, '')}${registerPath}`;
 
   beforeEach(async () => {
 
@@ -70,7 +73,7 @@ describe('Registro Component', () => {
 
     component.registrar();
 
-    const req = httpMock.expectOne('/api/estudiantes/registro');
+    const req = httpMock.expectOne(registerUrl);
 
     expect(req.request.method).toBe('POST');
 
@@ -91,7 +94,7 @@ describe('Registro Component', () => {
 
     component.registrar();
 
-    const req = httpMock.expectOne('/api/estudiantes/registro');
+    const req = httpMock.expectOne(registerUrl);
 
     req.flush(
       { message: 'correo existente' },
