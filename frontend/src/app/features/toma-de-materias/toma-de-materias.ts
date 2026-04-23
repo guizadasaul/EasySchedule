@@ -1,6 +1,5 @@
 import { NgFor, NgIf } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import { RouterLink } from '@angular/router';
 
 import {
   HorarioActualResponse,
@@ -10,7 +9,7 @@ import {
 
 @Component({
   selector: 'app-toma-de-materias',
-  imports: [RouterLink, NgIf, NgFor],
+  imports: [NgIf, NgFor],
   templateUrl: './toma-de-materias.html',
   styleUrl: './toma-de-materias.scss',
 })
