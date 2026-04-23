@@ -1,6 +1,7 @@
 package com.easyschedule.backend.academico.estado_materia.repository;
 
 import com.easyschedule.backend.academico.estado_materia.model.EstadoMateria;
+import java.util.List;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -11,6 +12,20 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface EstadoMateriaRepository extends JpaRepository<EstadoMateria, Long> {
     Optional<EstadoMateria> findByUserIdAndMallaMateria_Id(Long userId, Long mallaMateriaId);
+    
+    List<EstadoMateria> findByUser_Id(Long userId);
+    
+    @Query(
+        """
+            SELECT e FROM EstadoMateria e 
+            JOIN e.mallaMateria mm
+            WHERE e.user.id = :userId AND mm.malla.id = :mallaId
+            """
+    )
+    List<EstadoMateria> findByUserIdAndMallaId(
+        @Param("userId") Long userId,
+        @Param("mallaId") Long mallaId
+    );
 
     @Modifying
     @Query(
