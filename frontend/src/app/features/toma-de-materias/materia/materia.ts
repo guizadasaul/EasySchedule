@@ -20,7 +20,7 @@ export class Materia {
 
   constructor(private fb: FormBuilder) {
     this.materiaForm = this.fb.group({
-      bloques: this.fb.formArray([])
+      bloques: this.fb.array([])
     });
     this.addBloque();
   }
