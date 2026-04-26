@@ -4,126 +4,93 @@ import com.easyschedule.backend.academico.estado_materia.dto.EstadoMateriaReques
 import com.easyschedule.backend.academico.estado_materia.dto.EstadoMateriaResponse;
 import com.easyschedule.backend.academico.estado_materia.model.EstadoMateria;
 import com.easyschedule.backend.academico.estado_materia.repository.EstadoMateriaRepository;
-import com.easyschedule.backend.academico.malla.model.MallaMateria;
-import com.easyschedule.backend.academico.malla.repository.MallaMateriaRepository;
-import com.easyschedule.backend.estudiante.model.Estudiante;
-import com.easyschedule.backend.estudiante.repository.EstudianteRepository;
-import org.springframework.http.HttpStatus;
+import java.util.List;
+import java.util.Locale;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
-
-import java.time.OffsetDateTime;
-import java.util.List;
-import java.util.Optional;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Service
 public class EstadoMateriaService {
 
-    private static final Logger log = LoggerFactory.getLogger(EstadoMateriaService.class);
-
     private final EstadoMateriaRepository estadoMateriaRepository;
-    private final MallaMateriaRepository mallaMateriaRepository;
-    private final EstudianteRepository estudianteRepository;
 
-    public EstadoMateriaService(
-        EstadoMateriaRepository estadoMateriaRepository,
-        MallaMateriaRepository mallaMateriaRepository,
-        EstudianteRepository estudianteRepository
-    ) {
+    public EstadoMateriaService(EstadoMateriaRepository estadoMateriaRepository) {
         this.estadoMateriaRepository = estadoMateriaRepository;
-        this.mallaMateriaRepository = mallaMateriaRepository;
-        this.estudianteRepository = estudianteRepository;
+    }
+
+    public String getEstadoMateria(Long userId, Long mallaMateriaId) {
+        return estadoMateriaRepository
+                .findByUserIdAndMallaMateria_Id(userId, mallaMateriaId)
+                .map(EstadoMateria::getEstado)
+                .orElse(null);
     }
 
     public List<EstadoMateriaResponse> getEstadosByUserId(Long userId) {
-        return estadoMateriaRepository.findByUserId(userId).stream()
-            .map(EstadoMateriaResponse::fromEntity)
+        return estadoMateriaRepository.findByUser_Id(userId)
+            .stream()
+            .map(this::mapToResponse)
             .toList();
     }
 
     public List<EstadoMateriaResponse> getEstadosByMalla(Long userId, Long mallaId) {
-        return estadoMateriaRepository.findByUserIdAndMallaId(userId, mallaId).stream()
-            .map(EstadoMateriaResponse::fromEntity)
+        return estadoMateriaRepository.findByUserIdAndMallaId(userId, mallaId)
+            .stream()
+            .map(this::mapToResponse)
             .toList();
     }
 
     @Transactional
     public EstadoMateriaResponse saveEstado(Long userId, EstadoMateriaRequest request) {
-        validarPropiedadMallaMateria(userId, request.mallaMateriaId());
-
-        Optional<EstadoMateria> existenteOpt = estadoMateriaRepository.findByUserIdAndMallaMateriaId(
-            userId, request.mallaMateriaId()
+        estadoMateriaRepository.upsertEstado(
+            userId,
+            request.mallaMateriaId(),
+            request.estado()
         );
-
-        EstadoMateria estado;
-        if (existenteOpt.isPresent()) {
-            estado = existenteOpt.get();
-            log.debug("[ESTADO_MATERIA_SAVE] actualizando estado existente | userId={} mallaMateriaId={}", userId, request.mallaMateriaId());
-            estado.setEstado(request.estado());
-            estado.setFechaActualizacion(OffsetDateTime.now());
-        } else {
-            log.debug("[ESTADO_MATERIA_SAVE] creando nuevo estado | userId={} mallaMateriaId={}", userId, request.mallaMateriaId());
-            estado = new EstadoMateria(userId, request.mallaMateriaId(), request.estado());
-        }
-
-        EstadoMateria saved = estadoMateriaRepository.save(estado);
-        log.info("[ESTADO_MATERIA_SAVE] estado guardado exitosamente | userId={} id={}", userId, saved.getId());
-        return EstadoMateriaResponse.fromEntity(saved);
+        EstadoMateria estado = estadoMateriaRepository
+            .findByUserIdAndMallaMateria_Id(userId, request.mallaMateriaId())
+            .orElseThrow(() -> new RuntimeException("Estado no guardado"));
+        return mapToResponse(estado);
     }
 
     @Transactional
     public List<EstadoMateriaResponse> saveEstados(Long userId, List<EstadoMateriaRequest> requests) {
-        log.info("[ESTADO_MATERIA_BATCH] procesando {} estados en lote | userId={}", requests.size(), userId);
         return requests.stream()
-            .map(req -> saveEstadoInternal(userId, req))
+            .map(request -> saveEstado(userId, request))
             .toList();
     }
 
-    private EstadoMateriaResponse saveEstadoInternal(Long userId, EstadoMateriaRequest request) {
-        validarPropiedadMallaMateria(userId, request.mallaMateriaId());
-
-        Optional<EstadoMateria> existenteOpt = estadoMateriaRepository.findByUserIdAndMallaMateriaId(
-            userId, request.mallaMateriaId()
-        );
-
-        EstadoMateria estado;
-        if (existenteOpt.isPresent()) {
-            estado = existenteOpt.get();
-            log.debug("[ESTADO_MATERIA_SAVE] actualizando estado existente | userId={} mallaMateriaId={}", userId, request.mallaMateriaId());
-            estado.setEstado(request.estado());
-            estado.setFechaActualizacion(OffsetDateTime.now());
-        } else {
-            log.debug("[ESTADO_MATERIA_SAVE] creando nuevo estado | userId={} mallaMateriaId={}", userId, request.mallaMateriaId());
-            estado = new EstadoMateria(userId, request.mallaMateriaId(), request.estado());
-        }
-
-        EstadoMateria saved = estadoMateriaRepository.save(estado);
-        log.info("[ESTADO_MATERIA_SAVE] estado guardado exitosamente | userId={} id={}", userId, saved.getId());
-        return EstadoMateriaResponse.fromEntity(saved);
+    @Transactional
+    public void syncEstadoFromToma(Long userId, Long mallaMateriaId, String tomaEstado) {
+        String estadoDestino = mapEstadoTomaToEstadoMateria(tomaEstado);
+        estadoMateriaRepository.upsertEstado(userId, mallaMateriaId, estadoDestino);
     }
 
-    private void validarPropiedadMallaMateria(Long userId, Long mallaMateriaId) {
-        Estudiante estudiante = estudianteRepository.findById(userId)
-            .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuario no encontrado"));
+    @Transactional
+    public void markPendiente(Long userId, Long mallaMateriaId) {
+        estadoMateriaRepository.upsertEstado(userId, mallaMateriaId, "pendiente");
+    }
 
-        if (estudiante.getMalla() == null) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Usuario sin malla asignada");
+    private EstadoMateriaResponse mapToResponse(EstadoMateria entity) {
+        return new EstadoMateriaResponse(
+            entity.getId(),
+            entity.getUser().getId(),
+            entity.getMallaMateria().getId(),
+            entity.getEstado(),
+            entity.getFechaActualizacion()
+        );
+    }
+
+    private String mapEstadoTomaToEstadoMateria(String tomaEstado) {
+        if (tomaEstado == null) {
+            return "cursando";
         }
 
-        Optional<MallaMateria> mallaMateriaOpt = mallaMateriaRepository.findById(mallaMateriaId);
-        if (mallaMateriaOpt.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "MallaMateria no encontrada");
-        }
-
-        MallaMateria mallaMateria = mallaMateriaOpt.get();
-        if (!mallaMateria.getMalla().getId().equals(estudiante.getMalla().getId())) {
-            log.warn("[IDOR_BLOCKED] intento de acceso no autorizado | userId={} mallaMateriaId={} mallaUsuarioId={}", 
-                userId, mallaMateriaId, estudiante.getMalla().getId());
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "MallaMateria no pertenece al curriculum del usuario");
-        }
+        String normalized = tomaEstado.trim().toLowerCase(Locale.ROOT);
+        return switch (normalized) {
+            case "aprobada" -> "aprobada";
+            case "inscrita" -> "cursando";
+            case "retirada", "reprobada" -> "pendiente";
+            default -> "cursando";
+        };
     }
 }

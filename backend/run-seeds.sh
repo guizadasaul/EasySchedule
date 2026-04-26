@@ -39,6 +39,8 @@ fi
 "${PSQL_BASE[@]}" -f "$RESOURCES_DIR/seed/seed_mallas.sql"
 "${PSQL_BASE[@]}" -f "$RESOURCES_DIR/seed/seed_materias.sql"
 "${PSQL_BASE[@]}" -f "$RESOURCES_DIR/seed/seed_malla_materia.sql"
+"${PSQL_BASE[@]}" -f "$RESOURCES_DIR/seed/seed_ofertas.sql"
 "${PSQL_BASE[@]}" -f "$RESOURCES_DIR/seed/seed_prerequisitos.sql"
+"${PSQL_BASE[@]}" -f "$RESOURCES_DIR/seed/seed_default_usuario.sql"
 
 echo "Seeds ejecutados correctamente."

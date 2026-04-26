@@ -1,19 +1,45 @@
 package com.easyschedule.backend.academico.estado_materia.repository;
 
 import com.easyschedule.backend.academico.estado_materia.model.EstadoMateria;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.util.List;
-import java.util.Optional;
-
 @Repository
 public interface EstadoMateriaRepository extends JpaRepository<EstadoMateria, Long> {
-    List<EstadoMateria> findByUserId(Long userId);
-    Optional<EstadoMateria> findByUserIdAndMallaMateriaId(Long userId, Long mallaMateriaId);
+    Optional<EstadoMateria> findByUserIdAndMallaMateria_Id(Long userId, Long mallaMateriaId);
+    
+    List<EstadoMateria> findByUser_Id(Long userId);
+    
+    @Query(
+        """
+            SELECT e FROM EstadoMateria e 
+            JOIN e.mallaMateria mm
+            WHERE e.user.id = :userId AND mm.malla.id = :mallaId
+            """
+    )
+    List<EstadoMateria> findByUserIdAndMallaId(
+        @Param("userId") Long userId,
+        @Param("mallaId") Long mallaId
+    );
 
-    @Query(value = "SELECT e.* FROM estado_materia_estudiante e INNER JOIN malla_materia mm ON e.malla_materia_id = mm.id WHERE e.user_id = :userId AND mm.malla_id = :mallaId", nativeQuery = true)
-    List<EstadoMateria> findByUserIdAndMallaId(@Param("userId") Long userId, @Param("mallaId") Long mallaId);
+    @Modifying
+    @Query(
+        value = """
+            INSERT INTO estado_materia_estudiante (user_id, malla_materia_id, estado, fecha_actualizacion)
+            VALUES (:userId, :mallaMateriaId, :estado, NOW())
+            ON CONFLICT (user_id, malla_materia_id)
+            DO UPDATE SET estado = EXCLUDED.estado, fecha_actualizacion = NOW()
+            """,
+        nativeQuery = true
+    )
+    void upsertEstado(
+        @Param("userId") Long userId,
+        @Param("mallaMateriaId") Long mallaMateriaId,
+        @Param("estado") String estado
+    );
 }

@@ -418,17 +418,7 @@ export class Malla implements OnInit, OnDestroy {
     this.semestres = [];
 
     try {
-      const [materiasBD, estados]: [MallaMateria[], EstadoMateriaItem[]] = await Promise.all([
-        firstValueFrom(this.mallaCatalogoService.getMateriasPorMalla(mallaId)),
-        firstValueFrom(this.estadoMateriaService.getEstadosPorMalla(mallaId)),
-      ]);
-
-      const estadosMap = new Map<number, string>(estados.map(e => [e.mallaMateriaId, e.estado]));
-
-      this.materias = materiasBD.map(m => ({
-        ...m,
-        estado: this.mapEstadoBDToUI(estadosMap.get(m.id)),
-      }));
+      this.materias = await firstValueFrom(this.mallaCatalogoService.getMateriasPorMalla(mallaId));
 
       this.materias.forEach(materia => {
         const sem = materia.semestreSugerido;
