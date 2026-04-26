@@ -15,6 +15,59 @@
 	}
 }
 
+.horario-export {
+	margin-top: 1rem;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.8rem;
+}
+
+.horario-export__label {
+	font-weight: 600;
+	color: #1b2330;
+}
+
+.horario-export__select {
+	min-width: 180px;
+	padding: 0.45rem 0.7rem;
+	border-radius: 10px;
+	border: 1px solid rgba(34, 53, 74, 0.35);
+	background: #f5f7fb;
+	font-family: 'Poppins', sans-serif;
+}
+
+.horario-export__button {
+	padding: 0.5rem 1rem;
+	border-radius: 12px;
+	border: none;
+	background: #274a69;
+	color: #f5f9ff;
+	font-family: 'Poppins', sans-serif;
+	font-weight: 600;
+	cursor: pointer;
+	transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.horario-export__button:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+}
+
+.horario-export__message {
+	margin-top: 0.6rem;
+	padding: 0.6rem 0.8rem;
+	border-radius: 10px;
+	background: #e8eef4;
+	color: #1c3047;
+	font-family: 'Poppins', sans-serif;
+}
+
+.horario-export__message--error {
+	background: #fff0ed;
+	color: #7f271f;
+}
+
 .horario-chip {
 	display: inline-block;
 	padding-bottom: 0.15rem;

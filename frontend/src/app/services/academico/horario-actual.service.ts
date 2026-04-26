@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { HttpResponse } from '@angular/common/http';
 
 import { ApiService } from '../api.service';
 
@@ -30,5 +31,10 @@ export class HorarioActualService {
 
   getHorarioActual(): Observable<HorarioActualResponse> {
     return this.apiService.get<HorarioActualResponse>('/api/academico/horario/actual');
+  }
+
+  exportHorarioActualCsv(estudianteId: number): Observable<HttpResponse<Blob>> {
+    const path = `/api/academico/horario/actual/${estudianteId}/export?formato=csv`;
+    return this.apiService.getBlob(path);
   }
 }
