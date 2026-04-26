@@ -63,7 +63,7 @@ class TomaMateriaServiceTest {
         oferta.setMallaMateriaId(77L);
         
         Materia materia = new Materia();
-        materia.setCreditos(5);
+        materia.setCreditos((short) 5);
         materia.setNombre("Matematicas");
         
         MallaMateria mm = new MallaMateria();
@@ -84,7 +84,7 @@ class TomaMateriaServiceTest {
         oferta.setMallaMateriaId(77L);
         
         Materia materia = new Materia();
-        materia.setCreditos(5);
+        materia.setCreditos((short) 5);
         materia.setNombre("Fisica");
         
         MallaMateria mm = new MallaMateria();
@@ -116,7 +116,7 @@ class TomaMateriaServiceTest {
         oferta.setMallaMateriaId(77L);
         
         Materia materia = new Materia();
-        materia.setCreditos(35); // Forzamos el límite de 30
+        materia.setCreditos((short) 35);
         
         MallaMateria mm = new MallaMateria();
         mm.setId(77L);
@@ -138,7 +138,7 @@ class TomaMateriaServiceTest {
         oferta.setMallaMateriaId(77L);
         
         Materia materia = new Materia();
-        materia.setCreditos(5);
+        materia.setCreditos((short) 5);
         
         MallaMateria mm = new MallaMateria();
         mm.setId(77L);
