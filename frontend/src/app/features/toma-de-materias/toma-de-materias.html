@@ -9,6 +9,23 @@
 			<span *ngIf="h.semestreOferta"> | {{ h.semestreOferta }}</span>
 			<span *ngIf="h.semestreActual"> | Semestre {{ h.semestreActual }}</span>
 		</p>
+
+		<div class="horario-export">
+			<label class="horario-export__label" for="export-format">Formato</label>
+			<select id="export-format" class="horario-export__select" [(ngModel)]="exportFormat">
+				<option value="csv">CSV</option>
+				<option value="pdf">PDF</option>
+				<option value="imagen">Imagen</option>
+			</select>
+			<button class="horario-export__button" type="button" (click)="exportHorario()" [disabled]="exportLoading">
+				<span *ngIf="!exportLoading">Exportar horario</span>
+				<span *ngIf="exportLoading">Generando...</span>
+			</button>
+		</div>
+		<div class="horario-export__message" *ngIf="exportInfo">{{ exportInfo }}</div>
+		<div class="horario-export__message horario-export__message--error" *ngIf="exportError">
+			{{ exportError }}
+		</div>
 	</header>
 
 	<div class="horario-state" *ngIf="loading">Cargando horario...</div>
@@ -16,7 +33,11 @@
 		No se pudo cargar el horario. Intenta nuevamente.
 	</div>
 
-	<div class="horario-grid-wrapper" *ngIf="!loading && !error">
+	<div class="horario-state" *ngIf="!loading && !error && (!horario || !horario.clases || horario.clases.length === 0)">
+		No hay horario disponible para exportar.
+	</div>
+
+	<div class="horario-grid-wrapper" *ngIf="!loading && !error && horario && horario.clases && horario.clases.length">
 		<table class="horario-grid">
 			<thead>
 				<tr>

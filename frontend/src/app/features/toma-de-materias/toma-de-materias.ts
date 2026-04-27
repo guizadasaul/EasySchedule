@@ -1,15 +1,19 @@
 import { NgFor, NgIf } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { HttpErrorResponse } from '@angular/common/http';
 
 import {
   HorarioActualResponse,
   HorarioActualService,
   HorarioClase,
 } from '../../services/academico/horario-actual.service';
+import { AuthSessionService } from '../../core/services/auth-session.service';
+import { PerfilService } from '../perfil/perfil.service';
 
 @Component({
   selector: 'app-toma-de-materias',
-  imports: [NgIf, NgFor],
+  imports: [NgIf, NgFor, FormsModule],
   templateUrl: './toma-de-materias.html',
   styleUrl: './toma-de-materias.scss',
 })
@@ -29,10 +33,20 @@ export class TomaDeMaterias implements OnInit {
   protected horario: HorarioActualResponse | null = null;
   protected loading = true;
   protected error = false;
+  protected exportLoading = false;
+  protected exportFormat = 'csv';
+  protected exportError = '';
+  protected exportInfo = '';
   protected timeRows: string[] = [...this.timeRowsDefault];
   protected cellMap = new Map<string, HorarioClase[]>();
 
-  constructor(private readonly horarioActualService: HorarioActualService) {}
+  private estudianteId: number | null = null;
+
+  constructor(
+    private readonly horarioActualService: HorarioActualService,
+    private readonly authSessionService: AuthSessionService,
+    private readonly perfilService: PerfilService,
+  ) {}
 
   ngOnInit(): void {
     this.horarioActualService.getHorarioActual().subscribe({
@@ -46,10 +60,115 @@ export class TomaDeMaterias implements OnInit {
         this.loading = false;
       },
     });
+
+    this.loadEstudianteId();
+  }
+
+  protected exportHorario(): void {
+    this.exportError = '';
+    this.exportInfo = '';
+
+    if (this.exportLoading) {
+      return;
+    }
+
+    if (!this.horario || !this.horario.clases || this.horario.clases.length === 0) {
+      this.exportInfo = 'No hay horario disponible para exportar.';
+      return;
+    }
+
+    if (!['csv', 'pdf', 'imagen'].includes(this.exportFormat)) {
+      this.exportError = 'Formato no soportado por el momento.';
+      return;
+    }
+
+    if (this.estudianteId) {
+      this.requestExport(this.estudianteId, this.exportFormat);
+      return;
+    }
+
+    const username = this.authSessionService.getCurrentUsername();
+    if (!username) {
+      this.exportError = 'No se pudo identificar la sesion del estudiante.';
+      return;
+    }
+
+    this.exportLoading = true;
+    this.perfilService.getPerfilByUsername(username).subscribe({
+      next: (perfil) => {
+        this.estudianteId = perfil.id;
+        this.requestExport(perfil.id, this.exportFormat);
+      },
+      error: () => {
+        this.exportLoading = false;
+        this.exportError = 'No se pudo identificar al estudiante.';
+      },
+    });
   }
 
   protected getCellItems(timeRow: string, dia: string): HorarioClase[] {
     return this.cellMap.get(this.cellKey(timeRow, dia)) ?? [];
+  }
+
+  private requestExport(estudianteId: number, formato: string): void {
+    this.exportLoading = true;
+    const exportRequest = formato === 'pdf'
+      ? this.horarioActualService.exportHorarioActualPdf(estudianteId)
+      : (formato === 'imagen'
+        ? this.horarioActualService.exportHorarioActualImage(estudianteId)
+        : this.horarioActualService.exportHorarioActualCsv(estudianteId));
+
+    exportRequest.subscribe({
+      next: (response) => {
+        this.exportLoading = false;
+        this.triggerDownload(response.body, this.resolveFilename(response.headers.get('Content-Disposition')));
+      },
+      error: (error: HttpErrorResponse) => {
+        this.exportLoading = false;
+        if (error.status === 404) {
+          this.exportInfo = 'No hay horario disponible para exportar.';
+          return;
+        }
+        this.exportError = 'Ocurrio un error al exportar el horario. Intenta nuevamente.';
+      },
+    });
+  }
+
+  private resolveFilename(contentDisposition: string | null): string {
+    if (!contentDisposition) {
+      return this.defaultFilenameByFormat();
+    }
+
+    const filenameMatch = /filename="?([^";]+)"?/i.exec(contentDisposition);
+    if (!filenameMatch || !filenameMatch[1]) {
+      return this.defaultFilenameByFormat();
+    }
+
+    return filenameMatch[1].trim() || this.defaultFilenameByFormat();
+  }
+
+  private defaultFilenameByFormat(): string {
+    if (this.exportFormat === 'pdf') {
+      return 'horario.pdf';
+    }
+    if (this.exportFormat === 'imagen') {
+      return 'horario.png';
+    }
+    return 'horario.csv';
+  }
+
+  private triggerDownload(blob: Blob | null, filename: string): void {
+    if (!blob) {
+      this.exportError = 'No se pudo generar el archivo.';
+      return;
+    }
+
+    const url = window.URL.createObjectURL(blob);
+    const anchor = document.createElement('a');
+    anchor.href = url;
+    anchor.download = filename;
+    anchor.click();
+    window.URL.revokeObjectURL(url);
   }
 
   private buildGrid(clases: HorarioClase[]): void {
@@ -106,5 +225,21 @@ export class TomaDeMaterias implements OnInit {
 
   private cellKey(timeRow: string, dia: string): string {
     return `${timeRow}|${dia}`;
+  }
+
+  private loadEstudianteId(): void {
+    const username = this.authSessionService.getCurrentUsername();
+    if (!username) {
+      return;
+    }
+
+    this.perfilService.getPerfilByUsername(username).subscribe({
+      next: (perfil) => {
+        this.estudianteId = perfil.id;
+      },
+      error: () => {
+        this.estudianteId = null;
+      },
+    });
   }
 }
