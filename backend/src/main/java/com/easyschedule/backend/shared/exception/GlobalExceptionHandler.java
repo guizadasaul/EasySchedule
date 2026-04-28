@@ -115,6 +115,8 @@ public class GlobalExceptionHandler {
                     message = "Error: Username is already taken!";
                 } else if (constraintName.contains("users_email_key")) {
                     message = "Error: Email is already in use!";
+                } else if (constraintName.contains("uq_toma_user_oferta")) {
+                    message = "Ya registraste esta materia/paralelo.";
                 }
             }
         }
