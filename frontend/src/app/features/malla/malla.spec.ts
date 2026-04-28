@@ -6,6 +6,8 @@ import { MallaCatalogoService } from '../../services/academico/malla-catalogo.se
 import { SeleccionAcademicaService } from '../../services/academico/seleccion-academica.service';
 import { UniversidadService } from '../../services/academico/universidad.service';
 import { FeatureToggleService, FeatureFlags } from '../../services/feature-toggle.service';
+import { TomaSeleccionService } from '../../services/academico/toma-seleccion.service';
+import { TranslateService } from '@ngx-translate/core';
 
 describe('Malla component logic', () => {
   let component: Malla;
@@ -16,6 +18,8 @@ describe('Malla component logic', () => {
   let mallaCatalogoServiceSpy: jasmine.SpyObj<MallaCatalogoService>;
   let seleccionAcademicaServiceSpy: jasmine.SpyObj<SeleccionAcademicaService>;
   let estadoMateriaServiceSpy: jasmine.SpyObj<any>;
+  let tomaSeleccionServiceSpy: jasmine.SpyObj<TomaSeleccionService>;
+  let translateServiceSpy: jasmine.SpyObj<TranslateService>;
   let routerSpy: jasmine.SpyObj<any>;
   let activatedRouteStub: any;
 
@@ -31,29 +35,25 @@ describe('Malla component logic', () => {
     mallaCatalogoServiceSpy = jasmine.createSpyObj<MallaCatalogoService>('MallaCatalogoService', ['getMallasActivasPorCarrera', 'getMateriasPorMalla']);
     seleccionAcademicaServiceSpy = jasmine.createSpyObj<SeleccionAcademicaService>('SeleccionAcademicaService', ['getSeleccionActual', 'guardarSeleccion']);
     estadoMateriaServiceSpy = jasmine.createSpyObj('EstadoMateriaService', ['getEstadosMateria']);
+    tomaSeleccionServiceSpy = jasmine.createSpyObj<TomaSeleccionService>('TomaSeleccionService', ['agregarMateria']);
+    Object.defineProperty(tomaSeleccionServiceSpy, 'seleccion$', { value: of([]) });
+    translateServiceSpy = jasmine.createSpyObj<TranslateService>('TranslateService', ['instant']);
+    translateServiceSpy.instant.and.callFake((key: string) => key);
     routerSpy = jasmine.createSpyObj('Router', ['navigate', 'navigateByUrl']);
     activatedRouteStub = { snapshot: { queryParams: {} } };
 
-    if ((Malla as any).length >= 8) {
-      component = new (Malla as any)(
-        featureServiceMock,
-        universidadServiceSpy,
-        carreraServiceSpy,
-        mallaCatalogoServiceSpy,
-        estadoMateriaServiceSpy,
-        seleccionAcademicaServiceSpy,
-        routerSpy,
-        activatedRouteStub,
-      );
-    } else {
-      component = new (Malla as any)(
-        featureServiceMock,
-        universidadServiceSpy,
-        carreraServiceSpy,
-        mallaCatalogoServiceSpy,
-        seleccionAcademicaServiceSpy,
-      );
-    }
+    component = new (Malla as any)(
+      featureServiceMock,
+      universidadServiceSpy,
+      carreraServiceSpy,
+      mallaCatalogoServiceSpy,
+      estadoMateriaServiceSpy,
+      seleccionAcademicaServiceSpy,
+      routerSpy,
+      activatedRouteStub,
+      tomaSeleccionServiceSpy,
+      translateServiceSpy,
+    );
   });
 
   it('sets required error when trying to save universidad without selection', () => {

@@ -33,7 +33,7 @@
           >
             <option *ngFor="let materia of materias" [value]="materia.id">
               {{ materia.codigoMateria }} - {{ materia.nombreMateria }}
-              ({{ getEstadoLabel(materia.estadoUI) }})
+              ({{ getEstadoLabelKey(materia.estadoUI) | translate }})
             </option>
           </select>
         </div>

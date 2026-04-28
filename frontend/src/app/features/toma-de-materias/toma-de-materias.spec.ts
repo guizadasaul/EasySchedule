@@ -6,6 +6,7 @@ import { ApiService } from '../../services/api.service';
 import { TomaSeleccionService } from '../../services/academico/toma-seleccion.service';
 import { AuthSessionService } from '../../core/services/auth-session.service';
 import { PerfilService } from '../perfil/perfil.service';
+import { TranslateService } from '@ngx-translate/core';
 
 describe('TomaDeMaterias', () => {
   let component: TomaDeMaterias;
@@ -14,6 +15,7 @@ describe('TomaDeMaterias', () => {
   let tomaSeleccionServiceSpy: jasmine.SpyObj<TomaSeleccionService>;
   let authSessionServiceSpy: jasmine.SpyObj<AuthSessionService>;
   let perfilServiceSpy: jasmine.SpyObj<PerfilService>;
+  let translateServiceSpy: jasmine.SpyObj<TranslateService>;
 
   beforeEach(() => {
     horarioActualServiceSpy = jasmine.createSpyObj<HorarioActualService>('HorarioActualService', [
@@ -26,6 +28,16 @@ describe('TomaDeMaterias', () => {
     tomaSeleccionServiceSpy = jasmine.createSpyObj('TomaSeleccionService', ['removerMateria', 'limpiar', 'agregarMateria']);
     authSessionServiceSpy = jasmine.createSpyObj<AuthSessionService>('AuthSessionService', ['getCurrentUsername']);
     perfilServiceSpy = jasmine.createSpyObj<PerfilService>('PerfilService', ['getPerfilByUsername']);
+    translateServiceSpy = jasmine.createSpyObj<TranslateService>('TranslateService', ['instant']);
+
+    translateServiceSpy.instant.and.callFake((key: string) => {
+      const translations: Record<string, string> = {
+        'tomaMaterias.messages.noScheduleToExport': 'No hay horario disponible para exportar.',
+        'tomaMaterias.messages.unsupportedFormat': 'Formato no soportado por el momento.',
+      };
+
+      return translations[key] ?? key;
+    });
 
     const mockResponse: HorarioActualResponse = {
       universidad: 'Test',
@@ -45,7 +57,8 @@ describe('TomaDeMaterias', () => {
       apiServiceSpy,
       tomaSeleccionServiceSpy,
       authSessionServiceSpy,
-      perfilServiceSpy
+      perfilServiceSpy,
+      translateServiceSpy,
     );
   });
 

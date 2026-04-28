@@ -8,6 +8,7 @@ import {
   HorarioActualService,
   HorarioClase,
 } from '../../services/academico/horario-actual.service';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { ApiService } from '../../services/api.service';
 import { TomaSeleccionService } from '../../services/academico/toma-seleccion.service';
 import { AuthSessionService } from '../../core/services/auth-session.service';
@@ -22,7 +23,7 @@ export interface MateriaSeleccionada {
 
 @Component({
   selector: 'app-toma-de-materias',
-  imports: [NgIf, NgFor, FormsModule],
+  imports: [NgIf, NgFor, FormsModule, TranslatePipe],
   templateUrl: './toma-de-materias.html',
   styleUrl: './toma-de-materias.scss',
 })
@@ -65,6 +66,7 @@ export class TomaDeMaterias implements OnInit {
     private readonly tomaSeleccionService: TomaSeleccionService,
     private readonly authSessionService: AuthSessionService,
     private readonly perfilService: PerfilService,
+    private readonly translateService: TranslateService,
   ) {}
 
   ngOnInit(): void {
@@ -99,7 +101,7 @@ export class TomaDeMaterias implements OnInit {
   }
 
   protected removerMateria(id: number): void {
-    const confirmacion = window.confirm('¿Estás seguro de deseleccionar esta materia?');
+    const confirmacion = window.confirm(this.translateService.instant('tomaMaterias.confirm.removeSubject'));
     if (confirmacion) {
       this.tomaSeleccionService.removerMateria(id);
     }
@@ -115,7 +117,7 @@ export class TomaDeMaterias implements OnInit {
 
     const ofertaIds = this.buildOfertaIds();
     if (ofertaIds.length === 0) {
-      this.submitError = 'No hay grupos validos seleccionados para registrar.';
+      this.submitError = this.translateService.instant('tomaMaterias.messages.noValidGroups');
       return;
     }
 
@@ -125,7 +127,7 @@ export class TomaDeMaterias implements OnInit {
     this.apiService.post('/api/academico/toma-materias', body).subscribe({
       next: () => {
         this.submitLoading = false;
-        this.submitSuccess = 'Registro exitoso.';
+        this.submitSuccess = this.translateService.instant('tomaMaterias.messages.registrationSuccess');
         const creditosNuevos = this.materiasSeleccionadas.reduce((sum, m) => sum + (Number(m.creditos) || 0), 0);
         this.creditosConfirmados += creditosNuevos;
 
@@ -149,22 +151,10 @@ export class TomaDeMaterias implements OnInit {
 
   private extractApiErrorMessage(error: HttpErrorResponse): string {
     if (!error) {
-      return 'Ocurrio un error inesperado al registrar las materias.';
+      return this.translateService.instant('tomaMaterias.messages.unexpectedRegistrationError');
     }
 
-    const payload = error.error;
-    if (typeof payload === 'string' && payload.trim().length > 0) {
-      return payload;
-    }
-
-    if (payload && typeof payload === 'object') {
-      const message = (payload as { message?: string }).message;
-      if (message && message.trim().length > 0) {
-        return message;
-      }
-    }
-
-    return 'Ocurrio un error inesperado al registrar las materias.';
+    return this.translateService.instant('tomaMaterias.messages.unexpectedRegistrationError');
   }
 
   private cargarHorarioYSelecciones(): void {
@@ -195,12 +185,12 @@ export class TomaDeMaterias implements OnInit {
     }
 
     if (!this.horario || !this.horario.clases || this.horario.clases.length === 0) {
-      this.exportInfo = 'No hay horario disponible para exportar.';
+      this.exportInfo = this.translateService.instant('tomaMaterias.messages.noScheduleToExport');
       return;
     }
 
     if (!['csv', 'pdf', 'imagen'].includes(this.exportFormat)) {
-      this.exportError = 'Formato no soportado por el momento.';
+      this.exportError = this.translateService.instant('tomaMaterias.messages.unsupportedFormat');
       return;
     }
 
@@ -211,7 +201,7 @@ export class TomaDeMaterias implements OnInit {
 
     const username = this.authSessionService.getCurrentUsername();
     if (!username) {
-      this.exportError = 'No se pudo identificar la sesion del estudiante.';
+      this.exportError = this.translateService.instant('tomaMaterias.messages.studentSessionNotFound');
       return;
     }
 
@@ -223,7 +213,7 @@ export class TomaDeMaterias implements OnInit {
       },
       error: () => {
         this.exportLoading = false;
-        this.exportError = 'No se pudo identificar al estudiante.';
+        this.exportError = this.translateService.instant('tomaMaterias.messages.studentNotFound');
       },
     });
   }
@@ -248,10 +238,10 @@ export class TomaDeMaterias implements OnInit {
       error: (error: HttpErrorResponse) => {
         this.exportLoading = false;
         if (error.status === 404) {
-          this.exportInfo = 'No hay horario disponible para exportar.';
+          this.exportInfo = this.translateService.instant('tomaMaterias.messages.noScheduleToExport');
           return;
         }
-        this.exportError = 'Ocurrio un error al exportar el horario. Intenta nuevamente.';
+        this.exportError = this.translateService.instant('tomaMaterias.messages.exportError');
       },
     });
   }
@@ -281,7 +271,7 @@ export class TomaDeMaterias implements OnInit {
 
   private triggerDownload(blob: Blob | null, filename: string): void {
     if (!blob) {
-      this.exportError = 'No se pudo generar el archivo.';
+      this.exportError = this.translateService.instant('tomaMaterias.messages.fileGenerationError');
       return;
     }
 
