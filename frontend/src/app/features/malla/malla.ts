@@ -2,7 +2,7 @@ import { NgFor, NgIf, NgClass } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { filter, firstValueFrom, Subscription } from 'rxjs';
 
 import { CarreraCatalogoItem, CarreraService } from '../../services/academico/carrera.service';
@@ -90,6 +90,7 @@ export class Malla implements OnInit, OnDestroy {
     private readonly router: Router,
     private readonly route: ActivatedRoute,
     private readonly tomaSeleccionService: TomaSeleccionService,
+    private readonly translateService: TranslateService,
   ) {}
 
   ngOnInit(): void {
@@ -227,7 +228,7 @@ export class Malla implements OnInit, OnDestroy {
       const mallaAnteriorId = this.previousSelectionSnapshot.mallaId;
       const isChangingMalla = mallaAnteriorId !== null && this.selectedMallaId !== mallaAnteriorId;
       if (isChangingMalla) {
-        const confirmed = window.confirm('Cambiar de malla reiniciara tu progreso en la malla anterior. ¿Deseas continuar?');
+        const confirmed = window.confirm(this.translateService.instant('malla.modal.confirmChangeMalla'));
         if (!confirmed) {
           return;
         }
@@ -250,7 +251,7 @@ export class Malla implements OnInit, OnDestroy {
         this.loadingDetalle = false;
       },
       error: () => {
-        alert('Error al cargar detalles');
+        alert(this.translateService.instant('malla.modal.detailLoadError'));
         this.closeModal();
       }
     });

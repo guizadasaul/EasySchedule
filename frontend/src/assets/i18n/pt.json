@@ -167,6 +167,7 @@
       "cursando": "Em curso",
       "aprobada": "Completada",
       "success": "Estado da Matéria Atualizado!",
+      "cursandoAutoAssigned": "O estado Em curso é atribuído automaticamente ao selecionar a matéria.",
       "errorUpdate": "Erro ao atualizar.",
       "errorUpdateMsg": "Tente novamente.",
       "volver": "Voltar",
@@ -176,11 +177,85 @@
     "warning": {
       "title": "Aviso",
       "progressReset": "O progresso da grade anterior não será transferido após confirmar esta alteração."
+    },
+    "modal": {
+      "confirmChangeMalla": "Alterar a grade curricular reiniciará seu progresso na grade anterior. Deseja continuar?",
+      "detailLoadError": "Erro ao carregar detalhes",
+      "loadingSubjects": "Carregando matérias...",
+      "subjectsLoadError": "Erro ao carregar as matérias da grade.",
+      "semesterLabel": "{{semester}}º semestre",
+      "noSubjectsForCurriculum": "Não há matérias registradas para esta grade.",
+      "subjectSelectionEyebrow": "Seleção de matérias",
+      "subjectDetailTitle": "Detalhe da matéria",
+      "closeSubjectDetailAria": "Fechar detalhe da matéria",
+      "loadingSubjectDetail": "Carregando informações da matéria...",
+      "creditsLabel": "Créditos:",
+      "prerequisitesLabel": "Pré-requisitos necessários:",
+      "selectGroupLabel": "Selecionar grupo:",
+      "selectParallelPlaceholder": "Selecione uma turma",
+      "parallelLabel": "Turma",
+      "noGroupsAvailable": "Esta matéria não possui grupos disponíveis no momento.",
+      "cancel": "Cancelar",
+      "addToSelection": "Adicionar à seleção"
     }
   },
   "tomaMaterias": {
     "placeholder": "Seleção de disciplinas funcionando!",
-    "subject": "Disciplina"
+    "subject": "Disciplina",
+    "title": "Seleção de disciplinas",
+    "header": {
+      "careerFallback": "Carreira",
+      "curriculumFallback": "Grade",
+      "universityUndefined": "Universidade não definida",
+      "semester": "Semestre"
+    },
+    "export": {
+      "format": "Formato",
+      "image": "Imagem",
+      "button": "Exportar horário",
+      "generating": "Gerando..."
+    },
+    "selection": {
+      "title": "Seleção de matérias",
+      "totalCredits": "Total de créditos",
+      "placeholder": "Clique em uma matéria da sua grade para adicioná-la aqui.",
+      "registering": "Registrando...",
+      "confirmRegistration": "Confirmar registro"
+    },
+    "credits": {
+      "currentSchedule": "Créditos do horário atual:",
+      "toTake": "Créditos a cursar (nova seleção):",
+      "total": "Total de créditos:"
+    },
+    "schedulePreview": "Prévia de horário",
+    "loading": "Carregando dados...",
+    "loadError": "Não foi possível carregar as informações. Tente novamente.",
+    "table": {
+      "time": "Hora",
+      "parallel": "Turma"
+    },
+    "days": {
+      "Lunes": "Segunda-feira",
+      "Martes": "Terça-feira",
+      "Miercoles": "Quarta-feira",
+      "Jueves": "Quinta-feira",
+      "Viernes": "Sexta-feira",
+      "Sabado": "Sábado"
+    },
+    "messages": {
+      "noValidGroups": "Não há grupos válidos selecionados para registrar.",
+      "registrationSuccess": "Registro realizado com sucesso.",
+      "unexpectedRegistrationError": "Ocorreu um erro inesperado ao registrar as matérias.",
+      "noScheduleToExport": "Não há horário disponível para exportar.",
+      "unsupportedFormat": "Formato não suportado no momento.",
+      "studentSessionNotFound": "Não foi possível identificar a sessão do estudante.",
+      "studentNotFound": "Não foi possível identificar o estudante.",
+      "exportError": "Ocorreu um erro ao exportar o horário. Tente novamente.",
+      "fileGenerationError": "Não foi possível gerar o arquivo."
+    },
+    "confirm": {
+      "removeSubject": "Tem certeza de que deseja desmarcar esta matéria?"
+    }
   },
   "materia": {
     "placeholder": "Disciplina funcionando!"

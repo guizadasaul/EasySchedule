@@ -158,6 +158,26 @@
       "title": "Warning",
       "progressReset": "Progress from your previous curriculum will not be transferred after confirming this change."
     },
+    "modal": {
+      "confirmChangeMalla": "Changing your curriculum will reset your progress from the previous one. Do you want to continue?",
+      "detailLoadError": "Error loading details",
+      "loadingSubjects": "Loading subjects...",
+      "subjectsLoadError": "Error loading curriculum subjects.",
+      "semesterLabel": "Semester {{semester}}",
+      "noSubjectsForCurriculum": "No subjects registered for this curriculum.",
+      "subjectSelectionEyebrow": "Subject selection",
+      "subjectDetailTitle": "Subject detail",
+      "closeSubjectDetailAria": "Close subject detail",
+      "loadingSubjectDetail": "Loading subject information...",
+      "creditsLabel": "Credits:",
+      "prerequisitesLabel": "Required prerequisites:",
+      "selectGroupLabel": "Select group:",
+      "selectParallelPlaceholder": "Select a section",
+      "parallelLabel": "Section",
+      "noGroupsAvailable": "This subject currently has no available groups.",
+      "cancel": "Cancel",
+      "addToSelection": "Add to selection"
+    },
     "UpdateCourse": {
       "title": "Course status",
       "subtitle": "Study plan",
@@ -172,6 +192,7 @@
       "cursando": "In progress",
       "aprobada": "Completed",
       "success": "Subject Status Updated!",
+      "cursandoAutoAssigned": "In progress status is assigned automatically when selecting the subject.",
       "errorUpdate": "Error updating.",
       "errorUpdateMsg": "Try again.",
       "volver": "Back",
@@ -181,7 +202,61 @@
   },
   "tomaMaterias": {
     "placeholder": "Course Selection Works!",
-    "subject": "Subject"
+    "subject": "Subject",
+    "title": "Course selection",
+    "header": {
+      "careerFallback": "Career",
+      "curriculumFallback": "Curriculum",
+      "universityUndefined": "University not defined",
+      "semester": "Semester"
+    },
+    "export": {
+      "format": "Format",
+      "image": "Image",
+      "button": "Export schedule",
+      "generating": "Generating..."
+    },
+    "selection": {
+      "title": "Subject selection",
+      "totalCredits": "Total credits",
+      "placeholder": "Click a subject from your curriculum to add it here.",
+      "registering": "Registering...",
+      "confirmRegistration": "Confirm registration"
+    },
+    "credits": {
+      "currentSchedule": "Current schedule credits:",
+      "toTake": "Credits to take (new selection):",
+      "total": "Total credits:"
+    },
+    "schedulePreview": "Schedule preview",
+    "loading": "Loading data...",
+    "loadError": "Could not load the information. Please try again.",
+    "table": {
+      "time": "Time",
+      "parallel": "Section"
+    },
+    "days": {
+      "Lunes": "Monday",
+      "Martes": "Tuesday",
+      "Miercoles": "Wednesday",
+      "Jueves": "Thursday",
+      "Viernes": "Friday",
+      "Sabado": "Saturday"
+    },
+    "messages": {
+      "noValidGroups": "There are no valid selected groups to register.",
+      "registrationSuccess": "Registration successful.",
+      "unexpectedRegistrationError": "An unexpected error occurred while registering subjects.",
+      "noScheduleToExport": "There is no schedule available to export.",
+      "unsupportedFormat": "Format not supported at the moment.",
+      "studentSessionNotFound": "Could not identify the student session.",
+      "studentNotFound": "Could not identify the student.",
+      "exportError": "An error occurred while exporting the schedule. Please try again.",
+      "fileGenerationError": "Could not generate the file."
+    },
+    "confirm": {
+      "removeSubject": "Are you sure you want to deselect this subject?"
+    }
   },
   "materia": {
     "placeholder": "Subject Works!"

@@ -112,7 +112,7 @@ export class ActualizarMalla implements OnInit {
 
     // Proteger contra estado CURSANDO
     if (this.selectedEstado === 'CURSANDO') {
-      this.toastService.error('El estado Cursando se asigna automaticamente al tomar la materia');
+      this.toastService.error('malla.UpdateCourse.cursandoAutoAssigned');
       return;
     }
 
@@ -136,19 +136,8 @@ export class ActualizarMalla implements OnInit {
       this.toastService.success('malla.UpdateCourse.success');
     } catch (error) {
       console.error('Error al actualizar:', error);
-      
-      // Extraer mensaje de error descriptivo del backend
-      let mensajeError = 'malla.UpdateCourse.errorUpdate';
-      if (error && typeof error === 'object') {
-        const errorObj = error as any;
-        // Intentar obtener el mensaje desde diferentes estructuras posibles
-        const mensaje = errorObj.error?.message || errorObj.message || errorObj.error?.msg || null;
-        if (mensaje && typeof mensaje === 'string') {
-          mensajeError = mensaje;
-        }
-      }
-      
-      this.toastService.error(mensajeError);
+
+      this.toastService.error('malla.UpdateCourse.errorUpdate');
       const materiaIndex = this.materias.findIndex(m => m.id === this.selectedMateriaId);
       if (materiaIndex !== -1) {
         this.materias[materiaIndex].estadoUI = this.estadoAnterior;
@@ -171,11 +160,11 @@ export class ActualizarMalla implements OnInit {
     await this.cargarDatos();
   }
 
-  protected getEstadoLabel(estado: EstadoUI): string {
+  protected getEstadoLabelKey(estado: EstadoUI): string {
     const labelMap: Record<EstadoUI, string> = {
-      'APROBADA': 'Completada',
-      'CURSANDO': 'En curso',
-      'PENDIENTE': 'Pendiente',
+      'APROBADA': 'malla.UpdateCourse.aprobada',
+      'CURSANDO': 'malla.UpdateCourse.cursando',
+      'PENDIENTE': 'malla.UpdateCourse.pendiente',
     };
     return labelMap[estado];
   }
