@@ -1,5 +1,5 @@
 <div class="registro-page">
-  <div class="registro-shell">
+  <div class="registro-shell" [class.is-loading]="loading">
     <section class="registro-image" aria-hidden="true"></section>
 
     <section class="registro-panel">
@@ -85,11 +85,11 @@
             'registro.validation.passwordMismatch' | translate }}</small>
         </div>
 
-        <button type="submit" class="btn-primary" [disabled]="form.invalid || loading">{{ 'registro.button.submit' |
-          translate }}</button>
+        <button type="submit" class="btn-primary" [class.btn-loading]="loading" [disabled]="form.invalid || loading">
+          <span class="btn-text">{{ 'registro.button.submit' | translate }}</span>
+          <div class="spinner"></div>
+        </button>
         <a routerLink="/login" class="btn-secondary">{{ 'registro.button.gotoLogin' | translate }}</a>
-
-        <p *ngIf="loading" class="loading">{{ 'registro.loading' | translate }}</p>
       </form>
     </section>
   </div>
