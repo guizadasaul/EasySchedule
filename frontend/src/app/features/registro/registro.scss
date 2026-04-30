@@ -127,6 +127,45 @@ input {
   }
 }
 
+.input-with-icon {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: center;
+
+  input {
+    width: 100%;
+    padding-right: 2.4rem;
+  }
+
+  .toggle-password {
+    position: absolute;
+    right: 0.6rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: #3d5f8a;
+    }
+
+    &:focus {
+      outline: none;
+    }
+
+    .eye-icon {
+      width: 1.1rem;
+      height: 1.1rem;
+    }
+  }
+}
+
 .btn-primary,
 .btn-secondary {
   align-self: center;
