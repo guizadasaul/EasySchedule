@@ -16,6 +16,7 @@ import {
 import { UniversidadCatalogoItem, UniversidadService } from '../../services/academico/universidad.service';
 import { TomaSeleccionService } from '../../services/academico/toma-seleccion.service';
 import { OfertaDetalleResponse, OfertaMateriaSimple } from '../../services/academico/malla-catalogo.service';
+import { ToastService } from '../../core/services/toast.service';
 
 type SeleccionStep = 'universidad' | 'carrera' | 'malla' | 'resumen';
 type EditMode = 'universidad' | 'malla' | null;
@@ -75,6 +76,8 @@ export class Malla implements OnInit, OnDestroy {
   private materiasLoadedForMallaId: number | null = null;
 
   protected showModal = false;
+  protected showAccionesModal = false;
+  protected selectedMateriaParaAccion: MallaMateria | null = null;
   protected materiaDetalle: OfertaDetalleResponse | null = null;
   protected loadingDetalle = false;
   protected selectedOfertaId: number | null = null;
@@ -91,6 +94,7 @@ export class Malla implements OnInit, OnDestroy {
     private readonly route: ActivatedRoute,
     private readonly tomaSeleccionService: TomaSeleccionService,
     private readonly translateService: TranslateService,
+    private readonly toastService: ToastService,
   ) {}
 
   ngOnInit(): void {
@@ -144,12 +148,92 @@ export class Malla implements OnInit, OnDestroy {
     void this.prepareMallaEditMode();
   }
 
+  protected showActualizarModal = false;
+  protected selectedMateriaIdActualizar: number | null = null;
+  protected selectedEstadoActualizar: 'APROBADA' | 'CURSANDO' | 'PENDIENTE' = 'PENDIENTE';
+  protected savingEstado = false;
+
   protected onActualizarMallaClick(): void {
     if (this.selectedMallaId === null) {
       return;
     }
 
-    void this.router.navigate(['actualizar'], { relativeTo: this.route });
+    this.showActualizarModal = true;
+    if (this.showAccionesModal) {
+      const materiaId = this.selectedMateriaParaAccion?.id ?? null;
+      this.closeAccionesModal();
+      this.selectedMateriaIdActualizar = materiaId;
+    } else {
+      this.selectedMateriaIdActualizar = this.materias.length > 0 ? this.materias[0].id : null;
+    }
+    this.onMateriaActualizarChange();
+  }
+
+  protected closeActualizarModal(): void {
+    this.showActualizarModal = false;
+  }
+
+  protected onMateriaActualizarChange(): void {
+    const materia = this.materias.find(m => m.id === this.selectedMateriaIdActualizar);
+    if (materia) {
+      this.selectedEstadoActualizar = this.mapEstadoBDToUI(materia.estado);
+    }
+  }
+
+  protected async actualizarMateriaSeleccionada(): Promise<void> {
+    if (this.selectedMateriaIdActualizar === null) return;
+    
+    if (this.selectedEstadoActualizar === 'CURSANDO') {
+      this.toastService.error('malla.UpdateCourse.cursandoAutoAssigned');
+      return;
+    }
+
+    this.savingEstado = true;
+    try {
+      const request: EstadoMateriaRequest = {
+        mallaMateriaId: this.selectedMateriaIdActualizar,
+        estado: this.mapEstadoUIToBD(this.selectedEstadoActualizar),
+      };
+
+      await firstValueFrom(this.estadoMateriaService.guardarEstado(request));
+
+      const materia = this.materias.find(m => m.id === this.selectedMateriaIdActualizar);
+      if (materia) {
+        materia.estado = request.estado;
+      }
+
+      this.toastService.success('malla.UpdateCourse.success');
+      this.closeActualizarModal();
+    } catch (error) {
+      this.toastService.error('malla.UpdateCourse.errorUpdate');
+    } finally {
+      this.savingEstado = false;
+    }
+  }
+
+  protected getEstadoLabelKey(estado: 'APROBADA' | 'CURSANDO' | 'PENDIENTE'): string {
+    const labelMap = {
+      'APROBADA': 'malla.UpdateCourse.aprobada',
+      'CURSANDO': 'malla.UpdateCourse.cursando',
+      'PENDIENTE': 'malla.UpdateCourse.pendiente',
+    };
+    return labelMap[estado];
+  }
+
+  private mapEstadoUIToBD(estado: 'APROBADA' | 'CURSANDO' | 'PENDIENTE'): 'aprobada' | 'pendiente' | 'cursando' {
+    const map = {
+      'APROBADA': 'aprobada' as const,
+      'CURSANDO': 'cursando' as const,
+      'PENDIENTE': 'pendiente' as const,
+    };
+    return map[estado];
+  }
+
+  protected mapEstadoBDToUI(estado: string | null | undefined): 'APROBADA' | 'CURSANDO' | 'PENDIENTE' {
+    if (!estado) return 'PENDIENTE';
+    if (estado === 'aprobada') return 'APROBADA';
+    if (estado === 'cursando') return 'CURSANDO';
+    return 'PENDIENTE';
   }
 
   protected onCancelChangeClick(): void {
@@ -574,13 +658,5 @@ export class Malla implements OnInit, OnDestroy {
     }
   }
 
-  private mapEstadoBDToUI(estado: string | undefined): 'APROBADA' | 'CURSANDO' | 'PENDIENTE' {
-    if (!estado) return 'PENDIENTE';
-    const map: Record<string, 'APROBADA' | 'CURSANDO' | 'PENDIENTE'> = {
-      'aprobada': 'APROBADA',
-      'cursando': 'CURSANDO',
-      'pendiente': 'PENDIENTE',
-    };
-    return map[estado] ?? 'PENDIENTE';
-  }
+
 }

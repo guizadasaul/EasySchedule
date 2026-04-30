@@ -481,6 +481,10 @@
   box-shadow: 0 20px 48px rgba(11, 20, 33, 0.34);
 }
 
+.malla-modal--small {
+  width: min(420px, 96vw);
+}
+
 .malla-modal__header {
   display: flex;
   align-items: flex-start;

@@ -217,6 +217,65 @@
     </button>
   </section>
 
+  <div class="malla-modal-overlay" *ngIf="showAccionesModal">
+    <div class="malla-modal malla-modal--small">
+      <header class="malla-modal__header">
+        <div>
+          <p class="malla-modal__eyebrow">{{ 'malla.modal.subjectSelectionEyebrow' | translate }}</p>
+          <h3>{{ selectedMateriaParaAccion?.nombreMateria }}</h3>
+        </div>
+        <button type="button" class="malla-modal__close" (click)="closeAccionesModal()">×</button>
+      </header>
+
+      <div class="malla-modal__body" style="display: flex; flex-direction: column; gap: 0.8rem; padding-bottom: 1.5rem;">
+        <button class="malla-button malla-button--save" style="margin-top: 0;" (click)="onTomarMateriaClick()" [disabled]="selectedMateriaParaAccion?.estado === 'aprobada' || selectedMateriaParaAccion?.estado === 'cursando'">
+          Tomar materia
+        </button>
+        <button class="malla-button malla-button--outline" style="width: 100%; margin-top: 0;" (click)="onActualizarMallaClick()">
+          {{ 'malla.actions.changeStatusSingle' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="malla-modal-overlay" *ngIf="showActualizarModal">
+    <div class="malla-modal malla-modal--small">
+      <header class="malla-modal__header">
+        <div>
+          <p class="malla-modal__eyebrow">{{ 'malla.UpdateCourse.subtitle' | translate }}</p>
+          <h3>{{ 'malla.UpdateCourse.title' | translate }}</h3>
+        </div>
+        <button type="button" class="malla-modal__close" (click)="closeActualizarModal()">×</button>
+      </header>
+
+      <div class="malla-modal__body">
+        <div style="margin-bottom: 1rem;">
+          <label class="malla-label" for="materiaSelect">{{ 'malla.UpdateCourse.materia' | translate }}</label>
+          <select id="materiaSelect" class="malla-select" [(ngModel)]="selectedMateriaIdActualizar" (change)="onMateriaActualizarChange()">
+            <option *ngFor="let materia of materias" [value]="materia.id">
+              {{ materia.codigoMateria }} - {{ materia.nombreMateria }} ({{ getEstadoLabelKey(mapEstadoBDToUI(materia.estado)) | translate }})
+            </option>
+          </select>
+        </div>
+
+        <div style="margin-bottom: 1.5rem;">
+          <label class="malla-label" for="estadoSelect">{{ 'malla.UpdateCourse.estado' | translate }}</label>
+          <select id="estadoSelect" class="malla-select" [(ngModel)]="selectedEstadoActualizar">
+            <option value="PENDIENTE">{{ 'malla.UpdateCourse.pendiente' | translate }}</option>
+            <option value="APROBADA">{{ 'malla.UpdateCourse.aprobada' | translate }}</option>
+          </select>
+        </div>
+      </div>
+
+      <footer class="malla-modal__footer">
+        <button class="malla-button malla-button--ghost" (click)="closeActualizarModal()">{{ 'malla.modal.cancel' | translate }}</button>
+        <button class="malla-button malla-button--save" [disabled]="savingEstado" (click)="actualizarMateriaSeleccionada()">
+          {{ savingEstado ? ('malla.UpdateCourse.saving' | translate) : ('malla.UpdateCourse.save' | translate) }}
+        </button>
+      </footer>
+    </div>
+  </div>
+
   <div class="malla-modal-overlay" *ngIf="showModal">
     <div class="malla-modal">
       <header class="malla-modal__header">
