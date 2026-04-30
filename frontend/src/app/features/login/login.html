@@ -1,5 +1,5 @@
 <div class="registro-page">
-    <div class="registro-shell">
+    <div class="registro-shell" [class.is-loading]="loading">
   
       <section class="registro-image" aria-hidden="true"></section>
   
@@ -55,19 +55,15 @@
           </div>
   
           <!-- BOTÓN -->
-          <button type="submit" class="btn-primary" [disabled]="form.invalid || loading">
-            {{ 'login.button.submit' | translate }}
+          <button type="submit" class="btn-primary" [class.btn-loading]="loading" [disabled]="form.invalid || loading">
+            <span class="btn-text">{{ 'login.button.submit' | translate }}</span>
+            <div class="spinner"></div>
           </button>
   
           <!-- LINKS -->
           <a routerLink="/registro" class="btn-secondary">
             {{ 'login.button.gotoRegister' | translate }}
           </a>
-  
-          <!-- ESTADOS -->
-          <p *ngIf="loading" class="loading">
-            {{ 'login.loading' | translate }}
-          </p>
   
         </form>
       </section>
