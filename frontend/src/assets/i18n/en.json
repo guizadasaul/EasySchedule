@@ -229,6 +229,18 @@
       "total": "Total credits:"
     },
     "schedulePreview": "Schedule preview",
+    "summary": {
+      "title": "Progress summary",
+      "totalSubjects": "Total subjects in curriculum",
+      "approved": "Approved",
+      "inProgress": "In progress",
+      "remaining": "Remaining"
+    ,
+      "legend": {
+        "approved": "Approved",
+        "remaining": "Remaining"
+      }
+    },
     "loading": "Loading data...",
     "loadError": "Could not load the information. Please try again.",
     "table": {

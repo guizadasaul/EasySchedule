@@ -227,6 +227,18 @@
       "total": "Total de creditos:"
     },
     "schedulePreview": "Vista previa de horario",
+    "summary": {
+      "title": "Resumen de avance",
+      "totalSubjects": "Total de materias en la malla",
+      "approved": "Aprobadas",
+      "inProgress": "En curso",
+      "remaining": "Faltantes"
+    ,
+      "legend": {
+        "approved": "Aprobadas",
+        "remaining": "Faltantes"
+      }
+    },
     "loading": "Cargando datos...",
     "loadError": "No se pudo cargar la informacion. Intenta nuevamente.",
     "table": {
