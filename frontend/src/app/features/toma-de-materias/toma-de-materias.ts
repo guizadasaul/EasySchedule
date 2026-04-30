@@ -260,6 +260,13 @@ export class TomaDeMaterias implements OnInit {
     return this.cellMap.get(this.cellKey(timeRow, dia)) ?? [];
   }
 
+  protected getClasesPorDia(dia: string): HorarioClase[] {
+    if (!this.horario?.clases) return [];
+    return this.horario.clases
+      .filter(c => this.normalizeDay(c.dia) === dia)
+      .sort((a, b) => (a.horaInicio ?? '').localeCompare(b.horaInicio ?? ''));
+  }
+
   private requestExport(estudianteId: number, formato: string): void {
     this.exportLoading = true;
     const exportRequest = formato === 'pdf'
