@@ -228,6 +228,18 @@
       "total": "Total de créditos:"
     },
     "schedulePreview": "Prévia de horário",
+    "summary": {
+      "title": "Resumo de progresso",
+      "totalSubjects": "Total de matérias na grade",
+      "approved": "Aprovadas",
+      "inProgress": "Em curso",
+      "remaining": "Faltantes"
+    ,
+      "legend": {
+        "approved": "Aprovadas",
+        "remaining": "Faltantes"
+      }
+    },
     "loading": "Carregando dados...",
     "loadError": "Não foi possível carregar as informações. Tente novamente.",
     "table": {

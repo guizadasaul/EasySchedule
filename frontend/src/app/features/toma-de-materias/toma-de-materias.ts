@@ -13,6 +13,7 @@ import { ApiService } from '../../services/api.service';
 import { TomaSeleccionService } from '../../services/academico/toma-seleccion.service';
 import { AuthSessionService } from '../../core/services/auth-session.service';
 import { PerfilService } from '../perfil/perfil.service';
+import { MallaCatalogoService, MallaMateria } from '../../services/academico/malla-catalogo.service';
 
 export interface MateriaSeleccionada {
   id: number;
@@ -67,7 +68,16 @@ export class TomaDeMaterias implements OnInit {
     private readonly authSessionService: AuthSessionService,
     private readonly perfilService: PerfilService,
     private readonly translateService: TranslateService,
+    private readonly mallaCatalogoService: MallaCatalogoService,
   ) {}
+
+  // Estadísticas de malla
+  protected totalMateriasMalla = 0;
+  protected materiasAprobadas = 0;
+  protected materiasCursando = 0;
+  protected materiasPendientes = 0;
+  protected porcentajeCompletado = 0;
+  protected porcentajeAnimated = 0;
 
   ngOnInit(): void {
     this.cargarHorarioYSelecciones();
@@ -98,6 +108,34 @@ export class TomaDeMaterias implements OnInit {
     }
 
     this.totalCreditosHorario = totalCreditos;
+  }
+
+  private loadMallaProgress(mallaId: number | null): void {
+    // reset
+    this.totalMateriasMalla = 0;
+    this.materiasAprobadas = 0;
+    this.materiasCursando = 0;
+    this.materiasPendientes = 0;
+
+    if (!mallaId) {
+      return;
+    }
+
+    this.mallaCatalogoService.getMateriasPorMalla(mallaId).subscribe({
+      next: (materias: MallaMateria[]) => {
+        this.totalMateriasMalla = materias.length;
+        this.materiasAprobadas = materias.filter(m => m.estado === 'aprobada').length;
+        this.materiasCursando = materias.filter(m => m.estado === 'cursando').length;
+        this.materiasPendientes = materias.filter(m => m.estado === 'pendiente' || m.estado === null).length;
+        this.porcentajeCompletado = this.totalMateriasMalla > 0 ? Math.round((this.materiasAprobadas / this.totalMateriasMalla) * 100) : 0;
+        // animate from 0 to porcentajeCompletado
+        this.porcentajeAnimated = 0;
+        setTimeout(() => (this.porcentajeAnimated = this.porcentajeCompletado), 50);
+      },
+      error: () => {
+        // leave zeros on error
+      }
+    });
   }
 
   protected removerMateria(id: number): void {
@@ -348,6 +386,7 @@ export class TomaDeMaterias implements OnInit {
     this.perfilService.getPerfilByUsername(username).subscribe({
       next: (perfil) => {
         this.estudianteId = perfil.id;
+        this.loadMallaProgress(perfil.mallaId ?? null);
       },
       error: () => {
         this.estudianteId = null;

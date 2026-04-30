@@ -121,4 +121,58 @@
       </tbody>
     </table>
   </div>
+  <div class="malla-progress" *ngIf="!loading && !error && totalMateriasMalla > 0">
+    <div class="horario-section-title">
+      <h3>{{ 'tomaMaterias.summary.title' | translate }}</h3>
+    </div>
+    
+    <div class="malla-progress__body">
+      <div class="malla-progress__left">
+        <div class="malla-progress__items">
+          <div class="malla-progress__item">
+            <span class="label">{{ 'tomaMaterias.summary.totalSubjects' | translate }}:</span>
+            <span class="value">{{ totalMateriasMalla }}</span>
+          </div>
+          <div class="malla-progress__item">
+            <span class="label">{{ 'tomaMaterias.summary.approved' | translate }}:</span>
+            <span class="value">{{ materiasAprobadas }}</span>
+          </div>
+          <div class="malla-progress__item">
+            <span class="label">{{ 'tomaMaterias.summary.inProgress' | translate }}:</span>
+            <span class="value">{{ materiasCursando }}</span>
+          </div>
+          <div class="malla-progress__item">
+            <span class="label">{{ 'tomaMaterias.summary.remaining' | translate }}:</span>
+            <span class="value">{{ materiasPendientes }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="malla-progress__right">
+        <div class="malla-pie" [attr.data-percent]="porcentajeCompletado">
+          <svg viewBox="0 0 36 36" class="circular-chart">
+            <path class="circle-bg"
+                  d="M18 2.0845
+                     a 15.9155 15.9155 0 0 1 0 31.831
+                     a 15.9155 15.9155 0 0 1 0 -31.831"/>
+            <path class="circle"
+                      [attr.stroke-dasharray]="porcentajeAnimated + ', 100'"
+                  d="M18 2.0845
+                     a 15.9155 15.9155 0 0 1 0 31.831
+                     a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                  <text x="18" y="21" class="percentage" font-size="6">{{ porcentajeCompletado }}%</text>
+          </svg>
+            </div>
+            <div class="malla-legend">
+              <div class="legend-item">
+                <span class="legend-color legend-approved"></span>
+                <span class="legend-label">{{ 'tomaMaterias.summary.legend.approved' | translate }}</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-color legend-remaining"></span>
+                <span class="legend-label">{{ 'tomaMaterias.summary.legend.remaining' | translate }}</span>
+              </div>
+            </div>
+      </div>
+    </div>
+  </div>
 </section>

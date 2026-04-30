@@ -16,6 +16,7 @@ describe('TomaDeMaterias', () => {
   let authSessionServiceSpy: jasmine.SpyObj<AuthSessionService>;
   let perfilServiceSpy: jasmine.SpyObj<PerfilService>;
   let translateServiceSpy: jasmine.SpyObj<TranslateService>;
+  let mallaCatalogoServiceSpy: jasmine.SpyObj<any>;
 
   beforeEach(() => {
     horarioActualServiceSpy = jasmine.createSpyObj<HorarioActualService>('HorarioActualService', [
@@ -29,6 +30,7 @@ describe('TomaDeMaterias', () => {
     authSessionServiceSpy = jasmine.createSpyObj<AuthSessionService>('AuthSessionService', ['getCurrentUsername']);
     perfilServiceSpy = jasmine.createSpyObj<PerfilService>('PerfilService', ['getPerfilByUsername']);
     translateServiceSpy = jasmine.createSpyObj<TranslateService>('TranslateService', ['instant']);
+    mallaCatalogoServiceSpy = jasmine.createSpyObj('MallaCatalogoService', ['getMateriasPorMalla']);
 
     translateServiceSpy.instant.and.callFake((key: string) => {
       const translations: Record<string, string> = {
@@ -49,6 +51,7 @@ describe('TomaDeMaterias', () => {
     };
     horarioActualServiceSpy.getHorarioActual.and.returnValue(of(mockResponse));
     authSessionServiceSpy.getCurrentUsername.and.returnValue(null);
+    mallaCatalogoServiceSpy.getMateriasPorMalla.and.returnValue(of([]));
 
     Object.defineProperty(tomaSeleccionServiceSpy, 'seleccion$', { value: of([]) });
 
@@ -59,6 +62,7 @@ describe('TomaDeMaterias', () => {
       authSessionServiceSpy,
       perfilServiceSpy,
       translateServiceSpy,
+      mallaCatalogoServiceSpy,
     );
   });
 
