@@ -1,9 +1,10 @@
 import { NgFor, NgIf, NgClass } from '@angular/common';
-import { Component, OnDestroy, OnInit, HostListener } from '@angular/core';
+import { Component, OnDestroy, OnInit, HostListener, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { filter, firstValueFrom, Subscription } from 'rxjs';
+import { NgbPopover, NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { CarreraCatalogoItem, CarreraService } from '../../services/academico/carrera.service';
 import { EstadoMateriaService, EstadoMateriaItem, EstadoMateriaRequest } from '../../services/academico/estado-materia.service';
@@ -29,7 +30,7 @@ interface SeleccionSnapshot {
 
 @Component({
   selector: 'app-malla',
-  imports: [FormsModule, NgFor, NgIf, NgClass, TranslatePipe],
+  imports: [FormsModule, NgFor, NgIf, NgClass, TranslatePipe, NgbPopoverModule],
   templateUrl: './malla.html',
   styleUrl: './malla.scss',
 })

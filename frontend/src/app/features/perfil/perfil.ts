@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
-import { NgbDateStruct, NgbDatepickerModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDateStruct, NgbDatepickerModule, NgbPopover, NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
 
@@ -31,7 +31,7 @@ type PasswordChangeForm = FormGroup<{
 
 @Component({
   selector: 'app-perfil',
-  imports: [CommonModule, ReactiveFormsModule, NgbDatepickerModule, TranslatePipe],
+  imports: [CommonModule, ReactiveFormsModule, NgbDatepickerModule, TranslatePipe, NgbPopoverModule],
   templateUrl: './perfil.html',
   styleUrl: './perfil.scss',
 })

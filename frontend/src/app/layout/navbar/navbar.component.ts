@@ -1,17 +1,18 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { NgIf } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 import { Subscription } from 'rxjs';
 
 import { LanguageService } from '../../core/services/language.service';
+import { NgbPopover, NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
 import { AuthSessionService } from '../../core/services/auth-session.service';
 import { FeatureToggleService } from '../../services/feature-toggle.service';
 import { ApiService } from '../../services/api.service';
 
 @Component({
   selector: 'app-navbar',
-  imports: [RouterLink, RouterLinkActive, NgIf, TranslatePipe],
+  imports: [RouterLink, RouterLinkActive, NgIf, TranslatePipe, NgbPopoverModule],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.scss',
 })
