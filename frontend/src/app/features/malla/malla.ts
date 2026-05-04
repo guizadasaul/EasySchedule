@@ -20,6 +20,7 @@ import { OfertaDetalleResponse, OfertaMateriaSimple } from '../../services/acade
 import { ToastService } from '../../core/services/toast.service';
 import { AuthSessionService } from '../../core/services/auth-session.service';
 import { PerfilService } from '../perfil/perfil.service';
+import { TourHintsService } from '../../services/tour-hints.service';
 
 type SeleccionStep = 'universidad' | 'carrera' | 'malla' | 'resumen';
 type EditMode = 'universidad' | 'malla' | null;
@@ -88,7 +89,6 @@ export class Malla implements OnInit, OnDestroy {
 
   @ViewChild('popoverStep1') popoverStep1?: NgbPopover;
   @ViewChild('popoverStep2') popoverStep2?: NgbPopover;
-  @ViewChild('popoverStep3') popoverStep3?: NgbPopover;
   @ViewChild('popoverStep4') popoverStep4?: NgbPopover;
 
   protected tourStep = 0;
@@ -107,6 +107,7 @@ export class Malla implements OnInit, OnDestroy {
     private readonly toastService: ToastService,
     private readonly authSessionService: AuthSessionService,
     private readonly perfilService: PerfilService,
+    private readonly tourHintsService: TourHintsService,
   ) {}
 
   ngOnInit(): void {
@@ -722,13 +723,13 @@ export class Malla implements OnInit, OnDestroy {
   protected siguienteTour(step: number): void {
     this.popoverStep1?.close();
     this.popoverStep2?.close();
-    this.popoverStep3?.close();
     this.popoverStep4?.close();
+    this.tourHintsService.closeTomaMateriasPopover();
 
     setTimeout(() => {
       if (step === 1) this.popoverStep1?.open();
       if (step === 2) this.popoverStep2?.open();
-      if (step === 3) this.popoverStep3?.open();
+      if (step === 3) this.tourHintsService.openTomaMateriasPopover();
       if (step === 4) this.popoverStep4?.open();
     }, 100);
   }
@@ -755,8 +756,8 @@ export class Malla implements OnInit, OnDestroy {
   private cerrarTodosLosPopovers(): void {
     this.popoverStep1?.close();
     this.popoverStep2?.close();
-    this.popoverStep3?.close();
     this.popoverStep4?.close();
+    this.tourHintsService.closeTomaMateriasPopover();
   }
 
   private persistirTourCompletado(): void {
