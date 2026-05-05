@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import com.easyschedule.backend.academico.malla.dto.MallaMateriaResponse;
 import com.easyschedule.backend.academico.malla.dto.MallaResponse;
 import com.easyschedule.backend.academico.malla.service.MallaService;
 import com.easyschedule.backend.shared.config.BearerTokenAuthenticationFilter;
@@ -43,5 +44,25 @@ class MallaControllerTest {
             .andExpect(jsonPath("$[1].nombre").value("Malla 2024"));
 
         verify(mallaService).findActiveByCarrera(10L);
+    }
+
+    @Test
+    void findMateriasByMallaReturnsEstadoForAuthenticatedUser() throws Exception {
+        when(mallaService.findMateriasByMalla(16L, 7L)).thenReturn(List.of(
+            new MallaMateriaResponse(501L, 33L, "SIS101", "Algoritmos", (short) 1, "aprobada")
+        ));
+
+        mockMvc.perform(get("/api/academico/mallas/16/materias").principal(() -> "7"))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$[0].codigoMateria").value("SIS101"))
+            .andExpect(jsonPath("$[0].estado").value("aprobada"));
+
+        verify(mallaService).findMateriasByMalla(16L, 7L);
+    }
+
+    @Test
+    void findMateriasByMallaReturnsUnauthorizedWhenPrincipalMissing() throws Exception {
+        mockMvc.perform(get("/api/academico/mallas/16/materias"))
+            .andExpect(status().isUnauthorized());
     }
 }

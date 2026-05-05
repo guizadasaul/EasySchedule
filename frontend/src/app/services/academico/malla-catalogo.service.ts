@@ -17,8 +17,25 @@ export interface MallaMateria {
   codigoMateria: string;
   nombreMateria: string;
   semestreSugerido: number;
-  estado?: 'APROBADA' | 'CURSANDO' | 'PENDIENTE'; // Mocked state for UI
+  estado: 'aprobada' | 'cursando' | 'pendiente' | null;
 }
+
+export interface OfertaMateriaSimple {
+  id: number;
+  semestre: string;
+  paralelo: string;
+  docente: string;
+  aula: string;
+}
+
+export interface OfertaDetalleResponse {
+  mallaMateriaId: number;
+  nombreMateria: string;
+  creditos: number;
+  prerequisitos: string[];
+  gruposDisponibles: OfertaMateriaSimple[];
+}
+
 
 @Injectable({
   providedIn: 'root',
@@ -33,4 +50,9 @@ export class MallaCatalogoService {
   getMateriasPorMalla(mallaId: number): Observable<MallaMateria[]> {
     return this.apiService.get<MallaMateria[]>(`/api/academico/mallas/${mallaId}/materias`);
   }
+
+   getDetallesMateria(mallaMateriaId: number): Observable<OfertaDetalleResponse> {
+    return this.apiService.get<OfertaDetalleResponse>(`/api/academico/ofertas/detalles/${mallaMateriaId}`);
+  }
+
 }

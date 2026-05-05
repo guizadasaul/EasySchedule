@@ -1,7 +1,5 @@
 package com.easyschedule.backend.estudiante.service;
 
-import com.easyschedule.backend.academico.estado_materia.model.EstadoMateria;
-import com.easyschedule.backend.academico.estado_materia.repository.EstadoMateriaRepository;
 import com.easyschedule.backend.academico.malla.dto.MallaMateriaResponse;
 import com.easyschedule.backend.academico.malla.service.MallaService;
 import com.easyschedule.backend.estudiante.model.Estudiante;
@@ -13,23 +11,18 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 public class EstudianteMallaExportService {
 
     private final EstudianteRepository estudianteRepository;
     private final MallaService mallaService;
-    private final EstadoMateriaRepository estadoMateriaRepository;
 
     public EstudianteMallaExportService(
             EstudianteRepository estudianteRepository,
-            MallaService mallaService,
-            EstadoMateriaRepository estadoMateriaRepository) {
+            MallaService mallaService) {
         this.estudianteRepository = estudianteRepository;
         this.mallaService = mallaService;
-        this.estadoMateriaRepository = estadoMateriaRepository;
     }
 
     public byte[] exportarMalla(Long estudianteId, String formato) {
@@ -42,30 +35,20 @@ public class EstudianteMallaExportService {
 
         Long mallaId = estudiante.getMalla().getId();
 
-        // 🔥 usa versión compatible con CI
+        // 🔥 ahora ya incluye estado
         List<MallaMateriaResponse> materias = mallaService.findMateriasByMalla(mallaId, estudianteId);
-
-        List<EstadoMateria> estados = estadoMateriaRepository.findByUserIdAndMallaId(estudianteId, mallaId);
-
-        Map<Long, String> estadoPorMallaMateriaId = estados.stream()
-                .collect(Collectors.toMap(
-                        EstadoMateria::getMallaMateriaId,
-                        EstadoMateria::getEstado
-                ));
 
         StringBuilder csv = new StringBuilder();
         csv.append("Semestre,Codigo,Materia,Estado\n");
 
         for (MallaMateriaResponse materia : materias) {
-            String estado = estadoPorMallaMateriaId.getOrDefault(materia.id(), "PENDIENTE");
-
             csv.append(materia.semestreSugerido() != null ? materia.semestreSugerido() : "")
                .append(",")
                .append(escapeCsv(materia.codigoMateria()))
                .append(",")
                .append(escapeCsv(materia.nombreMateria()))
                .append(",")
-               .append(estado)
+               .append(materia.estado() != null ? materia.estado() : "PENDIENTE")
                .append("\n");
         }
 

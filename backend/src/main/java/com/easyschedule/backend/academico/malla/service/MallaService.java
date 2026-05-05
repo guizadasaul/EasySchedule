@@ -4,6 +4,7 @@ import com.easyschedule.backend.academico.malla.dto.MallaResponse;
 import com.easyschedule.backend.academico.malla.repository.MallaRepository;
 import com.easyschedule.backend.academico.malla.repository.MallaMateriaRepository;
 import com.easyschedule.backend.academico.malla.dto.MallaMateriaResponse;
+import com.easyschedule.backend.academico.estado_materia.service.EstadoMateriaService;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
@@ -12,10 +13,15 @@ public class MallaService {
 
     private final MallaRepository mallaRepository;
     private final MallaMateriaRepository mallaMateriaRepository;
+    private final EstadoMateriaService estadoMateriaService;
 
-    public MallaService(MallaRepository mallaRepository, MallaMateriaRepository mallaMateriaRepository) {
+    public MallaService(
+            MallaRepository mallaRepository,
+            MallaMateriaRepository mallaMateriaRepository,
+            EstadoMateriaService estadoMateriaService) {
         this.mallaRepository = mallaRepository;
         this.mallaMateriaRepository = mallaMateriaRepository;
+        this.estadoMateriaService = estadoMateriaService;
     }
 
     public List<MallaResponse> findActiveByCarrera(Long carreraId) {
@@ -30,21 +36,19 @@ public class MallaService {
             .toList();
     }
 
-    // ✔ Método original (se mantiene)
-    public List<MallaMateriaResponse> findMateriasByMalla(Long mallaId) {
+    public List<MallaMateriaResponse> findMateriasByMalla(Long mallaId, Long userId) {
         return mallaMateriaRepository.findByMallaIdAndMateriaActiveTrueOrderBySemestreSugeridoAsc(mallaId).stream()
-            .map(mm -> new MallaMateriaResponse(
-                mm.getId(),
-                mm.getMateria().getId(),
-                mm.getMateria().getCodigo(),
-                mm.getMateria().getNombre(),
-                mm.getSemestreSugerido()
-            ))
+            .map(mm -> {
+                String estado = estadoMateriaService.getEstadoMateria(userId, mm.getId());
+                return new MallaMateriaResponse(
+                    mm.getId(),
+                    mm.getMateria().getId(),
+                    mm.getMateria().getCodigo(),
+                    mm.getMateria().getNombre(),
+                    mm.getSemestreSugerido(),
+                    estado
+                );
+            })
             .toList();
-    }
-
-    // 🔥 NUEVO MÉTODO (compatibilidad con CI)
-    public List<MallaMateriaResponse> findMateriasByMalla(Long mallaId, Long estudianteId) {
-        return findMateriasByMalla(mallaId);
     }
 }

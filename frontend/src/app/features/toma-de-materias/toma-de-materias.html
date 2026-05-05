@@ -1,2 +1,178 @@
-<p class="placeholder-page">{{ 'tomaMaterias.placeholder' | translate }}</p>
-<a routerLink="/toma-de-materias/materia">{{ 'tomaMaterias.subject' | translate }}</a>
+<section class="horario-page">
+  <header class="horario-header" *ngIf="horario as h">
+    <div class="horario-chip" *ngIf="h.carrera || h.malla">
+      {{ h.carrera ?? ('tomaMaterias.header.careerFallback' | translate) }} - {{ h.malla ?? ('tomaMaterias.header.curriculumFallback' | translate) }}
+    </div>
+    <h1>{{ 'tomaMaterias.title' | translate }}</h1>
+    <p class="horario-subtitle">
+      {{ h.universidad ?? ('tomaMaterias.header.universityUndefined' | translate) }}
+      <span *ngIf="h.semestreOferta"> | {{ h.semestreOferta }}</span>
+      <span *ngIf="h.semestreActual"> | {{ 'tomaMaterias.header.semester' | translate }} {{ h.semestreActual }}</span>
+    </p>
+
+    <div class="horario-export">
+      <label class="horario-export__label" for="export-format">{{ 'tomaMaterias.export.format' | translate }}</label>
+      <select id="export-format" class="horario-export__select" [(ngModel)]="exportFormat">
+        <option value="csv">CSV</option>
+        <option value="pdf">PDF</option>
+        <option value="imagen">{{ 'tomaMaterias.export.image' | translate }}</option>
+      </select>
+      <button class="horario-export__button" type="button" (click)="exportHorario()" [disabled]="exportLoading">
+        <span *ngIf="!exportLoading">{{ 'tomaMaterias.export.button' | translate }}</span>
+        <span *ngIf="exportLoading">{{ 'tomaMaterias.export.generating' | translate }}</span>
+      </button>
+    </div>
+    <div class="horario-export__message" *ngIf="exportInfo">{{ exportInfo }}</div>
+    <div class="horario-export__message horario-export__message--error" *ngIf="exportError">
+      {{ exportError }}
+    </div>
+  </header>
+
+  <div class="toma-seleccion-container" *ngIf="!loading && !error">
+    <div class="toma-seleccion-header">
+      <h2>{{ 'tomaMaterias.selection.title' | translate }}</h2>
+      <div class="toma-creditos-badge">
+        {{ 'tomaMaterias.selection.totalCredits' | translate }}: <strong>{{ totalCreditosSeleccionados }} / 30</strong>
+      </div>
+    </div>
+
+    <div class="toma-materias-lista">
+      <p class="toma-placeholder" *ngIf="materiasSeleccionadas.length === 0">
+        {{ 'tomaMaterias.selection.placeholder' | translate }}
+      </p>
+
+      <div class="materia-tag" *ngFor="let m of materiasSeleccionadas">
+        <span>{{ m.nombre }} ({{ m.creditos }} cr)</span>
+        <button class="btn-remove" (click)="removerMateria(m.id)">×</button>
+      </div>
+    </div>
+
+    <div class="toma-acciones-finales" *ngIf="materiasSeleccionadas.length > 0">
+      <button
+        class="malla-button malla-button--save"
+        (click)="confirmarInscripcion()"
+        [disabled]="submitLoading"
+      >
+        {{ submitLoading ? ('tomaMaterias.selection.registering' | translate) : ('tomaMaterias.selection.confirmRegistration' | translate) }}
+      </button>
+    </div>
+
+    <div class="toma-feedback toma-feedback--success" *ngIf="submitSuccess">{{ submitSuccess }}</div>
+    <div class="toma-feedback toma-feedback--error" *ngIf="submitError">{{ submitError }}</div>
+  </div>
+
+  <hr class="toma-divider" *ngIf="!loading && !error">
+
+  <div class="toma-horario-creditos-section" *ngIf="!loading && !error">
+    <div class="toma-creditos-info">
+      <div class="toma-creditos-item">
+        <span class="toma-creditos-label">{{ 'tomaMaterias.credits.currentSchedule' | translate }}</span>
+        <span class="toma-creditos-value">{{ totalCreditosHorario }}</span>
+      </div>
+      <div class="toma-creditos-item">
+        <span class="toma-creditos-label">{{ 'tomaMaterias.credits.toTake' | translate }}</span>
+        <span class="toma-creditos-value">{{ totalCreditosSeleccionados - creditosConfirmados }}</span>
+      </div>
+      <div class="toma-creditos-item toma-creditos-item--total">
+        <span class="toma-creditos-label">{{ 'tomaMaterias.credits.total' | translate }}</span>
+        <span class="toma-creditos-value">{{ totalCreditosHorario + totalCreditosSeleccionados - creditosConfirmados }} / 30</span>
+      </div>
+    </div>
+  </div>
+
+  <hr class="toma-divider" *ngIf="!loading && !error">
+
+  <div class="horario-section-title" *ngIf="!loading && !error">
+    <h3>{{ 'tomaMaterias.schedulePreview' | translate }}</h3>
+  </div>
+
+  <div class="horario-state" *ngIf="loading">{{ 'tomaMaterias.loading' | translate }}</div>
+  <div class="horario-state horario-state--error" *ngIf="!loading && error">
+    {{ 'tomaMaterias.loadError' | translate }}
+  </div>
+
+  <div class="horario-state" *ngIf="!loading && !error && (!horario || !horario.clases || horario.clases.length === 0)">
+    {{ 'tomaMaterias.messages.noScheduleToExport' | translate }}
+  </div>
+
+  <div class="horario-grid-wrapper" *ngIf="!loading && !error && horario && horario.clases && horario.clases.length">
+    <table class="horario-grid">
+      <thead>
+        <tr>
+          <th>{{ 'tomaMaterias.table.time' | translate }}</th>
+          <th *ngFor="let dia of dias">{{ ('tomaMaterias.days.' + dia) | translate }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let timeRow of timeRows">
+          <td class="time-cell">{{ timeRow }}</td>
+          <td *ngFor="let dia of dias" class="slot-cell">
+            <div class="slot-card" *ngFor="let clase of getCellItems(timeRow, dia)">
+              <div class="slot-card__materia">{{ clase.materia }}</div>
+              <div class="slot-card__meta" *ngIf="clase.paralelo || clase.aula">
+                {{ clase.paralelo ? (('tomaMaterias.table.parallel' | translate) + ' ' + clase.paralelo) : '' }}
+                <span *ngIf="clase.paralelo && clase.aula"> | </span>
+                {{ clase.aula ?? '' }}
+              </div>
+              <div class="slot-card__meta" *ngIf="clase.docente">{{ clase.docente }}</div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="malla-progress" *ngIf="!loading && !error && totalMateriasMalla > 0">
+    <div class="horario-section-title">
+      <h3>{{ 'tomaMaterias.summary.title' | translate }}</h3>
+    </div>
+    
+    <div class="malla-progress__body">
+      <div class="malla-progress__left">
+        <div class="malla-progress__items">
+          <div class="malla-progress__item">
+            <span class="label">{{ 'tomaMaterias.summary.totalSubjects' | translate }}:</span>
+            <span class="value">{{ totalMateriasMalla }}</span>
+          </div>
+          <div class="malla-progress__item">
+            <span class="label">{{ 'tomaMaterias.summary.approved' | translate }}:</span>
+            <span class="value">{{ materiasAprobadas }}</span>
+          </div>
+          <div class="malla-progress__item">
+            <span class="label">{{ 'tomaMaterias.summary.inProgress' | translate }}:</span>
+            <span class="value">{{ materiasCursando }}</span>
+          </div>
+          <div class="malla-progress__item">
+            <span class="label">{{ 'tomaMaterias.summary.remaining' | translate }}:</span>
+            <span class="value">{{ materiasPendientes }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="malla-progress__right">
+        <div class="malla-pie" [attr.data-percent]="porcentajeCompletado">
+          <svg viewBox="0 0 36 36" class="circular-chart">
+            <path class="circle-bg"
+                  d="M18 2.0845
+                     a 15.9155 15.9155 0 0 1 0 31.831
+                     a 15.9155 15.9155 0 0 1 0 -31.831"/>
+            <path class="circle"
+                      [attr.stroke-dasharray]="porcentajeAnimated + ', 100'"
+                  d="M18 2.0845
+                     a 15.9155 15.9155 0 0 1 0 31.831
+                     a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                  <text x="18" y="21" class="percentage" font-size="6">{{ porcentajeCompletado }}%</text>
+          </svg>
+            </div>
+            <div class="malla-legend">
+              <div class="legend-item">
+                <span class="legend-color legend-approved"></span>
+                <span class="legend-label">{{ 'tomaMaterias.summary.legend.approved' | translate }}</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-color legend-remaining"></span>
+                <span class="legend-label">{{ 'tomaMaterias.summary.legend.remaining' | translate }}</span>
+              </div>
+            </div>
+      </div>
+    </div>
+  </div>
+</section>

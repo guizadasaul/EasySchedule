@@ -151,6 +151,26 @@
       "title": "Advertencia",
       "progressReset": "El progreso de la malla anterior no se transferira al confirmar este cambio."
     },
+    "modal": {
+      "confirmChangeMalla": "Cambiar de malla reiniciara tu progreso en la malla anterior. ¿Deseas continuar?",
+      "detailLoadError": "Error al cargar detalles",
+      "loadingSubjects": "Cargando materias...",
+      "subjectsLoadError": "Error al cargar las materias de la malla.",
+      "semesterLabel": "{{semester}}o semestre",
+      "noSubjectsForCurriculum": "No hay materias registradas para esta malla.",
+      "subjectSelectionEyebrow": "Seleccion de materias",
+      "subjectDetailTitle": "Detalle de materia",
+      "closeSubjectDetailAria": "Cerrar detalle de materia",
+      "loadingSubjectDetail": "Cargando informacion de la materia...",
+      "creditsLabel": "Creditos:",
+      "prerequisitesLabel": "Prerrequisitos necesarios:",
+      "selectGroupLabel": "Seleccionar grupo:",
+      "selectParallelPlaceholder": "Selecciona un paralelo",
+      "parallelLabel": "Paralelo",
+      "noGroupsAvailable": "Esta materia no tiene grupos disponibles actualmente.",
+      "cancel": "Cancelar",
+      "addToSelection": "Agregar a seleccion"
+    },
     "validation": {
       "universidadRequired": "Debes seleccionar una universidad.",
       "carreraRequired": "Debes seleccionar una carrera.",
@@ -170,6 +190,7 @@
       "cursando": "En curso",
       "aprobada": "Completada",
       "success": "Estado de Materia Actualizado!",
+      "cursandoAutoAssigned": "El estado Cursando se asigna automaticamente al tomar la materia.",
       "errorUpdate": "Error al actualizar.",
       "errorUpdateMsg": "Intenta de nuevo.",
       "volver": "Volver",
@@ -179,7 +200,73 @@
   },
   "tomaMaterias": {
     "placeholder": "Toma de Materias Works!",
-    "subject": "Materia"
+    "subject": "Materia",
+    "title": "Toma de materias",
+    "header": {
+      "careerFallback": "Carrera",
+      "curriculumFallback": "Malla",
+      "universityUndefined": "Universidad no definida",
+      "semester": "Semestre"
+    },
+    "export": {
+      "format": "Formato",
+      "image": "Imagen",
+      "button": "Exportar horario",
+      "generating": "Generando..."
+    },
+    "selection": {
+      "title": "Seleccion de materias",
+      "totalCredits": "Total creditos",
+      "placeholder": "Haz clic en una materia de tu malla para agregarla aqui.",
+      "registering": "Registrando...",
+      "confirmRegistration": "Confirmar registro"
+    },
+    "credits": {
+      "currentSchedule": "Creditos del horario actual:",
+      "toTake": "Creditos a tomar (nueva seleccion):",
+      "total": "Total de creditos:"
+    },
+    "schedulePreview": "Vista previa de horario",
+    "summary": {
+      "title": "Resumen de avance",
+      "totalSubjects": "Total de materias en la malla",
+      "approved": "Aprobadas",
+      "inProgress": "En curso",
+      "remaining": "Faltantes"
+    ,
+      "legend": {
+        "approved": "Aprobadas",
+        "remaining": "Faltantes"
+      }
+    },
+    "loading": "Cargando datos...",
+    "loadError": "No se pudo cargar la informacion. Intenta nuevamente.",
+    "table": {
+      "time": "Hora",
+      "parallel": "Paralelo"
+    },
+    "days": {
+      "Lunes": "Lunes",
+      "Martes": "Martes",
+      "Miercoles": "Miercoles",
+      "Jueves": "Jueves",
+      "Viernes": "Viernes",
+      "Sabado": "Sabado"
+    },
+    "messages": {
+      "noValidGroups": "No hay grupos validos seleccionados para registrar.",
+      "registrationSuccess": "Registro exitoso.",
+      "unexpectedRegistrationError": "Ocurrio un error inesperado al registrar las materias.",
+      "noScheduleToExport": "No hay horario disponible para exportar.",
+      "unsupportedFormat": "Formato no soportado por el momento.",
+      "studentSessionNotFound": "No se pudo identificar la sesion del estudiante.",
+      "studentNotFound": "No se pudo identificar al estudiante.",
+      "exportError": "Ocurrio un error al exportar el horario. Intenta nuevamente.",
+      "fileGenerationError": "No se pudo generar el archivo."
+    },
+    "confirm": {
+      "removeSubject": "¿Estas seguro de deseleccionar esta materia?"
+    }
   },
   "materia": {
     "placeholder": "Materia Works!"

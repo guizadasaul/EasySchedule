@@ -110,6 +110,12 @@ export class ActualizarMalla implements OnInit {
       return;
     }
 
+    // Proteger contra estado CURSANDO
+    if (this.selectedEstado === 'CURSANDO') {
+      this.toastService.error('malla.UpdateCourse.cursandoAutoAssigned');
+      return;
+    }
+
     const estadoAActualizar = this.selectedEstado;
     this.saving = true;
 
@@ -130,6 +136,7 @@ export class ActualizarMalla implements OnInit {
       this.toastService.success('malla.UpdateCourse.success');
     } catch (error) {
       console.error('Error al actualizar:', error);
+
       this.toastService.error('malla.UpdateCourse.errorUpdate');
       const materiaIndex = this.materias.findIndex(m => m.id === this.selectedMateriaId);
       if (materiaIndex !== -1) {
@@ -153,11 +160,11 @@ export class ActualizarMalla implements OnInit {
     await this.cargarDatos();
   }
 
-  protected getEstadoLabel(estado: EstadoUI): string {
+  protected getEstadoLabelKey(estado: EstadoUI): string {
     const labelMap: Record<EstadoUI, string> = {
-      'APROBADA': 'Completada',
-      'CURSANDO': 'En curso',
-      'PENDIENTE': 'Pendiente',
+      'APROBADA': 'malla.UpdateCourse.aprobada',
+      'CURSANDO': 'malla.UpdateCourse.cursando',
+      'PENDIENTE': 'malla.UpdateCourse.pendiente',
     };
     return labelMap[estado];
   }

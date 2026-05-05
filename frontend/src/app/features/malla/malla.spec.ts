@@ -6,6 +6,8 @@ import { MallaCatalogoService } from '../../services/academico/malla-catalogo.se
 import { SeleccionAcademicaService } from '../../services/academico/seleccion-academica.service';
 import { UniversidadService } from '../../services/academico/universidad.service';
 import { FeatureToggleService, FeatureFlags } from '../../services/feature-toggle.service';
+import { TomaSeleccionService } from '../../services/academico/toma-seleccion.service';
+import { TranslateService } from '@ngx-translate/core';
 
 describe('Malla component logic', () => {
   let component: Malla;
@@ -16,6 +18,8 @@ describe('Malla component logic', () => {
   let mallaCatalogoServiceSpy: jasmine.SpyObj<MallaCatalogoService>;
   let seleccionAcademicaServiceSpy: jasmine.SpyObj<SeleccionAcademicaService>;
   let estadoMateriaServiceSpy: jasmine.SpyObj<any>;
+  let tomaSeleccionServiceSpy: jasmine.SpyObj<TomaSeleccionService>;
+  let translateServiceSpy: jasmine.SpyObj<TranslateService>;
   let routerSpy: jasmine.SpyObj<any>;
   let activatedRouteStub: any;
 
@@ -28,32 +32,28 @@ describe('Malla component logic', () => {
 
     universidadServiceSpy = jasmine.createSpyObj<UniversidadService>('UniversidadService', ['getUniversidadesActivas']);
     carreraServiceSpy = jasmine.createSpyObj<CarreraService>('CarreraService', ['getCarrerasActivasPorUniversidad']);
-    mallaCatalogoServiceSpy = jasmine.createSpyObj<MallaCatalogoService>('MallaCatalogoService', ['getMallasActivasPorCarrera']);
+    mallaCatalogoServiceSpy = jasmine.createSpyObj<MallaCatalogoService>('MallaCatalogoService', ['getMallasActivasPorCarrera', 'getMateriasPorMalla']);
     seleccionAcademicaServiceSpy = jasmine.createSpyObj<SeleccionAcademicaService>('SeleccionAcademicaService', ['getSeleccionActual', 'guardarSeleccion']);
     estadoMateriaServiceSpy = jasmine.createSpyObj('EstadoMateriaService', ['getEstadosMateria']);
+    tomaSeleccionServiceSpy = jasmine.createSpyObj<TomaSeleccionService>('TomaSeleccionService', ['agregarMateria']);
+    Object.defineProperty(tomaSeleccionServiceSpy, 'seleccion$', { value: of([]) });
+    translateServiceSpy = jasmine.createSpyObj<TranslateService>('TranslateService', ['instant']);
+    translateServiceSpy.instant.and.callFake((key: string) => key);
     routerSpy = jasmine.createSpyObj('Router', ['navigate', 'navigateByUrl']);
     activatedRouteStub = { snapshot: { queryParams: {} } };
 
-    if ((Malla as any).length >= 8) {
-      component = new (Malla as any)(
-        featureServiceMock,
-        universidadServiceSpy,
-        carreraServiceSpy,
-        mallaCatalogoServiceSpy,
-        estadoMateriaServiceSpy,
-        seleccionAcademicaServiceSpy,
-        routerSpy,
-        activatedRouteStub,
-      );
-    } else {
-      component = new (Malla as any)(
-        featureServiceMock,
-        universidadServiceSpy,
-        carreraServiceSpy,
-        mallaCatalogoServiceSpy,
-        seleccionAcademicaServiceSpy,
-      );
-    }
+    component = new (Malla as any)(
+      featureServiceMock,
+      universidadServiceSpy,
+      carreraServiceSpy,
+      mallaCatalogoServiceSpy,
+      estadoMateriaServiceSpy,
+      seleccionAcademicaServiceSpy,
+      routerSpy,
+      activatedRouteStub,
+      tomaSeleccionServiceSpy,
+      translateServiceSpy,
+    );
   });
 
   it('sets required error when trying to save universidad without selection', () => {
@@ -81,6 +81,7 @@ describe('Malla component logic', () => {
     universidadServiceSpy.getUniversidadesActivas.and.returnValue(of([{ id: 1, nombre: 'UCB', codigo: 'UCB' }]));
     carreraServiceSpy.getCarrerasActivasPorUniversidad.and.returnValue(of([{ id: 11, universidadId: 1, nombre: 'Sistemas', codigo: 'SIS' }]));
     mallaCatalogoServiceSpy.getMallasActivasPorCarrera.and.returnValue(of([{ id: 101, carreraId: 11, nombre: 'Malla 2017', version: '2017', active: true }]));
+    mallaCatalogoServiceSpy.getMateriasPorMalla.and.returnValue(of([]));
     seleccionAcademicaServiceSpy.getSeleccionActual.and.returnValue(of({
       universidadId: 1,
       universidad: 'UCB',
@@ -169,5 +170,43 @@ describe('Malla component logic', () => {
     (component as any).onGuardarMallaClick();
 
     expect(seleccionAcademicaServiceSpy.guardarSeleccion).not.toHaveBeenCalled();
+  });
+
+  it('loadMaterias preserves estado values returned by backend', async () => {
+    mallaCatalogoServiceSpy.getMateriasPorMalla.and.returnValue(of([
+      {
+        id: 1,
+        materiaId: 10,
+        codigoMateria: 'INF-101',
+        nombreMateria: 'Programacion I',
+        semestreSugerido: 1,
+        estado: 'aprobada',
+      },
+      {
+        id: 2,
+        materiaId: 11,
+        codigoMateria: 'INF-102',
+        nombreMateria: 'Programacion II',
+        semestreSugerido: 2,
+        estado: null,
+      },
+    ]));
+
+    await (component as any).loadMaterias(100);
+
+    expect((component as any).materias.length).toBe(2);
+    expect((component as any).materias[0].estado).toBe('aprobada');
+    expect((component as any).materias[1].estado).toBeNull();
+    expect((component as any).materiasPorSemestre.get(1).length).toBe(1);
+    expect((component as any).materiasPorSemestre.get(2).length).toBe(1);
+  });
+
+  it('sets loadMateriasError when materias request fails', async () => {
+    mallaCatalogoServiceSpy.getMateriasPorMalla.and.returnValue(throwError(() => new Error('boom')));
+
+    await (component as any).loadMaterias(100);
+
+    expect((component as any).loadMateriasError).toBeTrue();
+    expect((component as any).loadingMaterias).toBeFalse();
   });
 });

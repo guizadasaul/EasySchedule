@@ -2,7 +2,7 @@ import { NgFor, NgIf, NgClass } from '@angular/common';
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { filter, firstValueFrom, Subscription } from 'rxjs';
 
 import { CarreraCatalogoItem, CarreraService } from '../../services/academico/carrera.service';
@@ -14,6 +14,8 @@ import {
   SeleccionAcademicaService,
 } from '../../services/academico/seleccion-academica.service';
 import { UniversidadCatalogoItem, UniversidadService } from '../../services/academico/universidad.service';
+import { TomaSeleccionService } from '../../services/academico/toma-seleccion.service';
+import { OfertaDetalleResponse, OfertaMateriaSimple } from '../../services/academico/malla-catalogo.service';
 
 type SeleccionStep = 'universidad' | 'carrera' | 'malla' | 'resumen';
 type EditMode = 'universidad' | 'malla' | null;
@@ -68,8 +70,15 @@ export class Malla implements OnInit, OnDestroy {
 
   private flagsSubscription?: Subscription;
   private routerEventsSubscription?: Subscription;
+  private tomaSeleccionSubscription?: Subscription;
   private previousSelectionSnapshot: SeleccionSnapshot | null = null;
   private materiasLoadedForMallaId: number | null = null;
+
+  protected showModal = false;
+  protected materiaDetalle: OfertaDetalleResponse | null = null;
+  protected loadingDetalle = false;
+  protected selectedOfertaId: number | null = null;
+  protected materiasSeleccionadas: Set<number> = new Set();
 
   constructor(
     private readonly featureService: FeatureToggleService,
@@ -80,6 +89,8 @@ export class Malla implements OnInit, OnDestroy {
     private readonly seleccionAcademicaService: SeleccionAcademicaService,
     private readonly router: Router,
     private readonly route: ActivatedRoute,
+    private readonly tomaSeleccionService: TomaSeleccionService,
+    private readonly translateService: TranslateService,
   ) {}
 
   ngOnInit(): void {
@@ -98,6 +109,10 @@ export class Malla implements OnInit, OnDestroy {
         }
       });
 
+    this.tomaSeleccionSubscription = this.tomaSeleccionService.seleccion$.subscribe((materias) => {
+      this.materiasSeleccionadas = new Set(materias.map(m => m.id));
+    });
+
     void this.featureService.loadFlags();
     void this.loadUniversidades();
   }
@@ -105,6 +120,7 @@ export class Malla implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.flagsSubscription?.unsubscribe();
     this.routerEventsSubscription?.unsubscribe();
+    this.tomaSeleccionSubscription?.unsubscribe();
   }
 
   protected retryLoadUniversidades(): void {
@@ -212,7 +228,7 @@ export class Malla implements OnInit, OnDestroy {
       const mallaAnteriorId = this.previousSelectionSnapshot.mallaId;
       const isChangingMalla = mallaAnteriorId !== null && this.selectedMallaId !== mallaAnteriorId;
       if (isChangingMalla) {
-        const confirmed = window.confirm('Cambiar de malla reiniciara tu progreso en la malla anterior. ¿Deseas continuar?');
+        const confirmed = window.confirm(this.translateService.instant('malla.modal.confirmChangeMalla'));
         if (!confirmed) {
           return;
         }
@@ -221,6 +237,46 @@ export class Malla implements OnInit, OnDestroy {
 
     void this.guardarSeleccion();
   }
+
+  protected onMateriaClick(materia: MallaMateria): void {
+    if (materia.estado === 'aprobada' || materia.estado === 'cursando') return;
+
+    this.showModal = true;
+    this.loadingDetalle = true;
+    this.selectedOfertaId = null;
+
+    this.mallaCatalogoService.getDetallesMateria(materia.id).subscribe({
+      next: (detalle) => {
+        this.materiaDetalle = detalle;
+        this.loadingDetalle = false;
+      },
+      error: () => {
+        alert(this.translateService.instant('malla.modal.detailLoadError'));
+        this.closeModal();
+      }
+    });
+  }
+
+  protected confirmarSeleccionModal(): void {
+    if (!this.materiaDetalle || !this.selectedOfertaId) return;
+
+    this.tomaSeleccionService.agregarMateria({
+      id: this.materiaDetalle.mallaMateriaId,
+      nombre: this.materiaDetalle.nombreMateria,
+      creditos: this.materiaDetalle.creditos,
+      ofertaId: this.selectedOfertaId
+    });
+
+    this.closeModal();
+    this.router.navigate(['/toma-de-materias']);
+
+  }
+
+  protected closeModal(): void {
+    this.showModal = false;
+    this.materiaDetalle = null;
+  }
+
 
   protected getResumenUniversidad(): string {
     const nombre = this.selectedResumen?.universidad;
@@ -418,17 +474,7 @@ export class Malla implements OnInit, OnDestroy {
     this.semestres = [];
 
     try {
-      const [materiasBD, estados]: [MallaMateria[], EstadoMateriaItem[]] = await Promise.all([
-        firstValueFrom(this.mallaCatalogoService.getMateriasPorMalla(mallaId)),
-        firstValueFrom(this.estadoMateriaService.getEstadosPorMalla(mallaId)),
-      ]);
-
-      const estadosMap = new Map<number, string>(estados.map(e => [e.mallaMateriaId, e.estado]));
-
-      this.materias = materiasBD.map(m => ({
-        ...m,
-        estado: this.mapEstadoBDToUI(estadosMap.get(m.id)),
-      }));
+      this.materias = await firstValueFrom(this.mallaCatalogoService.getMateriasPorMalla(mallaId));
 
       this.materias.forEach(materia => {
         const sem = materia.semestreSugerido;

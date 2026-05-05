@@ -109,19 +109,30 @@ CREATE TABLE IF NOT EXISTS estado_materia_estudiante (
 
 CREATE TABLE IF NOT EXISTS ofertas (
     id BIGSERIAL PRIMARY KEY,
-    user_id BIGINT NOT NULL,
     malla_materia_id BIGINT NOT NULL,
     semestre VARCHAR(30) NOT NULL,
     paralelo VARCHAR(20),
     horario_json JSONB NOT NULL,
     docente VARCHAR(150),
     aula VARCHAR(100),
-    fecha_creacion TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    fecha_actualizacion TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-    CONSTRAINT fk_ofertas_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    fecha_creacion TIMESTAMPTZ DEFAULT NOW(),
+    fecha_actualizacion TIMESTAMPTZ DEFAULT NOW(),
     CONSTRAINT fk_ofertas_malla_materia FOREIGN KEY (malla_materia_id) REFERENCES malla_materia(id) ON DELETE RESTRICT,
     CONSTRAINT ck_ofertas_horario_json_array CHECK (jsonb_typeof(horario_json) = 'array'),
-    CONSTRAINT uq_ofertas UNIQUE (user_id, malla_materia_id, semestre, paralelo)
+    CONSTRAINT uq_ofertas UNIQUE (malla_materia_id, semestre, paralelo)
+);
+
+CREATE TABLE IF NOT EXISTS toma_materia_estudiante (
+    id BIGSERIAL PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    oferta_id BIGINT NOT NULL,
+    estado VARCHAR(20) NOT NULL DEFAULT 'inscrita',
+    fecha_inscripcion TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    fecha_actualizacion TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+    CONSTRAINT fk_toma_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_toma_oferta FOREIGN KEY (oferta_id) REFERENCES ofertas(id) ON DELETE CASCADE,
+    CONSTRAINT ck_toma_estado CHECK (estado IN ('inscrita', 'retirada', 'aprobada', 'reprobada')),
+    CONSTRAINT uq_toma_user_oferta UNIQUE (user_id, oferta_id)
 );
 
 CREATE TABLE IF NOT EXISTS horarios_recomendados (
@@ -142,11 +153,13 @@ CREATE INDEX IF NOT EXISTS idx_prereq_prereq_malla_materia_id ON prerequisitos(p
 CREATE INDEX IF NOT EXISTS idx_student_profiles_carrera_id ON student_profiles(carrera_id);
 CREATE INDEX IF NOT EXISTS idx_student_profiles_malla_id ON student_profiles(malla_id);
 CREATE INDEX IF NOT EXISTS idx_student_profiles_universidad_id ON student_profiles(universidad_id);
-CREATE INDEX IF NOT EXISTS idx_estado_user_id ON estado_materia_estudiante(user_id);
-CREATE INDEX IF NOT EXISTS idx_estado_malla_materia_id ON estado_materia_estudiante(malla_materia_id);
-CREATE INDEX IF NOT EXISTS idx_ofertas_user_id ON ofertas(user_id);
 CREATE INDEX IF NOT EXISTS idx_ofertas_malla_materia_id ON ofertas(malla_materia_id);
 CREATE INDEX IF NOT EXISTS idx_ofertas_horario_json_gin ON ofertas USING GIN (horario_json);
+CREATE INDEX IF NOT EXISTS idx_toma_user_id ON toma_materia_estudiante(user_id);
+CREATE INDEX IF NOT EXISTS idx_toma_oferta_id ON toma_materia_estudiante(oferta_id);
+CREATE INDEX IF NOT EXISTS idx_toma_estado ON toma_materia_estudiante(estado);
+CREATE INDEX IF NOT EXISTS idx_estado_user_id ON estado_materia_estudiante(user_id);
+CREATE INDEX IF NOT EXISTS idx_estado_malla_materia_id ON estado_materia_estudiante(malla_materia_id);
 CREATE INDEX IF NOT EXISTS idx_horarios_user_id ON horarios_recomendados(user_id);
 CREATE INDEX IF NOT EXISTS idx_horarios_json_gin ON horarios_recomendados USING GIN (json_resultado);
 

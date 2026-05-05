@@ -1,0 +1,509 @@
+.horario-page {
+	max-width: min(1450px, 96vw);
+	margin: 1.8rem auto;
+	padding: 0 1rem 2rem;
+}
+
+.horario-header {
+	margin-bottom: 1.2rem;
+
+h1 {
+		margin: 0.6rem 0 0;
+		font-family: 'Poppins', sans-serif;
+		font-size: clamp(1.65rem, 1.25rem + 1.2vw, 2.4rem);
+		color: #121722;
+	}
+}
+
+.horario-export {
+	margin-top: 1rem;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.8rem;
+}
+
+.horario-export__label {
+	font-weight: 600;
+	color: #1b2330;
+}
+
+.horario-export__select {
+	min-width: 180px;
+	padding: 0.45rem 0.7rem;
+	border-radius: 10px;
+	border: 1px solid rgba(34, 53, 74, 0.35);
+	background: #f5f7fb;
+	font-family: 'Poppins', sans-serif;
+}
+
+.horario-export__button {
+	padding: 0.5rem 1rem;
+	border-radius: 12px;
+	border: none;
+	background: #274a69;
+	color: #f5f9ff;
+	font-family: 'Poppins', sans-serif;
+	font-weight: 600;
+	cursor: pointer;
+	transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.horario-export__button:disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+}
+
+.horario-export__message {
+	margin-top: 0.6rem;
+	padding: 0.6rem 0.8rem;
+	border-radius: 10px;
+	background: #e8eef4;
+	color: #1c3047;
+	font-family: 'Poppins', sans-serif;
+}
+
+.horario-export__message--error {
+	background: #fff0ed;
+	color: #7f271f;
+}
+
+.horario-chip {
+	display: inline-block;
+	padding-bottom: 0.15rem;
+	border-bottom: 4px solid #3f6383;
+	font-family: 'Poppins', sans-serif;
+	font-size: 1.1rem;
+	font-weight: 700;
+	color: #141b25;
+}
+
+.horario-subtitle {
+	margin-top: 0.45rem;
+	font-size: 1.05rem;
+	color: #1b2330;
+}
+
+.horario-state {
+	margin-top: 1rem;
+	padding: 0.8rem 1rem;
+	border-radius: 10px;
+	background: #e8eef4;
+	color: #1c3047;
+	font-family: 'Poppins', sans-serif;
+}
+
+.horario-state--error {
+	background: #fff0ed;
+	color: #7f271f;
+}
+
+.horario-grid-wrapper {
+	margin-top: 1.2rem;
+	overflow-x: auto;
+	border-radius: 20px;
+	border: 1px solid rgba(34, 53, 74, 0.25);
+	background: #dce1e8;
+}
+
+.horario-grid {
+	width: 100%;
+	min-width: 1024px;
+	border-collapse: collapse;
+	table-layout: fixed;
+
+	thead th {
+		background: #3f6383;
+		color: #f5f9ff;
+		font-family: 'Poppins', sans-serif;
+		font-size: 1rem;
+		letter-spacing: 0.02em;
+		padding: 0.85rem 0.55rem;
+		border-bottom: 2px solid rgba(24, 36, 52, 0.65);
+	}
+
+	td,
+	th {
+		border: 2px solid rgba(24, 36, 52, 0.55);
+		vertical-align: top;
+	}
+}
+
+.time-cell {
+	width: 130px;
+	background: #3f6383;
+	color: #f5f9ff;
+	text-align: center;
+	font-family: 'Poppins', sans-serif;
+	font-weight: 600;
+	padding: 0.8rem 0.45rem;
+}
+
+.slot-cell {
+	background: #b9c0c9;
+	padding: 0.35rem;
+	min-height: 90px;
+}
+
+.slot-card {
+	background: #8298b5;
+	border-radius: 8px;
+	padding: 0.45rem 0.5rem;
+	margin-bottom: 0.3rem;
+	color: #112033;
+}
+
+.slot-card__materia {
+	font-family: 'Poppins', sans-serif;
+	font-size: 0.95rem;
+	font-weight: 700;
+	line-height: 1.25;
+}
+
+.slot-card__meta {
+	margin-top: 0.2rem;
+	font-size: 0.75rem;
+}
+
+.horario-link {
+	display: inline-block;
+	margin-top: 1rem;
+	color: #2f4f73;
+	font-weight: 600;
+}
+
+.toma-seleccion-container {
+	margin-top: 1.25rem;
+	padding: 1.05rem;
+	border-radius: 14px;
+	border: 1px solid rgba(34, 53, 74, 0.2);
+	background: #ece8d8;
+}
+
+.toma-seleccion-header {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.65rem;
+
+	h2 {
+		margin: 0;
+		font-family: 'Poppins', sans-serif;
+		font-size: clamp(1.55rem, 1.2rem + 1.1vw, 2.05rem);
+		color: #141b25;
+	}
+}
+
+.toma-creditos-badge {
+	padding: 0.45rem 0.7rem;
+	border-radius: 10px;
+	background: #dde3ea;
+	color: #1b2330;
+	font-family: 'Poppins', sans-serif;
+	font-size: 0.95rem;
+}
+
+.toma-materias-lista {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.55rem;
+	margin-top: 0.8rem;
+	min-height: 2.3rem;
+}
+
+.toma-placeholder {
+	margin: 0;
+	color: #3b4655;
+	font-family: 'Poppins', sans-serif;
+	font-size: 0.95rem;
+}
+
+.materia-tag {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.55rem;
+	padding: 0.45rem 0.55rem;
+	border-radius: 10px;
+	background: #f5f7fb;
+	border: 1px solid rgba(47, 79, 115, 0.26);
+	color: #1a2433;
+	font-family: 'Poppins', sans-serif;
+	font-size: 0.95rem;
+}
+
+.btn-remove {
+	border: 1px solid rgba(32, 44, 64, 0.4);
+	background: #fff;
+	color: #202c40;
+	width: 1.55rem;
+	height: 1.55rem;
+	line-height: 1;
+	border-radius: 6px;
+	cursor: pointer;
+	font-weight: 700;
+	padding: 0;
+}
+
+.toma-acciones-finales {
+	margin-top: 0.95rem;
+}
+
+.malla-button {
+	border: 0;
+	border-radius: 8px;
+	background: #2f4f73;
+	color: #fff;
+	padding: 0.5rem 0.9rem;
+	font-family: 'Poppins', sans-serif;
+	font-weight: 700;
+	cursor: pointer;
+
+	&:disabled {
+		opacity: 0.55;
+		cursor: not-allowed;
+	}
+}
+
+.malla-button--save {
+	display: inline-block;
+}
+
+.toma-feedback {
+	margin-top: 0.75rem;
+	padding: 0.6rem 0.8rem;
+	border-radius: 10px;
+	font-family: 'Poppins', sans-serif;
+	font-size: 0.92rem;
+}
+
+.toma-feedback--success {
+	background: #e9f7ef;
+	border: 1px solid rgba(31, 104, 63, 0.32);
+	color: #1f683f;
+}
+
+.toma-feedback--error {
+	background: #fff0ed;
+	border: 1px solid rgba(127, 39, 31, 0.3);
+	color: #7f271f;
+}
+
+.toma-divider {
+	margin: 1.3rem 0 0;
+	border: 0;
+	border-top: 1px solid rgba(34, 53, 74, 0.2);
+}
+
+.toma-horario-creditos-section {
+	margin-top: 1.5rem;
+	padding: 0;
+}
+
+.toma-creditos-info {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+	gap: 1rem;
+	margin-top: 0.5rem;
+}
+
+.toma-creditos-item {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 0.8rem 1.2rem;
+	border-radius: 12px;
+	background: #f5f7fb;
+	border: 1px solid rgba(47, 79, 115, 0.15);
+	font-family: 'Poppins', sans-serif;
+}
+
+.toma-creditos-item--total {
+	background: #eef2f8;
+	border: 1px solid rgba(47, 79, 115, 0.25);
+	grid-column: 1 / -1;
+}
+
+.toma-creditos-label {
+	color: #3b4655;
+	font-weight: 500;
+	font-size: 0.95rem;
+}
+
+.toma-creditos-value {
+	color: #274a69;
+	font-weight: 700;
+	font-size: 1.1rem;
+	margin-left: 0.5rem;
+}
+
+.toma-creditos-item--total .toma-creditos-value {
+	color: #1a3a52;
+	font-size: 1.25rem;
+}
+
+.malla-progress {
+	margin: 1.2rem 0 0;
+	padding: 1rem;
+
+	&__body {
+		margin-top: 0.75rem; // ← espacio entre título y contenido
+		display: grid;
+		grid-template-columns: minmax(320px, 1fr) auto;
+		gap: 1.25rem;
+		align-items: center;
+	}
+
+	&__left {
+		min-width: 0;
+		.horario-section-title h3 {
+			margin: 0 0 0.45rem;
+			font-family: 'Poppins', sans-serif;
+			font-size: clamp(1.45rem, 1.12rem + 0.9vw, 1.95rem);
+			color: #141b25;
+			font-weight: 400;
+		}
+	}
+
+	&__right {
+		width: 220px;
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 0.55rem;
+	}
+
+	&__items { 
+		margin-top: 0.45rem;
+		display: grid;
+		grid-template-columns: repeat(2, minmax(140px, 1fr));
+		gap: 0.6rem;
+	}
+
+	&__item {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 0.6rem;
+		border-radius: 8px;
+		background: #eef2f8;
+		border: 1px solid rgba(47,79,115,0.06);
+		font-family: 'Poppins', sans-serif;
+		color: #123147;
+		font-weight: 600;
+	}
+}
+
+.malla-pie {
+	width: 180px;
+	height: 180px;
+	display: block;
+
+	.circular-chart {
+		width: 100%;
+		height: 100%;
+		transform: rotate(-90deg);
+	}
+
+	.circle-bg {
+		fill: none;
+		stroke: #edf1f4; /* light gray background segment */
+		stroke-width: 4.5;
+	}
+
+	.circle {
+		fill: none;
+		stroke: #28a745; /* green for completed */
+		stroke-width: 4.5;
+		stroke-linecap: round;
+		transition: stroke-dasharray 1s cubic-bezier(.22,.9,.3,1), stroke 0.6s ease;
+	}
+
+	.percentage {
+	text-anchor: middle;
+	fill: #123147;
+	transform: rotate(90deg);
+	transform-origin: center;
+	font-weight: 800;
+	}
+
+	/* Make the pie look like two-colored: green arc over gray background */
+}
+
+.malla-legend {
+	margin-top: 0;
+	display: flex;
+	gap: 0.7rem;
+	flex-wrap: wrap;
+	justify-content: center;
+	align-items: center;
+
+	.legend-item {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.45rem;
+		font-family: 'Poppins', sans-serif;
+		color: #123147;
+		font-weight: 600;
+	}
+
+	.legend-color {
+		width: 14px;
+		height: 14px;
+		border-radius: 3px;
+		display: inline-block;
+		border: 1px solid rgba(0,0,0,0.06);
+	}
+
+	.legend-approved { background: #2ecc71; }
+	.legend-remaining { background: #e6e9ec; }
+}
+
+@media (max-width: 880px) {
+	.malla-progress__body {
+		display: flex;
+		flex-direction: column;
+	}
+
+	.malla-progress__right {
+		margin-top: 0.5rem;
+		width: 100%;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+	}
+
+	.malla-pie { width: 140px; height: 140px; }
+	.malla-progress__items { grid-template-columns: 1fr; }
+}
+
+.horario-section-title h3 {
+	margin: 1rem 0 0;
+	font-family: 'Poppins', sans-serif;
+	font-size: clamp(1.45rem, 1.12rem + 0.9vw, 1.95rem);
+	color: #141b25;
+}
+
+@media (max-width: 860px) {
+	.horario-page {
+		margin-top: 1rem;
+	}
+
+	.toma-seleccion-container {
+		padding: 0.85rem;
+	}
+
+	.toma-seleccion-header {
+		align-items: flex-start;
+	}
+
+	.toma-creditos-badge {
+		width: 100%;
+	}
+
+	.horario-grid {
+		min-width: 920px;
+	}
+}

@@ -5,24 +5,34 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import java.time.OffsetDateTime;
 
+import com.easyschedule.backend.auth.models.User;
+import com.easyschedule.backend.academico.malla.model.MallaMateria;
+
 @Entity
-@Table(name = "estado_materia_estudiante")
+@Table(name = "estado_materia_estudiante", uniqueConstraints = {
+        @UniqueConstraint(name = "uq_estado_materia_estudiante", columnNames = { "user_id", "malla_materia_id" })
+})
 public class EstadoMateria {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
-    @Column(name = "malla_materia_id", nullable = false)
-    private Long mallaMateriaId;
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "malla_materia_id", nullable = false)
+    private MallaMateria mallaMateria;
 
-    @Column(nullable = false, length = 20)
+    @Column(name = "estado", nullable = false, length = 20)
     private String estado;
 
     @Column(name = "fecha_actualizacion", nullable = false)
@@ -31,9 +41,10 @@ public class EstadoMateria {
     public EstadoMateria() {
     }
 
-    public EstadoMateria(Long userId, Long mallaMateriaId, String estado) {
-        this.userId = userId;
-        this.mallaMateriaId = mallaMateriaId;
+    public EstadoMateria(Long id, User user, MallaMateria mallaMateria, String estado) {
+        this.id = id;
+        this.user = user;
+        this.mallaMateria = mallaMateria;
         this.estado = estado;
         this.fechaActualizacion = OffsetDateTime.now();
     }
@@ -46,20 +57,20 @@ public class EstadoMateria {
         this.id = id;
     }
 
-    public Long getUserId() {
-        return userId;
+    public User getUser() {
+        return user;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public void setUser(User user) {
+        this.user = user;
     }
 
-    public Long getMallaMateriaId() {
-        return mallaMateriaId;
+    public MallaMateria getMallaMateria() {
+        return mallaMateria;
     }
 
-    public void setMallaMateriaId(Long mallaMateriaId) {
-        this.mallaMateriaId = mallaMateriaId;
+    public void setMallaMateria(MallaMateria mallaMateria) {
+        this.mallaMateria = mallaMateria;
     }
 
     public String getEstado() {
