@@ -1,9 +1,10 @@
 import { NgFor, NgIf, NgClass } from '@angular/common';
-import { Component, OnDestroy, OnInit, HostListener } from '@angular/core';
+import { Component, OnDestroy, OnInit, HostListener, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { filter, firstValueFrom, Subscription } from 'rxjs';
+import { NgbPopover, NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { CarreraCatalogoItem, CarreraService } from '../../services/academico/carrera.service';
 import { EstadoMateriaService, EstadoMateriaItem, EstadoMateriaRequest } from '../../services/academico/estado-materia.service';
@@ -17,6 +18,9 @@ import { UniversidadCatalogoItem, UniversidadService } from '../../services/acad
 import { TomaSeleccionService } from '../../services/academico/toma-seleccion.service';
 import { OfertaDetalleResponse, OfertaMateriaSimple } from '../../services/academico/malla-catalogo.service';
 import { ToastService } from '../../core/services/toast.service';
+import { AuthSessionService } from '../../core/services/auth-session.service';
+import { PerfilService } from '../perfil/perfil.service';
+import { TourHintsService } from '../../services/tour-hints.service';
 
 type SeleccionStep = 'universidad' | 'carrera' | 'malla' | 'resumen';
 type EditMode = 'universidad' | 'malla' | null;
@@ -29,7 +33,7 @@ interface SeleccionSnapshot {
 
 @Component({
   selector: 'app-malla',
-  imports: [FormsModule, NgFor, NgIf, NgClass, TranslatePipe],
+  imports: [FormsModule, NgFor, NgIf, NgClass, TranslatePipe, NgbPopoverModule],
   templateUrl: './malla.html',
   styleUrl: './malla.scss',
 })
@@ -83,6 +87,12 @@ export class Malla implements OnInit, OnDestroy {
   protected selectedOfertaId: number | null = null;
   protected materiasSeleccionadas: Set<number> = new Set();
 
+  @ViewChild('popoverStep1') popoverStep1?: NgbPopover;
+  @ViewChild('popoverStep2') popoverStep2?: NgbPopover;
+  @ViewChild('popoverStep4') popoverStep4?: NgbPopover;
+
+  protected tourStep = 0;
+
   constructor(
     private readonly featureService: FeatureToggleService,
     private readonly universidadService: UniversidadService,
@@ -95,6 +105,9 @@ export class Malla implements OnInit, OnDestroy {
     private readonly tomaSeleccionService: TomaSeleccionService,
     private readonly translateService: TranslateService,
     private readonly toastService: ToastService,
+    private readonly authSessionService: AuthSessionService,
+    private readonly perfilService: PerfilService,
+    private readonly tourHintsService: TourHintsService,
   ) {}
 
   ngOnInit(): void {
@@ -654,9 +667,106 @@ export class Malla implements OnInit, OnDestroy {
       this.loadingMaterias = false;
       if (!this.loadMateriasError) {
         this.materiasLoadedForMallaId = mallaId;
+        this.iniciarTour();
       }
     }
   }
 
+  private getTourStorageKey(): string {
+    const username = this.authSessionService.getCurrentUsername();
+    return username ? `malla.tourCompleted.${username}` : 'malla.tourCompleted';
+  }
+
+  protected iniciarTour(): void {
+    const storageKey = this.getTourStorageKey();
+
+    // Migrar clave global antigua a clave por usuario (si existe)
+    const legacyKey = 'malla.tourCompleted';
+    if (localStorage.getItem(legacyKey) === 'true') {
+      // La clave vieja se elimina para no bloquear a otros usuarios
+      localStorage.removeItem(legacyKey);
+    }
+
+    // Verificar primero en localStorage (clave por usuario) para evitar flash
+    if (localStorage.getItem(storageKey) === 'true') {
+      return;
+    }
+
+    // Verificar en el backend (fuente de verdad, persiste entre dispositivos)
+    const username = this.authSessionService.getCurrentUsername();
+    if (username) {
+      this.perfilService.getPerfilByUsername(username).subscribe({
+        next: (perfil) => {
+          if (perfil.tourCompleted) {
+            localStorage.setItem(storageKey, 'true');
+            return;
+          }
+          this.lanzarTourConRetraso();
+        },
+        error: () => {
+          // Si falla la consulta, mostramos el tour de todas formas
+          this.lanzarTourConRetraso();
+        }
+      });
+    } else {
+      this.lanzarTourConRetraso();
+    }
+  }
+
+  private lanzarTourConRetraso(): void {
+    // Pequeno retraso para asegurar que los elementos del DOM esten listos
+    setTimeout(() => {
+      this.siguienteTour(1);
+    }, 800);
+  }
+
+  protected siguienteTour(step: number): void {
+    this.popoverStep1?.close();
+    this.popoverStep2?.close();
+    this.popoverStep4?.close();
+    this.tourHintsService.closeTomaMateriasPopover();
+
+    setTimeout(() => {
+      if (step === 1) this.popoverStep1?.open();
+      if (step === 2) this.popoverStep2?.open();
+      if (step === 3) this.tourHintsService.openTomaMateriasPopover();
+      if (step === 4) this.popoverStep4?.open();
+    }, 100);
+  }
+
+  protected finalizarTour(): void {
+    this.cerrarTodosLosPopovers();
+    localStorage.setItem(this.getTourStorageKey(), 'true');
+    this.persistirTourCompletado();
+  }
+
+  protected irATomaYCerrarTour(): void {
+    this.cerrarTodosLosPopovers();
+    localStorage.setItem(this.getTourStorageKey(), 'true');
+    this.persistirTourCompletado();
+    void this.router.navigate(['/toma-de-materias']);
+  }
+
+  protected noVolverAMostrarTour(): void {
+    this.cerrarTodosLosPopovers();
+    localStorage.setItem(this.getTourStorageKey(), 'true');
+    this.persistirTourCompletado();
+  }
+
+  private cerrarTodosLosPopovers(): void {
+    this.popoverStep1?.close();
+    this.popoverStep2?.close();
+    this.popoverStep4?.close();
+    this.tourHintsService.closeTomaMateriasPopover();
+  }
+
+  private persistirTourCompletado(): void {
+    const username = this.authSessionService.getCurrentUsername();
+    if (!username) return;
+    this.perfilService.completeTour(username).subscribe({
+      next: () => {},
+      error: () => {}
+    });
+  }
 
 }

@@ -35,6 +35,9 @@
     "aria": {
       "goHome": "Ir al inicio",
       "profile": "Ir al perfil"
+    },
+    "hints": {
+      "chooseMalla": "¡Elijamos tu Universidad y Carrera!"
     }
   },
   "home": {
@@ -280,6 +283,10 @@
     "readOnly": "Se actualiza según la malla.",
     "loading": "Cargando datos del perfil...",
     "avatarAlt": "Avatar del usuario",
+    "hints": {
+      "completeProfile": "Completa tu perfil para acceder a Malla y Toma de Materias",
+      "missingField": "Campo obligatorio para completar tu perfil"
+    },
     "fields": {
       "username": "Nombre de usuario",
       "nombre": "Nombre",
