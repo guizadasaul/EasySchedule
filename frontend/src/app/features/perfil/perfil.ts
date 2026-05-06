@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
-import { NgbDateStruct, NgbDatepickerModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbDateStruct, NgbDatepickerModule, NgbPopover, NgbPopoverModule } from '@ng-bootstrap/ng-bootstrap';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { firstValueFrom } from 'rxjs';
 
@@ -31,7 +31,7 @@ type PasswordChangeForm = FormGroup<{
 
 @Component({
   selector: 'app-perfil',
-  imports: [CommonModule, ReactiveFormsModule, NgbDatepickerModule, TranslatePipe],
+  imports: [CommonModule, ReactiveFormsModule, NgbDatepickerModule, TranslatePipe, NgbPopoverModule],
   templateUrl: './perfil.html',
   styleUrl: './perfil.scss',
 })
@@ -44,11 +44,20 @@ export class Perfil implements OnInit {
   protected errorKey = '';
   protected showIdentityConfirmModal = false;
   protected showChangePasswordModal = false;
+  protected showCurrentPassword = false;
+  protected showNewPassword = false;
+  protected showConfirmNewPassword = false;
   protected readonly fechaNacimientoMinDate: NgbDateStruct = { year: 1950, month: 1, day: 1 };
   protected readonly fechaNacimientoMaxDate: NgbDateStruct;
   protected readonly editForm: PerfilEditForm;
   protected readonly passwordForm: PasswordChangeForm;
   private pendingUpdatePayload: PerfilUpdateRequest | null = null;
+
+  @ViewChild('editBtnPopover') editBtnPopover?: NgbPopover;
+  @ViewChild('nombrePopover') nombrePopover?: NgbPopover;
+  @ViewChild('apellidoPopover') apellidoPopover?: NgbPopover;
+  @ViewChild('carnetPopover') carnetPopover?: NgbPopover;
+  @ViewChild('fechaPopover') fechaPopover?: NgbPopover;
 
   constructor(
     private readonly fb: FormBuilder,
@@ -104,6 +113,12 @@ export class Perfil implements OnInit {
         this.authSessionService.setCurrentUsername(perfilResponse.username);
         this.authSessionService.setProfileCompleted(Boolean(perfilResponse.profileCompleted));
         void this.sincronizarCamposAcademicos();
+
+        setTimeout(() => {
+          if (!this.perfil?.profileCompleted && this.editBtnPopover) {
+            this.editBtnPopover.open();
+          }
+        }, 300);
       },
       error: (error: { status?: number }) => {
         this.loading = false;
@@ -125,9 +140,20 @@ export class Perfil implements OnInit {
       return;
     }
 
+    if (this.editBtnPopover?.isOpen()) {
+      this.editBtnPopover.close();
+    }
+
     this.editMode = true;
     this.errorKey = '';
     this.cargarFormulario(this.perfil);
+
+    setTimeout(() => {
+      if (!this.editForm.controls.nombre.value) this.nombrePopover?.open();
+      if (!this.editForm.controls.apellido.value) this.apellidoPopover?.open();
+      if (!this.editForm.controls.carnetIdentidad.value) this.carnetPopover?.open();
+      if (!this.editForm.controls.fechaNacimiento.value) this.fechaPopover?.open();
+    }, 300);
   }
 
   protected esCampoSoloLectura(fieldName: string): boolean {
@@ -163,6 +189,12 @@ export class Perfil implements OnInit {
     if (this.perfil) {
       this.cargarFormulario(this.perfil);
     }
+
+    setTimeout(() => {
+      if (!this.perfil?.profileCompleted && this.editBtnPopover) {
+        this.editBtnPopover.open();
+      }
+    }, 300);
   }
 
   protected guardarEdicion(): void {
@@ -206,6 +238,9 @@ export class Perfil implements OnInit {
     });
     this.passwordForm.markAsPristine();
     this.passwordForm.markAsUntouched();
+    this.showCurrentPassword = false;
+    this.showNewPassword = false;
+    this.showConfirmNewPassword = false;
     this.showChangePasswordModal = true;
   }
 
@@ -266,6 +301,18 @@ export class Perfil implements OnInit {
         this.toastService.error('perfil.password.error.generic');
       },
     });
+  }
+
+  protected toggleCurrentPasswordVisibility(): void {
+    this.showCurrentPassword = !this.showCurrentPassword;
+  }
+
+  protected toggleNewPasswordVisibility(): void {
+    this.showNewPassword = !this.showNewPassword;
+  }
+
+  protected toggleConfirmNewPasswordVisibility(): void {
+    this.showConfirmNewPassword = !this.showConfirmNewPassword;
   }
 
   protected showPasswordMismatchError(): boolean {

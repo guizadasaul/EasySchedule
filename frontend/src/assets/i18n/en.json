@@ -35,6 +35,9 @@
     "aria": {
       "goHome": "Go to home",
       "profile": "Go to profile"
+    },
+    "hints": {
+      "chooseMalla": "Let's choose your University and Career!"
     }
   },
   "home": {
@@ -309,6 +312,10 @@
     "readOnly": "Updated according to the curriculum.",
     "loading": "Loading profile data...",
     "avatarAlt": "User avatar",
+    "hints": {
+      "completeProfile": "Complete your profile to access Curriculum and Course Selection",
+      "missingField": "Required field to complete your profile"
+    },
     "fields": {
       "username": "Username",
       "nombre": "First Name",
