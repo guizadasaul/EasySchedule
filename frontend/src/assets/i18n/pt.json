@@ -122,7 +122,8 @@
       "changeUniversidad": "Alterar universidade",
       "cancelChange": "Cancelar",
       "changeStatus": "Atualizar estado de matérias",
-      "uploadMalla": "Enviar nova grade curricular"
+      "uploadMalla": "Enviar nova grade curricular",
+      "changeStatusSingle": "Atualizar estado de matéria"
     },
     "import": {
       "eyebrow": "Importação de grade",

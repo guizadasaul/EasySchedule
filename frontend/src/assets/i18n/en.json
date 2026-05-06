@@ -123,7 +123,8 @@
       "changeUniversidad": "Change University",
       "cancelChange": "Cancel",
       "changeStatus": "Update course status",
-      "uploadMalla": "Upload new curriculum"
+      "uploadMalla": "Upload new curriculum",
+      "changeStatusSingle": "Update course status"
     },
     "import": {
       "eyebrow": "Curriculum import",
@@ -167,8 +168,6 @@
       "carreraRequired": "You must select a career.",
       "mallaRequired": "You must select a curriculum."
     },
-    "loadingCarreras": "Loading careers...",
-    "loadingMallas": "Loading curricula...",
     "steps": {
       "universidad": "University",
       "carrera": "Career",
